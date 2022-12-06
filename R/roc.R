@@ -6,13 +6,6 @@ roc <- function(){
 }
 
 
-#' Draw calibrate curve
-#'
-#' @export
-cal <- function(){
-
-}
-
 
 #' Draw DCA curve
 #'

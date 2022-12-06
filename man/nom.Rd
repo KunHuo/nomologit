@@ -6,23 +6,23 @@
 \usage{
 nom(
   data,
-  dependent = NULL,
-  independents = NULL,
+  outcome = NULL,
+  covariates = NULL,
   points.label = "Points",
   total.points.label = "Total points",
   funlabel = "Risk",
   maxscale = 100,
   xfrac = 0.35,
-  font.size = 11,
+  font.size = 12,
   ...
 )
 }
 \arguments{
 \item{data}{a data frame}
 
-\item{dependent}{dependent variable name.}
+\item{outcome}{dependent variable name.}
 
-\item{independents}{independent variable names.}
+\item{covariates}{independent variable names.}
 
 \item{points.label}{a character string giving the axis label for the points scale.}
 

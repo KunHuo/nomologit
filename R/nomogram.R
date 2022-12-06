@@ -1,8 +1,8 @@
 #' Draw a nomogram
 #'
 #' @param data a data frame
-#' @param dependent dependent variable name.
-#' @param independents independent variable names.
+#' @param outcome dependent variable name.
+#' @param covariates independent variable names.
 #' @param points.label a character string giving the axis label for the points scale.
 #' @param total.points.label a character string giving the axis label for the total points scale.
 #' @param funlabel label for fun axis.
@@ -13,23 +13,24 @@
 #'
 #' @export
 nom <- function(data,
-                     dependent = NULL,
-                     independents = NULL,
-                     points.label = "Points",
-                     total.points.label = "Total points",
-                     funlabel = "Risk",
-                     maxscale = 100,
-                     xfrac = 0.35,
-                     font.size = 11,
-                     ...){
+                outcome = NULL,
+                covariates = NULL,
+                points.label = "Points",
+                total.points.label = "Total points",
+                funlabel = "Risk",
+                maxscale = 100,
+                xfrac = 0.35,
+                font.size = 12,
+                ...){
 
   pos <- 1
   envir = as.environment(pos)
   assign("dddd", rms::datadist(data), envir = envir)
   options(datadist = "dddd")
 
-  model <- logistic(data = data, dependent = dependent, independents = independents)
-  nom <- rms::nomogram(model, fun = stats::plogis, lp = FALSE, funlabel = funlabel, maxscale = maxscale)
+  model <- logistic(data = data, dependent = outcome, independents = covariates)
+
+  nom <- rms::nomogram(model, fun = stats::plogis, lp = FALSE, funlabel = funlabel, maxscale = maxscale, ...)
 
   print(model)
 
@@ -45,5 +46,5 @@ nom <- function(data,
   plot(nom,
        xfrac = xfrac,
        points.label = points.label,
-       total.points.label = total.points.label, cex.var = font.size, cex.axis = font.size, ...)
+       total.points.label = total.points.label, cex.var = font.size, cex.axis = font.size)
 }

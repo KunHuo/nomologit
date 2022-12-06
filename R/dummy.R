@@ -65,7 +65,7 @@ dummy <- function(x,
   if(is.null(varnames)){
     varnames <- names(x)[sapply(x, function(i) is.factor(i) | is.character(i))]
   }else{
-    check_name(x, varnames)
+    # check_name(x, varnames)
   }
 
   if(length(varnames) == 0L){
