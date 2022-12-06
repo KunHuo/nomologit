@@ -6,6 +6,15 @@
 \usage{
 cal(data, outcome, covariates, newdata = NULL)
 }
+\arguments{
+\item{data}{data}
+
+\item{outcome}{outcome}
+
+\item{covariates}{covariates}
+
+\item{newdata}{newdata}
+}
 \description{
 Draw calibrate curve
 }

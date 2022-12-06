@@ -1,19 +1,24 @@
 #' Draw calibrate curve
 #'
+#' @param data data
+#' @param outcome outcome
+#' @param covariates covariates
+#' @param newdata newdata
+#'
 #' @export
 cal <- function(data, outcome, covariates, newdata = NULL){
 
    train  <- data[c(outcome, covariates)]
    dnames <- names(train)[sapply(train, \(x) is.factor(x) | is.character(x))][-1]
-   train  <- srpubr::dummy(train, varnames = dnames)
+   train  <- dummy(train, varnames = dnames)
 
    model <- logistic(data = train, dependent = outcome, independents = names(train)[-1])
 
    if(!is.null(newdata)){
      test <- newdata[c(outcome, covariates)]
-     test <- srpubr::dummy(test, varnames = dnames)
+     test <- dummy(test, varnames = dnames)
 
-     pred_f_validation <- predict(model, test)
+     pred_f_validation <- stats::predict(model, test)
 
      fit.vad <-
        rms::lrm(
@@ -33,5 +38,4 @@ cal <- function(data, outcome, covariates, newdata = NULL){
           ylab = "Actual probability",
           subtitles = FALSE)
    }
-
 }

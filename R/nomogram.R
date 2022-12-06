@@ -2,7 +2,7 @@
 #'
 #' @param data a data frame
 #' @param outcome dependent variable name.
-#' @param covariates independent variable names.
+#' @param predictors independent variable names.
 #' @param points.label a character string giving the axis label for the points scale.
 #' @param total.points.label a character string giving the axis label for the total points scale.
 #' @param funlabel label for fun axis.
@@ -14,7 +14,7 @@
 #' @export
 nom <- function(data,
                 outcome = NULL,
-                covariates = NULL,
+                predictors = NULL,
                 points.label = "Points",
                 total.points.label = "Total points",
                 funlabel = "Risk",
@@ -23,18 +23,32 @@ nom <- function(data,
                 font.size = 12,
                 ...){
 
+  UseMethod("nom")
+}
+
+
+#' @rdname nom
+#' @export
+nom.data.frame <- function(data,
+                           outcome = NULL,
+                           predictors = NULL,
+                           points.label = "Points",
+                           total.points.label = "Total points",
+                           funlabel = "Risk",
+                           maxscale = 100,
+                           xfrac = 0.35,
+                           font.size = 12,
+                           ...){
+
   pos <- 1
   envir = as.environment(pos)
   assign("dddd", rms::datadist(data), envir = envir)
   options(datadist = "dddd")
 
-  model <- logistic(data = data, dependent = outcome, independents = covariates)
+  model <- logistic(data = data, dependent = outcome, independents = predictors)
 
   nom <- rms::nomogram(model, fun = stats::plogis, lp = FALSE, funlabel = funlabel, maxscale = maxscale, ...)
 
-  print(model)
-
-  plot(rms::calibrate(model), xlab = "Predicted probability", ylab = "Actual probability", subtitles = FALSE)
 
   if(exists("dddd")){
     rm("dddd", inherits = TRUE, envir = parent.frame())

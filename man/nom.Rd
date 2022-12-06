@@ -2,12 +2,26 @@
 % Please edit documentation in R/nomogram.R
 \name{nom}
 \alias{nom}
+\alias{nom.data.frame}
 \title{Draw a nomogram}
 \usage{
 nom(
   data,
   outcome = NULL,
-  covariates = NULL,
+  predictors = NULL,
+  points.label = "Points",
+  total.points.label = "Total points",
+  funlabel = "Risk",
+  maxscale = 100,
+  xfrac = 0.35,
+  font.size = 12,
+  ...
+)
+
+\method{nom}{data.frame}(
+  data,
+  outcome = NULL,
+  predictors = NULL,
   points.label = "Points",
   total.points.label = "Total points",
   funlabel = "Risk",
@@ -22,7 +36,7 @@ nom(
 
 \item{outcome}{dependent variable name.}
 
-\item{covariates}{independent variable names.}
+\item{predictors}{independent variable names.}
 
 \item{points.label}{a character string giving the axis label for the points scale.}
 
