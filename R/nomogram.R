@@ -12,7 +12,7 @@
 #' @param ... settings of variables to use in constructing axes.
 #'
 #' @export
-nomogram <- function(data,
+nom <- function(data,
                      dependent = NULL,
                      independents = NULL,
                      points.label = "Points",

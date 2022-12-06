@@ -5,15 +5,18 @@ roc <- function(){
 
 }
 
+
 #' Draw calibrate curve
 #'
-calibrate <- function(){
+#' @export
+cal <- function(){
 
 }
 
 
 #' Draw DCA curve
 #'
+#' @export
 dca <- function(){
 
 }
