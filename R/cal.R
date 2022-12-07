@@ -13,14 +13,16 @@
 #' @param ... further arguments.
 #'
 #' @export
-cal <- function(data, outcome = NULL, predictors = NULL, newdata = NULL, B = 1000,  xlab = NULL, ylab = NULL, subtitles = FALSE, ...){
+cal <- function(data, outcome = NULL, predictors = NULL, newdata = NULL,
+                B = 1000,  xlab = NULL, ylab = NULL, subtitles = FALSE, ...){
   UseMethod("cal")
 }
 
 
 #' @rdname cal
 #' @export
-cal.data.frame <- function(data, outcome = NULL, predictors = NULL, newdata = NULL, B = 1000, xlab = NULL, ylab = NULL, subtitles = FALSE, ...){
+cal.data.frame <- function(data, outcome = NULL, predictors = NULL, newdata = NULL,
+                           B = 1000, xlab = NULL, ylab = NULL, subtitles = FALSE, ...){
 
   set.seed(1234)
 
@@ -68,7 +70,8 @@ cal.data.frame <- function(data, outcome = NULL, predictors = NULL, newdata = NU
 
 #' @rdname cal
 #' @export
-cal.nmtask <- function(data, outcome = NULL, predictors = NULL, newdata = NULL, B = 1000, xlab = NULL, ylab = NULL, subtitles = FALSE, ...){
+cal.nmtask <- function(data, outcome = NULL, predictors = NULL, newdata = NULL,
+                       B = 1000, xlab = NULL, ylab = NULL, subtitles = FALSE, ...){
 
   train.data <- data$train.data
 
