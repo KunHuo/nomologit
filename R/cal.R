@@ -27,8 +27,8 @@ cal.data.frame <- function(data, outcome = NULL, predictors = NULL, newdata = NU
   set.seed(1234)
 
   train  <- data[c(outcome, predictors)]
-  dnames <- names(train)[sapply(train, \(x) is.factor(x) | is.character(x))][-1]
-  train  <- dummy(train, varnames = dnames)
+  dnames <- names(train)[-1][sapply(train[-1], \(x) {is.factor(x) | is.character(x)})]
+  train  <- dummy.data.frame(train, varnames = dnames)
 
   model <- logistic(data = train, outcome = outcome, predictors = names(train)[-1])
 
@@ -43,7 +43,7 @@ cal.data.frame <- function(data, outcome = NULL, predictors = NULL, newdata = NU
 
   if(!is.null(newdata)){
     test <- newdata[c(outcome, predictors)]
-    test <- dummy(test, varnames = dnames)
+    test <- dummy.data.frame(test, varnames = dnames)
 
     pred_f_validation <- stats::predict(model, test)
 
@@ -60,10 +60,7 @@ cal.data.frame <- function(data, outcome = NULL, predictors = NULL, newdata = NU
          ylab = ylab,
          subtitles = subtitles)
   }else{
-    plot(rms::calibrate(model, B = B),
-         xlab = xlab,
-         ylab = ylab,
-         subtitles = subtitles)
+    rms::calibrate(model, B = B)
   }
 }
 
