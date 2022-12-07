@@ -50,6 +50,8 @@ nom.data.frame <- function(data,
 
   model <- logistic(data = data, outcome = outcome, predictors = predictors)
 
+  # print(model)
+
   if(is.null(fun.at)){
     nom <- rms::nomogram(model,
                          fun = stats::plogis,
