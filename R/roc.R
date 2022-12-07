@@ -158,13 +158,13 @@ gg_roc <- function(data,
     legends  <- sprintf("%s (%s)", names(roclist), auc.string)
     names(roclist) <- legends
   }
-
-  if(language == "zh"){
-    sysfonts::font_add("simsun", "simsun.ttc")
-    font.family <- "simsun"
-  }else{
-    font.family <- font.family
-  }
+#
+#   if(language == "zh"){
+#     sysfonts::font_add("simsun", "simsun.ttc")
+#     font.family <- "simsun"
+#   }else{
+#     font.family <- font.family
+#   }
 
   if(is.null(line.type)){
     aes <- c("colour")
