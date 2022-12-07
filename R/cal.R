@@ -1,41 +1,95 @@
 #' Draw calibrate curve
 #'
 #' @param data data
-#' @param outcome outcome
-#' @param covariates covariates
-#' @param newdata newdata
+#' @param outcome predict outcome.
+#' @param predictors predictors.
+#' @param newdata new data for verification.
+#' @param B  B is an upper limit on the number of resamples for which information
+#' is printed about which variables were selected in each model re-fit.
+#' @param xlab defaults to "Predicted x-units Survival" or to a suitable label for other models.
+#' @param ylab defaults to "Fraction Surviving x-units" or to a suitable label for other models.
+#' @param subtitles set to FALSE to suppress subtitles in plot describing method and for lrm and
+#' ols the mean absolute error and original sample size
+#' @param ... further arguments.
 #'
 #' @export
-cal <- function(data, outcome, covariates, newdata = NULL){
+cal <- function(data, outcome = NULL, predictors = NULL, newdata = NULL, B = 1000,  xlab = NULL, ylab = NULL, subtitles = FALSE, ...){
+  UseMethod("cal")
+}
 
-   train  <- data[c(outcome, covariates)]
-   dnames <- names(train)[sapply(train, \(x) is.factor(x) | is.character(x))][-1]
-   train  <- dummy(train, varnames = dnames)
 
-   model <- logistic(data = train, dependent = outcome, independents = names(train)[-1])
+#' @rdname cal
+#' @export
+cal.data.frame <- function(data, outcome = NULL, predictors = NULL, newdata = NULL, B = 1000, xlab = NULL, ylab = NULL, subtitles = FALSE, ...){
 
-   if(!is.null(newdata)){
-     test <- newdata[c(outcome, covariates)]
-     test <- dummy(test, varnames = dnames)
+  set.seed(1234)
 
-     pred_f_validation <- stats::predict(model, test)
+  train  <- data[c(outcome, predictors)]
+  dnames <- names(train)[sapply(train, \(x) is.factor(x) | is.character(x))][-1]
+  train  <- dummy(train, varnames = dnames)
 
-     fit.vad <-
-       rms::lrm(
-         test[[outcome]] ~ pred_f_validation,
-         data = test,
-         x = T,
-         y = T
-       )
+  model <- logistic(data = train, outcome = outcome, predictors = names(train)[-1])
 
-     plot(rms::calibrate(fit.vad),
-          xlab = "Predicted probability",
-          ylab = "Actual probability",
-          subtitles = FALSE)
-   }else{
-     plot(rms::calibrate(model),
-          xlab = "Predicted probability",
-          ylab = "Actual probability",
-          subtitles = FALSE)
-   }
+
+  if(is.null(xlab)){
+    xlab <- "Predicted probability"
+  }
+
+  if(is.null(ylab)){
+    ylab <- "Actual probability"
+  }
+
+  if(!is.null(newdata)){
+    test <- newdata[c(outcome, predictors)]
+    test <- dummy(test, varnames = dnames)
+
+    pred_f_validation <- stats::predict(model, test)
+
+    fit.vad <-
+      rms::lrm(
+        test[[outcome]] ~ pred_f_validation,
+        data = test,
+        x = T,
+        y = T
+      )
+
+    plot(rms::calibrate(fit.vad, B = B),
+         xlab = xlab,
+         ylab = ylab,
+         subtitles = subtitles)
+  }else{
+    plot(rms::calibrate(model, B = B),
+         xlab = xlab,
+         ylab = ylab,
+         subtitles = subtitles)
+  }
+}
+
+
+#' @rdname cal
+#' @export
+cal.nmtask <- function(data, outcome = NULL, predictors = NULL, newdata = NULL, B = 1000, xlab = NULL, ylab = NULL, subtitles = FALSE, ...){
+
+  train.data <- data$train.data
+
+  if(is.null(newdata)){
+    newdata  <- data$test.data
+  }
+
+  if(is.null(outcome)){
+    outcome <- data$outcome
+  }
+
+  if(is.null(predictors)){
+    predictors <- data$predictors
+  }
+
+  cal.data.frame(data = train.data,
+                 outcome = outcome,
+                 predictors = predictors,
+                 newdata = newdata,
+                 B = B,
+                 xlab = xlab,
+                 ylab = ylab,
+                 subtitles = subtitles, ...)
 }

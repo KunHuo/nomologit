@@ -2,18 +2,66 @@
 % Please edit documentation in R/cal.R
 \name{cal}
 \alias{cal}
+\alias{cal.data.frame}
+\alias{cal.nmtask}
 \title{Draw calibrate curve}
 \usage{
-cal(data, outcome, covariates, newdata = NULL)
+cal(
+  data,
+  outcome = NULL,
+  predictors = NULL,
+  newdata = NULL,
+  B = 1000,
+  xlab = NULL,
+  ylab = NULL,
+  subtitles = FALSE,
+  ...
+)
+
+\method{cal}{data.frame}(
+  data,
+  outcome = NULL,
+  predictors = NULL,
+  newdata = NULL,
+  B = 1000,
+  xlab = NULL,
+  ylab = NULL,
+  subtitles = FALSE,
+  ...
+)
+
+\method{cal}{nmtask}(
+  data,
+  outcome = NULL,
+  predictors = NULL,
+  newdata = NULL,
+  B = 1000,
+  xlab = NULL,
+  ylab = NULL,
+  subtitles = FALSE,
+  ...
+)
 }
 \arguments{
 \item{data}{data}
 
-\item{outcome}{outcome}
+\item{outcome}{predict outcome.}
 
-\item{covariates}{covariates}
+\item{predictors}{predictors.}
 
-\item{newdata}{newdata}
+\item{newdata}{new data for verification.}
+
+\item{B}{B is an upper limit on the number of resamples for which information
+is printed about which variables were selected in each model re-fit.}
+
+\item{xlab}{defaults to "Predicted x-units Survival" or to a suitable label for other models.}
+
+\item{ylab}{defaults to "Fraction Surviving x-units" or to a suitable label for other models.}
+
+\item{subtitles}{set to FALSE to suppress subtitles in plot describing method and for lrm and
+ols the mean absolute error and original sample size}
+
+\item{...}{further arguments.}
 }
 \description{
 Draw calibrate curve
