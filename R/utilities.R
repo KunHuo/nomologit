@@ -531,3 +531,37 @@ rownames_to_column <- function(data, varname = "term"){
   names(data)[1] <- varname
   data
 }
+
+
+reshape_long <- function(data,
+                         cols = names(data),
+                         names.to = ".name",
+                         values.to = ".value",
+                         add.id.col = FALSE,
+                         id.name = ".id",
+                         ...){
+
+  class(data) <- "data.frame"
+
+  if(is.numeric(cols)){
+    cols <- names(data)[cols]
+  }
+
+  cols <- select_variable(data, cols)
+
+  res <- stats::reshape(data,
+                        direction = "long",
+                        idvar = id.name,
+                        ids = as.character(1:nrow(data)),
+                        times   = cols,
+                        timevar = names.to,
+                        v.names = values.to,
+                        varying = list(cols))
+
+  if(add.id.col){
+    res <- relocate(res, variables = id.name, before = 1)
+  }else{
+    res <- res[, -which(names(res) == id.name), drop = FALSE]
+  }
+  tibble::as_tibble(res)
+}

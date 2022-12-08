@@ -2,7 +2,7 @@
 #'
 #' @param font.size font size, default 12,
 #' @param font.family font family, detault Times New Roman.
-#' @param axis.line.size axis line size, default 0.5.
+#' @param axis.line.size axis line size, default 0.25.
 #' @param axis.ticks.length axis ticks length, default 0.12.
 #' @param legend.key.size legend key size, dsfault 1.
 #' @param face.bold a logical, whether bold the title of axis, plot, strip, and legend, default FALSE.
@@ -18,7 +18,7 @@
 #' @keywords internal
 gg_theme_sci <- function(font.size = 12,
                       font.family = "serif",
-                      axis.line.size = 0.5,
+                      axis.line.size = 0.25,
                       axis.ticks.length = 0.12,
                       legend.key.size = 1.0,
                       face.bold = FALSE,
