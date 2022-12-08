@@ -15,6 +15,8 @@ cal(
   linesize = 0.5,
   linecolor = NULL,
   linelabel = NULL,
+  xlab = NULL,
+  ylab = NULL,
   ...
 )
 
@@ -27,6 +29,8 @@ cal(
   linesize = 0.5,
   linecolor = NULL,
   linelabel = NULL,
+  xlab = NULL,
+  ylab = NULL,
   ...
 )
 
@@ -39,6 +43,8 @@ cal(
   linesize = 0.5,
   linecolor = NULL,
   linelabel = NULL,
+  xlab = NULL,
+  ylab = NULL,
   ...
 )
 }
@@ -59,6 +65,10 @@ is printed about which variables were selected in each model re-fit, default 100
 \item{linecolor}{line color, the length must be 3.}
 
 \item{linelabel}{line label,the length must be 3.}
+
+\item{xlab}{label for X axis.}
+
+\item{ylab}{label for Y axis.}
 
 \item{...}{further arguments.}
 }

@@ -18,7 +18,6 @@ roc <- function(data, outcome = NULL, predictors = NULL, newdata = NULL, xlab = 
 #' @export
 roc.data.frame <- function(data, outcome = NULL, predictors = NULL, newdata = NULL,  xlab = NULL, ylab = NULL, ...){
 
-
   if(is.null(xlab)){
     xlab <- "1 - Specificity"
   }

@@ -9,17 +9,37 @@
 #' @param linesize line size, default 0.25.
 #' @param linecolor line color, the length must be 3.
 #' @param linelabel line label,the length must be 3.
+#' @param xlab label for X axis.
+#' @param ylab label for Y axis.
 #' @param ... further arguments.
 #'
 #' @export
-cal <- function(data, outcome = NULL, predictors = NULL, newdata = NULL, B = 1000,linesize = 0.5, linecolor = NULL, linelabel = NULL, ...){
+cal <- function(data,
+                outcome = NULL,
+                predictors = NULL,
+                newdata = NULL,
+                B = 1000,
+                linesize = 0.5,
+                linecolor = NULL,
+                linelabel = NULL,
+                xlab = NULL,
+                ylab = NULL, ...){
   UseMethod("cal")
 }
 
 
 #' @rdname cal
 #' @export
-cal.data.frame <- function(data, outcome = NULL, predictors = NULL, newdata = NULL, B = 1000, linesize = 0.5, linecolor = NULL, linelabel = NULL, ...){
+cal.data.frame <- function(data,
+                           outcome = NULL,
+                           predictors = NULL,
+                           newdata = NULL,
+                           B = 1000,
+                           linesize = 0.5,
+                           linecolor = NULL,
+                           linelabel = NULL,
+                           xlab = NULL,
+                           ylab = NULL,...){
 
   set.seed(1234)
 
@@ -29,28 +49,49 @@ cal.data.frame <- function(data, outcome = NULL, predictors = NULL, newdata = NU
 
   model <- logistic(data = train, outcome = outcome, predictors = names(train)[-1])
 
+  A <- plot_cal(rms::calibrate(model, B = B),
+                linesize = linesize,
+                linecolor = linecolor,
+                linelabel = linelabel,
+                xlab = xlab,
+                ylab = ylab, ...)
+
   if(!is.null(newdata)){
     test <- newdata[c(outcome, predictors)]
     test <- dummy.data.frame(test, varnames = dnames)
     pred_f_validation <- stats::predict(model, test)
     fit.vad <- rms::lrm(test[[outcome]] ~ pred_f_validation, data = test, x = T, y = T)
-    plot_cal(rms::calibrate(fit.vad, B = B),
+
+    B <- plot_cal(rms::calibrate(fit.vad, B = B),
              linesize = linesize,
              linecolor = linecolor,
-             linelabel = linelabel)
+             linelabel = linelabel,
+             xlab = xlab,
+             ylab = ylab, ...)
+
+    A <- A + gg_tags("A")
+    B <- B + gg_tags("B")
+
+    patchwork::wrap_plots(A, B)
 
   }else{
-    plot_cal(rms::calibrate(model, B = B),
-             linesize = linesize,
-             linecolor = linecolor,
-             linelabel = linelabel)
+    A
   }
 }
 
 
 #' @rdname cal
 #' @export
-cal.nmtask <- function(data, outcome = NULL, predictors = NULL, newdata = NULL, B = 1000, linesize = 0.5, linecolor = NULL, linelabel = NULL, ...){
+cal.nmtask <- function(data,
+                       outcome = NULL,
+                       predictors = NULL,
+                       newdata = NULL,
+                       B = 1000,
+                       linesize = 0.5,
+                       linecolor = NULL,
+                       linelabel = NULL,
+                       xlab = NULL,
+                       ylab = NULL, ...){
 
   train.data <- data$train.data
 
@@ -76,7 +117,7 @@ cal.nmtask <- function(data, outcome = NULL, predictors = NULL, newdata = NULL, 
 }
 
 
-plot_cal <- function(cal, linesize = 0.5, linecolor = NULL, linelabel = NULL, ...){
+plot_cal <- function(cal, linesize = 0.5, linecolor = NULL, linelabel = NULL, xlab = NULL, ylab = NULL, ...){
 
   if(is.null(linecolor)){
     linecolor <- c("#374E55FF", "#00A1D5FF", "#DF8F44FF")
@@ -88,6 +129,14 @@ plot_cal <- function(cal, linesize = 0.5, linecolor = NULL, linelabel = NULL, ..
     linelabel <- c("Ideal", "Apparent", "Bias-corrected")
   }else{
     stopifnot(length(linelabel) == 3L)
+  }
+
+  if(is.null(xlab)){
+    xlab <- "Predicted probability"
+  }
+
+  if(is.null(ylab)){
+    ylab <- "Actual probability"
   }
 
   plotdata <- cal[, 1:3]
@@ -111,11 +160,11 @@ plot_cal <- function(cal, linesize = 0.5, linecolor = NULL, linelabel = NULL, ..
     ggplot2::geom_line(ggplot2::aes_string(x = "predy", y = ".value", color = ".name", linetype = ".name"), size = linesize) +
     ggplot2::scale_color_manual(values = linecolor) +
     ggplot2::scale_linetype_manual(values = c(3, 2, 1)) +
-    gg_theme_sci(legend.key.size = 1.2) +
+    gg_theme_sci(legend.key.size = 1.2, ...) +
     gg_legend_position(c(1, 0)) +
     gg_delete_legend_title() +
-    gg_xlab("Predicted probability") +
-    gg_ylab("Actual probability") +
+    gg_xlab(xlab) +
+    gg_ylab(ylab) +
     ggplot2::scale_x_continuous(breaks = axis, limits = c(min(axis), max(axis)), expand = c(0, 0)) +
     ggplot2::scale_y_continuous(breaks = axis, limits = c(min(axis), max(axis)), expand = c(0, 0))
 }
