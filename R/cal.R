@@ -78,7 +78,6 @@ cal.nmtask <- function(data, outcome = NULL, predictors = NULL, newdata = NULL, 
 
 plot_cal <- function(cal, linesize = 0.5, linecolor = NULL, linelabel = NULL, ...){
 
-
   if(is.null(linecolor)){
     linecolor <- c("#374E55FF", "#00A1D5FF", "#DF8F44FF")
   }else{
