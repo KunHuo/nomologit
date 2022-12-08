@@ -29,19 +29,9 @@ cal.data.frame <- function(data, outcome = NULL, predictors = NULL, newdata = NU
   if(!is.null(newdata)){
     test <- newdata[c(outcome, predictors)]
     test <- dummy.data.frame(test, varnames = dnames)
-
     pred_f_validation <- stats::predict(model, test)
-
-    fit.vad <-
-      rms::lrm(
-        test[[outcome]] ~ pred_f_validation,
-        data = test,
-        x = T,
-        y = T
-      )
+    fit.vad <- rms::lrm(test[[outcome]] ~ pred_f_validation, data = test, x = T, y = T)
     plot_cal(rms::calibrate(fit.vad, B = B))
-
-
   }else{
     plot_cal(rms::calibrate(model, B = B))
   }
