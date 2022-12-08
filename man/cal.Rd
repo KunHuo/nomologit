@@ -6,11 +6,41 @@
 \alias{cal.nmtask}
 \title{Draw calibrate curve}
 \usage{
-cal(data, outcome = NULL, predictors = NULL, newdata = NULL, B = 1000, ...)
+cal(
+  data,
+  outcome = NULL,
+  predictors = NULL,
+  newdata = NULL,
+  B = 1000,
+  linesize = 0.5,
+  linecolor = NULL,
+  linelabel = NULL,
+  ...
+)
 
-\method{cal}{data.frame}(data, outcome = NULL, predictors = NULL, newdata = NULL, B = 1000, ...)
+\method{cal}{data.frame}(
+  data,
+  outcome = NULL,
+  predictors = NULL,
+  newdata = NULL,
+  B = 1000,
+  linesize = 0.5,
+  linecolor = NULL,
+  linelabel = NULL,
+  ...
+)
 
-\method{cal}{nmtask}(data, outcome = NULL, predictors = NULL, newdata = NULL, B = 1000, ...)
+\method{cal}{nmtask}(
+  data,
+  outcome = NULL,
+  predictors = NULL,
+  newdata = NULL,
+  B = 1000,
+  linesize = 0.5,
+  linecolor = NULL,
+  linelabel = NULL,
+  ...
+)
 }
 \arguments{
 \item{data}{data}
@@ -22,7 +52,13 @@ cal(data, outcome = NULL, predictors = NULL, newdata = NULL, B = 1000, ...)
 \item{newdata}{new data for verification.}
 
 \item{B}{B is an upper limit on the number of resamples for which information
-is printed about which variables were selected in each model re-fit.}
+is printed about which variables were selected in each model re-fit, default 1000.}
+
+\item{linesize}{line size, default 0.25.}
+
+\item{linecolor}{line color, the length must be 3.}
+
+\item{linelabel}{line label,the length must be 3.}
 
 \item{...}{further arguments.}
 }
