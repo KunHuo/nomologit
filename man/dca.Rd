@@ -13,6 +13,9 @@ dca(
   newdata = NULL,
   B = 1000,
   thresholds = seq(0, 1, by = 0.01),
+  linesize = 0.5,
+  linecolor = NULL,
+  linelabel = NULL,
   xlab = NULL,
   ylab = NULL,
   ...
@@ -25,6 +28,9 @@ dca(
   newdata = NULL,
   B = 1000,
   thresholds = seq(0, 1, by = 0.01),
+  linesize = 0.5,
+  linecolor = NULL,
+  linelabel = NULL,
   xlab = NULL,
   ylab = NULL,
   ...
@@ -37,6 +43,9 @@ dca(
   newdata = NULL,
   B = 1000,
   thresholds = seq(0, 1, by = 0.01),
+  linesize = 0.5,
+  linecolor = NULL,
+  linelabel = NULL,
   xlab = NULL,
   ylab = NULL,
   ...
@@ -55,9 +64,15 @@ dca(
 
 \item{thresholds}{thresholds.}
 
-\item{xlab}{defaults to "Predicted x-units Survival" or to a suitable label for other models.}
+\item{linesize}{line size, default 0.25.}
 
-\item{ylab}{defaults to "Fraction Surviving x-units" or to a suitable label for other models.}
+\item{linecolor}{line color, the length must be 3.}
+
+\item{linelabel}{line label,the length must be 3.}
+
+\item{xlab}{label for X axis.}
+
+\item{ylab}{label for Y axis.}
 
 \item{...}{further arguments.}
 }
