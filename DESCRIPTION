@@ -16,5 +16,6 @@ Imports:
     patchwork,
     pROC,
     R.utils,
+    rmda,
     rms,
     tibble
