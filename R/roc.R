@@ -59,9 +59,12 @@ roc.data.frame <- function(data, outcome = NULL, predictors = NULL, newdata = NU
 
     if(filename == ""){
       print_booktabs(perA)
+      cat("\n")
     }else{
       write_docx(perA, path = filename)
     }
+
+    cat("Figure: ROC curves of the nomogram for training set.\n")
 
     plotA
   }else{
@@ -84,9 +87,13 @@ roc.data.frame <- function(data, outcome = NULL, predictors = NULL, newdata = NU
     attr(per, "note") <- attr(perB, "note")
     if(filename == ""){
       print_booktabs(per)
+
+      cat("\n")
     }else{
       write_docx(per, path = filename)
     }
+
+    cat("Figure: ROC curves of the nomogram for training set (A) and validation set (B).\n")
 
     plotB <- gg_roc(data = newdata,
                     outcome = outcome,

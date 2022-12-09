@@ -19,6 +19,7 @@
 #' @param fun.at function values to label on axis.
 #' @param show.points show points, default FALSE..
 #' @param show.model show model, default FALSE.
+#' @param show.explain explain the figure, default TRUE.
 #' @param ... settings of variables to use in constructing axes.
 #'
 #' @export
@@ -34,6 +35,7 @@ nom <- function(data,
                 fun.at = NULL,
                 show.points = FALSE,
                 show.model = FALSE,
+                show.explain = TRUE,
                 ...){
 
   UseMethod("nom")
@@ -54,6 +56,7 @@ nom.data.frame <- function(data,
                            fun.at = NULL,
                            show.points = FALSE,
                            show.model = FALSE,
+                           show.explain = TRUE,
                            ...){
 
   pos <- 1
@@ -95,7 +98,7 @@ nom.data.frame <- function(data,
     suppressWarnings(print(nom))
   }
 
-  if(TRUE){
+  if(show.explain){
     cat(sprintf("Figure: Nomogram of risk model for predicting %s.\n", outcome))
     cat("The nomogram can be interpreted as follows: (1) for each variable, draw a straight line up to the points axis to determine the points for that variable, (2) repeat this process for each variable, (3) add the points for all variables and locate the sum on the total points axis, and (4) draw a straight line from total points down to risk.")
   }
@@ -125,6 +128,7 @@ nom.nmtask <- function(data,
                         fun.at = NULL,
                         show.points = FALSE,
                         show.model = FALSE,
+                        show.explain = TRUE,
                         ...){
 
   train.data <- data$train.data
@@ -147,7 +151,8 @@ nom.nmtask <- function(data,
                  xfrac = xfrac,
                  font.size = font.size,
                  fun.at = fun.at,
-                 show.points = FALSE,
-                 show.model = FALSE,
+                 show.points = show.points,
+                 show.model = show.model,
+                 show.explain = show.explain,
                  ...)
 }

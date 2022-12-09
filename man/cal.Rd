@@ -17,6 +17,7 @@ cal(
   linelabel = NULL,
   xlab = NULL,
   ylab = NULL,
+  show.explain = TRUE,
   ...
 )
 
@@ -31,6 +32,7 @@ cal(
   linelabel = NULL,
   xlab = NULL,
   ylab = NULL,
+  show.explain = TRUE,
   ...
 )
 
@@ -45,6 +47,7 @@ cal(
   linelabel = NULL,
   xlab = NULL,
   ylab = NULL,
+  show.explain = TRUE,
   ...
 )
 }
@@ -70,8 +73,14 @@ is printed about which variables were selected in each model re-fit, default 100
 
 \item{ylab}{label for Y axis.}
 
+\item{show.explain}{explain the figure, default TRUE.}
+
 \item{...}{further arguments.}
 }
 \description{
-Draw calibrate curve
+Calibration was quantified by comparing the actual observed progression with
+the model-predicted progression, and the results were graphically evaluated
+as calibration curves. Perfect calibration would be exhibited by a direct
+alignment between the actual observation and nomogram prediction probability
+along the 45 degree diagonal line.
 }

@@ -1,5 +1,12 @@
 #' Draw calibrate curve
 #'
+#' @description
+#' Calibration was quantified by comparing the actual observed progression with
+#' the model-predicted progression, and the results were graphically evaluated
+#' as calibration curves. Perfect calibration would be exhibited by a direct
+#' alignment between the actual observation and nomogram prediction probability
+#' along the 45 degree diagonal line.
+#'
 #' @param data data
 #' @param outcome predict outcome.
 #' @param predictors predictors.
@@ -11,6 +18,7 @@
 #' @param linelabel line label,the length must be 3.
 #' @param xlab label for X axis.
 #' @param ylab label for Y axis.
+#' @param show.explain explain the figure, default TRUE.
 #' @param ... further arguments.
 #'
 #' @export
@@ -23,7 +31,8 @@ cal <- function(data,
                 linecolor = NULL,
                 linelabel = NULL,
                 xlab = NULL,
-                ylab = NULL, ...){
+                ylab = NULL,
+                show.explain = TRUE,...){
   UseMethod("cal")
 }
 
@@ -39,7 +48,8 @@ cal.data.frame <- function(data,
                            linecolor = NULL,
                            linelabel = NULL,
                            xlab = NULL,
-                           ylab = NULL,...){
+                           ylab = NULL,
+                           show.explain = TRUE, ...){
 
   train  <- data[c(outcome, predictors)]
   dnames <- names(train)[-1][sapply(train[-1], \(x) {is.factor(x) | is.character(x)})]
@@ -53,6 +63,8 @@ cal.data.frame <- function(data,
                 linelabel = linelabel,
                 xlab = xlab,
                 ylab = ylab, ...)
+
+  explain <- sprintf("The gray line represents the ideal nomogram, the blue line represents the observed nomogram, and the orange line represents the corrected observed nomogram with %d bootstrap resamples. The predicted probability of risk by the nomogram is projected onto the x-axis, and the actual risk is projected onto the y-axis.", B)
 
   if(!is.null(newdata)){
     test <- newdata[c(outcome, predictors)]
@@ -70,9 +82,18 @@ cal.data.frame <- function(data,
     A <- A + gg_tags("A")
     B <- B + gg_tags("B")
 
+    if(show.explain){
+      cat("Figure: Calibration plots of the nomogram for training set (A) and validation set (B).\n")
+      cat(explain)
+    }
+
     patchwork::wrap_plots(A, B)
 
   }else{
+    if(show.explain){
+      cat("Figure: Calibration plots of the nomogram for training set.\n")
+      cat(explain)
+    }
     A
   }
 }
@@ -89,7 +110,8 @@ cal.nmtask <- function(data,
                        linecolor = NULL,
                        linelabel = NULL,
                        xlab = NULL,
-                       ylab = NULL, ...){
+                       ylab = NULL,
+                       show.explain = TRUE, ...){
 
   train.data <- data$train.data
 
@@ -111,7 +133,8 @@ cal.nmtask <- function(data,
                  newdata = newdata,
                  B = B,
                  xlab = xlab,
-                 ylab = ylab, ...)
+                 ylab = ylab,
+                 show.explain = show.explain, ...)
 }
 
 

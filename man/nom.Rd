@@ -19,6 +19,7 @@ nom(
   fun.at = NULL,
   show.points = FALSE,
   show.model = FALSE,
+  show.explain = TRUE,
   ...
 )
 
@@ -35,6 +36,7 @@ nom(
   fun.at = NULL,
   show.points = FALSE,
   show.model = FALSE,
+  show.explain = TRUE,
   ...
 )
 
@@ -51,6 +53,7 @@ nom(
   fun.at = NULL,
   show.points = FALSE,
   show.model = FALSE,
+  show.explain = TRUE,
   ...
 )
 }
@@ -78,6 +81,8 @@ nom(
 \item{show.points}{show points, default FALSE..}
 
 \item{show.model}{show model, default FALSE.}
+
+\item{show.explain}{explain the figure, default TRUE.}
 
 \item{...}{settings of variables to use in constructing axes.}
 }
