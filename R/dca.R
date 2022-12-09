@@ -27,6 +27,8 @@ dca.data.frame <- function(data, outcome = NULL, predictors = NULL, newdata = NU
                            B = 1000, thresholds = seq(0, 1, by = 0.01),
                            linesize = 0.5, linecolor = NULL, linelabel = NULL, xlab = NULL, ylab = NULL, ...){
 
+  options( warn = -1)
+
   data[[outcome]] <- as.numeric(as.factor(data[[outcome]])) - 1
   frm <- paste(predictors, collapse = " + ")
   frm <- paste(outcome, frm, sep = " ~ ")
@@ -35,6 +37,7 @@ dca.data.frame <- function(data, outcome = NULL, predictors = NULL, newdata = NU
   dcaA <- plot_dca(fitA, linesize = linesize, linecolor = linecolor, xlab = xlab, ylab = ylab)
 
   if(is.null(newdata)){
+    cat("Figure: Decision curves of the nomogram for training set.\n")
     dcaA
   }else{
     newdata[[outcome]] <- as.numeric(as.factor(newdata[[outcome]])) - 1
@@ -50,7 +53,8 @@ dca.data.frame <- function(data, outcome = NULL, predictors = NULL, newdata = NU
     dcaA <- dcaA + gg_tags("A")
     dcaB <- dcaB + gg_tags("B")
 
-    patchwork::wrap_plots(dcaA, dcaB)
+    cat("Figure: Decision curves of the nomogram for training set (A) and validation set (B).\n")
+    suppressMessages(patchwork::wrap_plots(dcaA, dcaB))
   }
 
 }
@@ -124,7 +128,7 @@ plot_dca <- function(fit, linesize = 0.5, linecolor = NULL, linelabel = NULL, xl
     ggplot2::scale_x_continuous(breaks = seq(0, 1, 0.2), limits = c(0, 1), expand = c(0, 0)) +
     ggplot2::scale_y_continuous(breaks = seq(-0.2, 1, 0.2), limits = c(-0.2, 1), expand = c(0, 0)) +
     ggplot2::scale_color_manual(values = linecolor) +
-    ggplot2::scale_linetype_manual(values = c(1, 1, 2)) +
+    ggplot2::scale_linetype_manual(values = c(1, 2, 3)) +
     gg_legend_position(c(1, 1)) +
     gg_delete_legend_title() +
     gg_xlab(xlab) +
