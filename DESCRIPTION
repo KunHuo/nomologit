@@ -4,7 +4,7 @@ Title: Nomogram for logistic regression
 Version: 0.1.1
 Author: Rongrui Huo
 Maintainer: Rongrui Huo <huorongrui@sr.gxmu.edu.cn>
-Description: Simply draw the nomogram of logistic regression and conduct internal and external verification, including ROC curve, calibration curve and decision curve.
+Description: Simply draw the nomogram of logistic regression and conduct internal and external verification, including ROC curve, calibration curve, decision curve, and SHAP.
 License: GPL (>= 3)
 Encoding: UTF-8
 LazyData: true
