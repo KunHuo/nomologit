@@ -17,6 +17,8 @@ nom(
   xfrac = 0.35,
   font.size = 12,
   fun.at = NULL,
+  show.points = FALSE,
+  show.model = FALSE,
   ...
 )
 
@@ -31,6 +33,8 @@ nom(
   xfrac = 0.35,
   font.size = 12,
   fun.at = NULL,
+  show.points = FALSE,
+  show.model = FALSE,
   ...
 )
 
@@ -45,6 +49,8 @@ nom(
   xfrac = 0.35,
   font.size = 12,
   fun.at = NULL,
+  show.points = FALSE,
+  show.model = FALSE,
   ...
 )
 }
@@ -69,8 +75,16 @@ nom(
 
 \item{fun.at}{function values to label on axis.}
 
+\item{show.points}{show points, default FALSE..}
+
+\item{show.model}{show model, default FALSE.}
+
 \item{...}{settings of variables to use in constructing axes.}
 }
 \description{
-Draw a nomogram
+The nomogram can be interpreted as follows: (1) for each  variable,
+draw a straight line up to the points axis to determine the points for that
+variable, (2) repeat this process for each variable, (3) add the points for
+all variables and locate the sum on the total points axis, and (4) draw a
+straight line from total points down to risk.
 }

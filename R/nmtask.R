@@ -12,9 +12,14 @@ nmtask <- function(train.data = NULL, test.data = NULL, outcome = NULL, predicto
   check_name(train.data, outcome)
   check_name(train.data, predictors)
 
+  DNAMETRAIN <- deparse(substitute(train.data))
+
   if(!is.null(test.data)){
     check_name(test.data, outcome)
     check_name(test.data, predictors)
+    DNAMETEST  <- deparse(substitute(test.data))
+  }else{
+    DNAMETEST  <- ""
   }
 
   if(is.null(predictors)){
@@ -25,6 +30,8 @@ nmtask <- function(train.data = NULL, test.data = NULL, outcome = NULL, predicto
 
   out <- list(train.data = train.data,
        test.data  = test.data,
+       DNAMETRAIN = DNAMETRAIN,
+       DNAMETEST = DNAMETEST,
        outcome    = outcome,
        predictors = predictors)
 

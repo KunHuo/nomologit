@@ -1,5 +1,12 @@
 #' Draw a nomogram
 #'
+#' @description
+#' The nomogram can be interpreted as follows: (1) for each  variable,
+#' draw a straight line up to the points axis to determine the points for that
+#' variable, (2) repeat this process for each variable, (3) add the points for
+#' all variables and locate the sum on the total points axis, and (4) draw a
+#' straight line from total points down to risk.
+#'
 #' @param data a data frame
 #' @param outcome predict outcome.
 #' @param predictors predictors.
@@ -10,6 +17,8 @@
 #' @param xfrac fraction of horizontal plot to set aside for axis titles.
 #' @param font.size font size.
 #' @param fun.at function values to label on axis.
+#' @param show.points show points, default FALSE..
+#' @param show.model show model, default FALSE.
 #' @param ... settings of variables to use in constructing axes.
 #'
 #' @export
@@ -23,6 +32,8 @@ nom <- function(data,
                 xfrac = 0.35,
                 font.size = 12,
                 fun.at = NULL,
+                show.points = FALSE,
+                show.model = FALSE,
                 ...){
 
   UseMethod("nom")
@@ -41,6 +52,8 @@ nom.data.frame <- function(data,
                            xfrac = 0.35,
                            font.size = 12,
                            fun.at = NULL,
+                           show.points = FALSE,
+                           show.model = FALSE,
                            ...){
 
   pos <- 1
@@ -50,7 +63,9 @@ nom.data.frame <- function(data,
 
   model <- logistic(data = data, outcome = outcome, predictors = predictors)
 
-  # print(model)
+  if(show.model){
+    print(model)
+  }
 
   if(is.null(fun.at)){
     nom <- rms::nomogram(model,
@@ -76,7 +91,14 @@ nom.data.frame <- function(data,
 
   font.size <- font.size * 0.0834
 
-  suppressWarnings(print(nom))
+  if(show.points){
+    suppressWarnings(print(nom))
+  }
+
+  if(TRUE){
+    cat(sprintf("Figure: Nomogram of risk model for predicting %s.\n", outcome))
+    cat("The nomogram can be interpreted as follows: (1) for each variable, draw a straight line up to the points axis to determine the points for that variable, (2) repeat this process for each variable, (3) add the points for all variables and locate the sum on the total points axis, and (4) draw a straight line from total points down to risk.")
+  }
 
   plot(nom,
        xfrac = xfrac,
@@ -101,6 +123,8 @@ nom.nmtask <- function(data,
                         xfrac = 0.35,
                         font.size = 12,
                         fun.at = NULL,
+                        show.points = FALSE,
+                        show.model = FALSE,
                         ...){
 
   train.data <- data$train.data
@@ -123,5 +147,7 @@ nom.nmtask <- function(data,
                  xfrac = xfrac,
                  font.size = font.size,
                  fun.at = fun.at,
+                 show.points = FALSE,
+                 show.model = FALSE,
                  ...)
 }
