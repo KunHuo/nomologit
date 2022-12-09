@@ -53,6 +53,8 @@ dca(
 
 \item{B}{Number of bootstrap replicates to use to calculate confidence intervals (default 1000).}
 
+\item{thresholds}{thresholds.}
+
 \item{xlab}{defaults to "Predicted x-units Survival" or to a suitable label for other models.}
 
 \item{ylab}{defaults to "Fraction Surviving x-units" or to a suitable label for other models.}

@@ -11,8 +11,11 @@ roc(
   outcome = NULL,
   predictors = NULL,
   newdata = NULL,
+  linesize = 0.5,
+  linecolor = NULL,
   xlab = NULL,
   ylab = NULL,
+  filename = "",
   ...
 )
 
@@ -21,8 +24,11 @@ roc(
   outcome = NULL,
   predictors = NULL,
   newdata = NULL,
+  linesize = 0.5,
+  linecolor = NULL,
   xlab = NULL,
   ylab = NULL,
+  filename = "",
   ...
 )
 
@@ -31,8 +37,11 @@ roc(
   outcome = NULL,
   predictors = NULL,
   newdata = NULL,
+  linesize = 0.5,
+  linecolor = NULL,
   xlab = NULL,
   ylab = NULL,
+  filename = "",
   ...
 )
 }
@@ -46,9 +55,15 @@ roc(
 \item{newdata}{new data for verification.
 is printed about which variables were selected in each model re-fit.}
 
-\item{xlab}{defaults to "Predicted x-units Survival" or to a suitable label for other models.}
+\item{linesize}{line size, default 0.25.}
 
-\item{ylab}{defaults to "Fraction Surviving x-units" or to a suitable label for other models.}
+\item{linecolor}{line color.}
+
+\item{xlab}{label for X axis.}
+
+\item{ylab}{label for Y axis.}
+
+\item{filename}{file name to save performance metrics.}
 
 \item{...}{further arguments.}
 }

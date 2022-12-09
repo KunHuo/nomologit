@@ -4,19 +4,22 @@
 #' @param predictors predictors.
 #' @param newdata new data for verification.
 #' is printed about which variables were selected in each model re-fit.
-#' @param xlab defaults to "Predicted x-units Survival" or to a suitable label for other models.
-#' @param ylab defaults to "Fraction Surviving x-units" or to a suitable label for other models.
+#' @param linesize line size, default 0.25.
+#' @param linecolor line color.
+#' @param xlab label for X axis.
+#' @param ylab label for Y axis.
+#' @param filename file name to save performance metrics.
 #' @param ... further arguments.
 #'
 #' @export
-roc <- function(data, outcome = NULL, predictors = NULL, newdata = NULL, xlab = NULL, ylab = NULL, ...){
+roc <- function(data, outcome = NULL, predictors = NULL, newdata = NULL, linesize =0.5, linecolor = NULL, xlab = NULL, ylab = NULL, filename = "", ...){
   UseMethod("roc")
 }
 
 
 #' @rdname roc
 #' @export
-roc.data.frame <- function(data, outcome = NULL, predictors = NULL, newdata = NULL,  xlab = NULL, ylab = NULL, ...){
+roc.data.frame <- function(data, outcome = NULL, predictors = NULL, newdata = NULL, linesize =0.5, linecolor = NULL, xlab = NULL, ylab = NULL, filename = "", ...){
 
   if(is.null(xlab)){
     xlab <- "1 - Specificity"
@@ -26,22 +29,41 @@ roc.data.frame <- function(data, outcome = NULL, predictors = NULL, newdata = NU
     ylab <- "Sensitivity"
   }
 
+  if(is.null(linecolor)){
+    linecolor <- c("#00A1D5FF")
+  }
+
+  plotA <- gg_roc(data = data,
+                  outcome = outcome,
+                  exposure = predictors,
+                  combine = TRUE,
+                  combine.only = TRUE,
+                  show.cutoff = FALSE,
+                  line.size = linesize,
+                  line.color = linecolor,
+                  ...) +
+    gg_delete_legend() +
+    gg_xlab(xlab) +
+    gg_ylab(ylab)
+
+  perA <- roc_exec(data = data,
+                 outcome = outcome,
+                 exposure = predictors,
+                 combine = TRUE,
+                 combine.only = TRUE,
+                 digits = 3)
+
+  names(perA) <- c("Items", "Training set")
+
   if(is.null(newdata)){
-    print(roc_exec(data = data,
-                   outcome = outcome,
-                   exposure = predictors,
-                   combine = TRUE,
-                   combine.only = TRUE,
-                   digits = 3))
-    gg_roc(data = data,
-           outcome = outcome,
-           exposure = predictors,
-           combine = TRUE,
-           combine.only = TRUE,
-           show.cutoff = FALSE,  ...) +
-      gg_delete_legend() +
-      gg_xlab(xlab) +
-      gg_ylab(ylab)
+
+    if(filename == ""){
+      print_booktabs(perA)
+    }else{
+      write_docx(perA, path = filename)
+    }
+
+    plotA
   }else{
     frm <- paste(predictors, collapse = " + ")
     frm <- paste(outcome, frm, sep = " ~ ")
@@ -50,25 +72,43 @@ roc.data.frame <- function(data, outcome = NULL, predictors = NULL, newdata = NU
     pre <- stats::predict(fit, newdata = newdata, type = "response")
     newdata$.pre <- pre
 
-    print(roc_exec(data = newdata,
+    perB <- roc_exec(data = newdata,
                    outcome = outcome,
                    exposure = ".pre",
-                   digits = 3))
+                   digits = 3)
+    # perB[1, 2] <- ""
+    names(perB) <- c("Items", "Validation set")
 
-    gg_roc(data = newdata,
-           outcome = outcome,
-           exposure = ".pre",
-           show.cutoff = FALSE,  ...) +
+    per <- merge_left(perA, perB, by = "Items")
+    attr(per, "title") <- attr(perB, "title")
+    attr(per, "note") <- attr(perB, "note")
+    if(filename == ""){
+      print_booktabs(per)
+    }else{
+      write_docx(per, path = filename)
+    }
+
+    plotB <- gg_roc(data = newdata,
+                    outcome = outcome,
+                    exposure = ".pre",
+                    show.cutoff = FALSE,
+                    line.size = linesize,
+                    line.color = linecolor, ...) +
       gg_delete_legend()  +
       gg_xlab(xlab) +
       gg_ylab(ylab)
+
+    plotA <- plotA + gg_tags("A")
+    plotB <- plotB + gg_tags("B")
+
+    patchwork::wrap_plots(plotA, plotB)
   }
 }
 
 
 #' @rdname roc
 #' @export
-roc.nmtask <- function(data, outcome = NULL, predictors = NULL, newdata = NULL, xlab = NULL, ylab = NULL, ...){
+roc.nmtask <- function(data, outcome = NULL, predictors = NULL, newdata = NULL, linesize = 0.5, linecolor = NULL, xlab = NULL, ylab = NULL, filename = "",...){
   train.data <- data$train.data
 
   if(is.null(newdata)){
@@ -88,7 +128,9 @@ roc.nmtask <- function(data, outcome = NULL, predictors = NULL, newdata = NULL, 
                  predictors = predictors,
                  newdata = newdata,
                  xlab = xlab,
-                 ylab = ylab)
+                 ylab = ylab,
+                 linesize = linesize,
+                 linecolor = linecolor, filename = filename, ...)
 }
 
 
@@ -173,12 +215,12 @@ gg_roc <- function(data,
 
   p <- suppressMessages(
     pROC::ggroc(roclist, legacy.axes = TRUE, size = line.size, aes = aes) +
-      ggplot2::geom_abline(intercept = 0, color = "darkgrey", linetype = "dashed", size = line.size) +
+      ggplot2::geom_abline(intercept = 0, color = "#374E55FF", linetype = "dashed", size = line.size) +
       gg_xbreaks_continuous(0, 1, by = 0.2) +
       gg_ybreaks_continuous(0, 1, by = 0.2) +
       gg_xlab(sprintf("1 - %s", string_specificity(language))) +
       gg_ylab(string_sensitivity(language)) +
-      gg_theme_sci(font.family = font.family, font.size = font.size, axis.line.size = line.size,  ...) +
+      gg_theme_sci(font.family = font.family, font.size = font.size, ...) +
       gg_legend_title(NULL) +
       gg_legend_position(c(1, 0))
   )
@@ -493,7 +535,7 @@ roc_exec <- function(data,
 
 
 .bootstrap <- function(object, threshold = "best", percent = FALSE, digits = 2, ci.sep = NULL, ci.branket = "(", progress = "text", boot.n = 1000, seed = 1234){
-  set.seed(seed)
+  # set.seed(seed)
   rets <- c("threshold", "accuracy", "sensitivity", "specificity", "ppv", "npv")
   names(rets) <- c("Threshold", "Accuracy", "Sensitivity", "Specificity", "PPV", "NPV")
 

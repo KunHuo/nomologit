@@ -41,8 +41,6 @@ cal.data.frame <- function(data,
                            xlab = NULL,
                            ylab = NULL,...){
 
-  set.seed(1234)
-
   train  <- data[c(outcome, predictors)]
   dnames <- names(train)[-1][sapply(train[-1], \(x) {is.factor(x) | is.character(x)})]
   train  <- dummy.data.frame(train, varnames = dnames)

@@ -93,6 +93,13 @@ dummy.data.frame <- function(x,
   x
 }
 
+check_index <- function(data, index){
+  tmp <- index >=1 & index <= ncol(data)
+  if(!all(tmp)){
+    meaasge <- sprintf("Index must be between 1 and %d.", ncol(data))
+    stop(meaasge, call. = FALSE)
+  }
+}
 
 check_name <- function(data, varnames){
   tmp <- varnames %in% names(data)
@@ -564,4 +571,277 @@ reshape_long <- function(data,
     res <- res[, -which(names(res) == id.name), drop = FALSE]
   }
   tibble::as_tibble(res)
+}
+
+
+relocate <- function(data, variables, before = NULL, after = NULL) {
+  if (is.numeric(variables)) {
+    check_index(data, variables)
+    to_move <- variables
+  } else{
+    check_name(data, variables)
+    to_move <- sapply(variables, function(x) { which(names(data) == x) })
+    names(to_move) <- NULL
+  }
+
+  if (!is.null(before) && !is.null(after)) {
+    stop("Must supply only one of `.before` and `.after`.")
+  } else if (!is.null(before)) {
+    if (is.numeric(before)) {
+      check_index(data, before)
+      where <- before
+    } else{
+      check_name(data, before)
+      where <- which(names(data) == before)
+    }
+    if (!where %in% to_move) {
+      to_move <- c(to_move, where)
+    }
+  } else if (!is.null(after)) {
+    if (is.numeric(after)) {
+      check_index(data, after)
+      where <- after
+    } else{
+      check_name(data, after)
+      where <- which(names(data) == after)
+    }
+    if (!where %in% to_move) {
+      to_move <- c(where, to_move)
+    }
+  } else {
+    where <- 1L
+    if (!where %in% to_move) {
+      to_move <- c(to_move, where)
+    }
+  }
+
+  lhs <- setdiff(seq2(1, where - 1), to_move)
+  rhs <- setdiff(seq2(where + 1, ncol(data)), to_move)
+
+  pos <- unique(c(lhs, to_move, rhs))
+  out <- data[pos]
+  out
+}
+
+seq2 <- function(from, to) {
+  if (length(from) != 1) {
+    stop("`from` must be length one")
+  }
+  if (length(to) != 1) {
+    stop("`to` must be length one")
+  }
+  if (from > to) {
+    integer()
+  }
+  else {
+    seq.int(from, to)
+  }
+}
+
+
+merge_left <- function(x, y, by){
+  x$.id <- 1:nrow(x)
+  res <- merge(x, y, sort = FALSE, by = by, all.x = TRUE)
+  res <- res[order(res$.id), ]
+  res[, -which(names(res) == ".id")]
+}
+
+
+print_booktabs <- function(data, sep = "__", adj = NULL, ...){
+
+  title <- attr(data, "title")
+  note  <- attr(data, "note")
+
+  if(!is.null(title)){
+    cat("\n")
+    cat(title, "\n")
+  }
+
+  pad_df <- function(data, adj = "left"){
+    if(length(adj) != ncol(data)){
+      adj <- c(adj,  rep(adj[length(adj)], ncol(data) - length(adj) ))
+    }
+
+    data[,] <-  Map(function(x, a){
+      str_pad(x, width = max_nchar(x), adj = a)
+    }, data, adj)
+    data
+  }
+
+  print_lines <- function(data, n.title = 1, n.space = 3){
+    for(i in 1:nrow(data)){
+      row <- data[i, ,drop = TRUE]
+      row <- paste(row, collapse = strrep(" ", n.space))
+      lines <- strrep("-", nchar(row))
+      if(n.title == 1){
+        if(i == 1 | i == 2){
+          cat(lines, "\n")
+        }
+      }else{
+        if(i == 1 | i == 4){
+          cat(lines, "\n")
+        }
+      }
+      cat(row, "\n")
+      if(i== nrow(data)){
+        cat(lines, "\n")
+      }
+    }
+  }
+
+  if(is.null(adj)){
+    adj <- sapply(data, function(x){
+      ifelse(is.numeric(x), "center", "left")
+    })
+  }
+
+  data[, ] <- lapply(data[, ], function(x){
+    if(is.numeric(x)){
+      sapply(x, \(i){
+        if(is.na(i)){
+          ""
+        }else{
+          fmt <- sprintf("%%.%df", max_digits(i))
+          sprintf(fmt, i)
+        }
+      })
+    }else{
+      sapply(x, function(i){
+        if(is.na(i)){
+          ""
+        }else{
+          as.character(i)
+        }
+      })
+    }
+  })
+
+  if(any(regex_detect(names(data), pattern = sep, fixed = TRUE))){
+    titles <- names(data)
+    titles <- strsplit(names(data), split = sep, fixed = TRUE)
+    titles <- do.call(cbind, titles)
+    title1 <- titles[1, ]
+    title2 <- titles[2, ]
+
+    data <- rbind(title2, data)
+    data <- pad_df(data, adj = adj)
+    data <- lapply(data, function(x){ c(strrep("-", max_nchar(x)), x) })
+    data <- as.data.frame(data)
+
+    cdata <- lapply(unique(title1), function(x){
+      colindex <- which(x == title1)
+      tmpdata <- data[, colindex, drop = FALSE]
+      tmpdata <- apply(tmpdata, 1, paste, collapse = strrep(" ", 3))
+      tmpdata[1] <- strrep("-", nchar(tmpdata[1]))
+      tmpdata
+    })
+
+    names(cdata) <- unique(title1)
+    cdata <- as.data.frame(cdata)
+    cdata <- rbind(unique(title1), cdata)
+    cdata <- pad_df(cdata, adj = c("left", "center"))
+
+    for(i in seq_along(cdata)){
+      if(str_trim(cdata[1, i]) == str_trim(cdata[3, i])){
+        cdata[2, i] <- cdata[1, i]
+        cdata[1, i] <- strrep(" ", nchar(cdata[1, i]))
+        cdata[3, i] <- strrep(" ", nchar(cdata[3, i]))
+      }
+    }
+
+    print_lines(cdata, n.title = 2, n.space = 3)
+  }else{
+    data <- rbind(names(data), data)
+    data <- pad_df(data, adj = adj)
+    print_lines(data, n.title = 1, n.space = 3)
+  }
+
+  if(!is.null(note)){
+    cat(note)
+    cat("\n\n")
+  }
+}
+
+
+n_digits <- function(x){
+  x <- as.character(x)
+  sapply(x, function(i) {
+    i <- regex_split(i, pattern = ".", fixed = TRUE)
+    i <- unlist(i)
+    if (length(i) == 1L) {
+      0
+    } else{
+      nchar(i[2])
+    }
+  })
+}
+
+
+max_digits <- function(x){
+  max(n_digits(x), na.rm = TRUE)
+}
+
+
+max_nchar <- function(x){
+  max(sapply(x, nchar), na.rm = TRUE)
+}
+
+str_pad <- function (x, width = NULL, pad = " ", adj = "left") {
+  .pad <- function(x, width, pad = " ", adj = "left") {
+    if (is.na(x))
+      return(NA)
+    mto <- match.arg(adj, c("left", "right", "center"))
+    free <- max(0, width - nchar(x))
+    fill <- substring(paste(rep(pad, ceiling(free/nchar(pad))),
+                            collapse = ""), 1, free)
+    if (free <= 0)
+      x
+    else if (mto == "left")
+      paste(x, fill, sep = "")
+    else if (mto == "right")
+      paste(fill, x, sep = "")
+    else paste(substring(fill, 1, free%/%2), x, substring(fill,
+                                                          1 + free%/%2, free), sep = "")
+  }
+  if (is.null(width))
+    width <- max(nchar(x), na.rm = TRUE)
+  lgp <- recycle(x = x, width = width, pad = pad,
+                 adj = adj)
+  sapply(1:attr(lgp, "maxdim"), function(i) .pad(lgp$x[i],
+                                                 lgp$width[i], lgp$pad[i], lgp$adj[i]))
+}
+
+recycle <- function (...) {
+  lst <- list(...)
+  maxdim <- max(lengths(lst))
+  res <- lapply(lst, rep, length.out = maxdim)
+  attr(res, "maxdim") <- maxdim
+  return(res)
+}
+
+str_trim <- function (x, pattern = " \t\n", method = "both") {
+  switch(
+    match.arg(arg = method, choices = c("both", "left", "right")),
+    both = {
+      gsub(
+        pattern = gettextf("^[%s]+|[%s]+$", pattern, pattern),
+        replacement = "",
+        x = x
+      )
+    },
+    left = {
+      gsub(
+        pattern = gettextf("^[%s]+", pattern),
+        replacement = "",
+        x = x
+      )
+    },
+    right = {
+      gsub(
+        pattern = gettextf("[%s]+$", pattern),
+        replacement = "",
+        x = x
+      )
+    }
+  )
 }

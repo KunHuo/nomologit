@@ -5,6 +5,7 @@
 #' @param predictors predictors.
 #' @param newdata new data for verification.
 #' @param B  Number of bootstrap replicates to use to calculate confidence intervals (default 1000).
+#' @param thresholds thresholds.
 #' @param xlab defaults to "Predicted x-units Survival" or to a suitable label for other models.
 #' @param ylab defaults to "Fraction Surviving x-units" or to a suitable label for other models.
 #' @param ... further arguments.
