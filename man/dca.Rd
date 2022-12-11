@@ -79,3 +79,33 @@ dca(
 \description{
 Draw decision curves
 }
+\examples{
+head(aps)
+
+# Basic usage
+dca(aps,
+    outcome = "elope",
+    predictors = c("age", "gender", "place3", "neuro"))
+
+# From a nmtask
+tk <- nmtask(train.data = aps,
+             outcome = "elope",
+             predictors = c("age", "gender", "place3", "neuro"))
+dca(tk)
+
+# With validation
+index <- sample(1:nrow(aps), 300)
+train <- aps[index, ]
+test  <- aps[-index, ]
+
+dca(train,
+    outcome = "elope",
+    predictors = c("age", "gender", "place3", "neuro"),
+    newdata = test)
+# or
+tk <- nmtask(train.data = train,
+             test.data = test,
+             outcome = "elope",
+             predictors = c("age", "gender", "place3", "neuro"))
+dca(tk)
+}

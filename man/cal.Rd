@@ -84,3 +84,35 @@ as calibration curves. Perfect calibration would be exhibited by a direct
 alignment between the actual observation and nomogram prediction probability
 along the 45 degree diagonal line.
 }
+\examples{
+head(aps)
+
+# Basic usage
+cal(aps,
+    outcome = "elope",
+    predictors = c("age", "gender", "place3", "neuro"))
+
+
+# From a nmtask
+tk <- nmtask(train.data = aps,
+             outcome = "elope",
+             predictors = c("age", "gender", "place3", "neuro"))
+cal(tk)
+
+
+# With validation
+index <- sample(1:nrow(aps), 300)
+train <- aps[index, ]
+test  <- aps[-index, ]
+
+cal(train,
+    outcome = "elope",
+    predictors = c("age", "gender", "place3", "neuro"),
+    newdata = test)
+# or
+tk <- nmtask(train.data = train,
+             test.data = test,
+             outcome = "elope",
+             predictors = c("age", "gender", "place3", "neuro"))
+cal(tk)
+}

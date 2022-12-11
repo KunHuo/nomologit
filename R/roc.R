@@ -12,6 +12,40 @@
 #' @param ... further arguments.
 #'
 #' @export
+#' @examples
+#' head(aps)
+#'
+#' # Basic usage
+#' roc(aps,
+#'     outcome = "elope",
+#'     predictors = c("age", "gender", "place3", "neuro"))
+#'
+#'
+#' # From a nmtask
+#' tk <- nmtask(train.data = aps,
+#'              outcome = "elope",
+#'              predictors = c("age", "gender", "place3", "neuro"))
+#' roc(tk)
+#'
+#'
+#' # With validation
+#' index <- sample(1:nrow(aps), 300)
+#' train <- aps[index, ]
+#' test  <- aps[-index, ]
+#'
+#' roc(train,
+#'     outcome = "elope",
+#'     predictors = c("age", "gender", "place3", "neuro"),
+#'     newdata = test)
+#' # or
+#' tk <- nmtask(train.data = train,
+#'              test.data = test,
+#'              outcome = "elope",
+#'              predictors = c("age", "gender", "place3", "neuro"))
+#' roc(tk)
+#'
+#' # save performance metrics to a word.
+#' # roc(tk, filename = "ROC.docx)
 roc <- function(data, outcome = NULL, predictors = NULL, newdata = NULL, linesize =0.5, linecolor = NULL, xlab = NULL, ylab = NULL, filename = "", ...){
   UseMethod("roc")
 }

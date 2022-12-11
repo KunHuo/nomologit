@@ -9,15 +9,46 @@ nmtask(train.data = NULL, test.data = NULL, outcome = NULL, predictors = NULL)
 \arguments{
 \item{train.data}{train data.}
 
-\item{test.data}{test data.}
+\item{test.data}{test data, If there is no test set, it can not be specified.
+If specified, it must have the same data structure as train data.}
 
 \item{outcome}{predict outcome.}
 
 \item{predictors}{predictors.}
 }
 \value{
-a list.
+a object of 'nmtask' class.
 }
 \description{
 Task for nomogram
+}
+\examples{
+index <- sample(1:nrow(aps), 300)
+# Training set
+train <- aps[index, ]
+# Validation set
+test  <- aps[-index, ]
+
+# Set task of nomogram model
+tk <- nmtask(train.data = train,
+             test.data = test,
+             outcome = "elope",
+             predictors = c("age", "gender", "place3"))
+# View task
+tk
+
+# Hosmer-Lemeshow test
+hoslem_test(tk)
+
+# Draw a nomogram
+nom(tk)
+
+# Draw calibrate curve
+cal(tk, B = 10)
+
+# Draw ROC curve
+roc(tk)
+
+# Draw decision curve
+dca(tk, B = 10)
 }

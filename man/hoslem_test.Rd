@@ -24,3 +24,17 @@ hoslem_test(data, outcome = NULL, predictors = NULL, g = 10)
 \description{
 Hosmer-Lemeshow Test
 }
+\examples{
+head(aps)
+
+# Basic usage
+hoslem_test(aps,
+           outcome = "elope",
+           predictors = c("age", "gender", "place3", "neuro"))
+
+# From a nmtask
+tk <- nmtask(train.data = aps,
+             outcome = "elope",
+             predictors = c("age", "gender", "place3", "neuro"))
+hoslem_test(tk)
+}

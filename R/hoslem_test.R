@@ -6,6 +6,19 @@
 #' @param g number of bins to use to calculate quantiles.
 #'
 #' @export
+#' @examples
+#' head(aps)
+#'
+#' # Basic usage
+#' hoslem_test(aps,
+#'            outcome = "elope",
+#'            predictors = c("age", "gender", "place3", "neuro"))
+#'
+#' # From a nmtask
+#' tk <- nmtask(train.data = aps,
+#'              outcome = "elope",
+#'              predictors = c("age", "gender", "place3", "neuro"))
+#' hoslem_test(tk)
 hoslem_test <- function(data, outcome = NULL, predictors = NULL, g = 10){
   UseMethod("hoslem_test")
 }

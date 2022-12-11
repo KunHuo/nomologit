@@ -23,6 +23,58 @@
 #' @param ... settings of variables to use in constructing axes.
 #'
 #' @export
+#' @examples
+#' head(aps)
+#'
+#' # Basic usage
+#' nom(data = aps,
+#'     outcome = "elope",
+#'     predictors = c("age", "gender", "place3", "neuro"))
+#'
+#' # Set labels
+#' attr(aps$age, "label") <- "Age at Admission (Years)"
+#' attr(aps$gender, "label") <- "Gender"
+#' attr(aps$place3, "label") <- "Placement"
+#' attr(aps$neuro, "label") <- "Neuropsychiatric Disturbance"
+#'
+#' nom(data = aps,
+#'     outcome = "elope",
+#'     predictors = c("age", "gender", "place3", "neuro"),
+#'     funlabel = "Risk of Elopement")
+#'
+#' # Set the scale of the risk axis.
+#' nom(data = aps,
+#'     outcome = "elope",
+#'     predictors = c("age", "gender", "place3", "neuro"),
+#'     funlabel = "Risk of Elopement",
+#'     fun.at = c(0.1, 0.15, 0.25, 0.35, 0.45, 0.55, 0.65))
+#'
+#' # Fraction of horizontal plot to set aside for axis titles.
+#' nom(data = aps,
+#'     outcome = "elope",
+#'     predictors = c("age", "gender", "place3", "neuro"),
+#'     funlabel = "Risk of Elopement",
+#'     fun.at = c(0.1, 0.15, 0.25, 0.35, 0.45, 0.55, 0.65),
+#'     xfrac = 0.65)
+#'
+#' # show model and points
+#' nom(data = aps,
+#'     outcome = "elope",
+#'     predictors = c("age", "gender", "place3", "neuro"),
+#'     funlabel = "Risk of Elopement",
+#'     fun.at = c(0.1, 0.15, 0.25, 0.35, 0.45, 0.55, 0.65),
+#'     xfrac = 0.65,
+#'     show.points = TRUE,
+#'     show.model = TRUE)
+#'
+#' # From nmtask
+#' tk <- nmtask(train.data = aps,
+#'              outcome = "elope",
+#'              predictors = c("age", "gender", "place3", "neuro"))
+#' nom(tk,
+#'     funlabel = "Risk of Elopement",
+#'     fun.at = c(0.1, 0.15, 0.25, 0.35, 0.45, 0.55, 0.65),
+#'     xfrac = 0.65)
 nom <- function(data,
                 outcome = NULL,
                 predictors = NULL,
