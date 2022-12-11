@@ -845,3 +845,17 @@ str_trim <- function (x, pattern = " \t\n", method = "both") {
     }
   )
 }
+
+
+fct_reorder <- function(data, varname, order, exclude = NA) {
+  levels <- levels(data[[varname]])
+  index <- order %in% levels
+  if (!all(index)) {
+    text <- paste(order[!index], collapse = ", ")
+    text <- sprintf("%s not at the level of %s.", text, varname)
+    stop(text, call. = FALSE)
+  }
+  levels <- c(order, setdiff(levels, order))
+  data[[varname]] <- factor(data[[varname]], levels = levels, exclude = exclude)
+  data
+}

@@ -1,4 +1,5 @@
 #' Draw ROC curve
+#'
 #' @param data data
 #' @param outcome predict outcome.
 #' @param predictors predictors.

@@ -5,6 +5,11 @@
 #' If specified, it must have the same data structure as train data.
 #' @param outcome predict outcome.
 #' @param predictors predictors.
+#' @param positive in which positive of outcome variable to make the comparison.
+#' By default, positive is automatically defined. If outcome is a factor variable,
+#' then positive is defined as the highest level. If outcome is a numerical
+#' variable, then positive is defined as the largest value.
+#' @param labels a list, labels for variables.
 #'
 #' @return a object of 'nmtask' class.
 #' @export
@@ -38,17 +43,35 @@
 #'
 #' # Draw decision curve
 #' dca(tk)
-nmtask <- function(train.data = NULL, test.data = NULL, outcome = NULL, predictors = NULL){
+nmtask <- function(train.data, test.data = NULL, outcome = NULL, positive = NULL, predictors = NULL, labels = NULL){
 
   outcome    <- select_variable(train.data, outcome)
   predictors <- select_variable(train.data, predictors)
-
   DNAMETRAIN <- deparse(substitute(train.data))
+
+  if(!is.null(positive)){
+    train.data[[outcome]] <- factor(train.data[[outcome]])
+    train.data <- fct_reorder(train.data, outcome, c(setdiff(levels(train.data[[outcome]]), positive), positive))
+  }
+
+  if(!is.null(labels)){
+    for(i in 1:length(labels)){
+      if(names(labels[i]) %in% names(train.data)){
+        attr(train.data[[names(labels[i])]], "label") <- labels[[i]]
+      }
+    }
+  }
 
   if(!is.null(test.data)){
     check_name(test.data, outcome)
     check_name(test.data, predictors)
     DNAMETEST  <- deparse(substitute(test.data))
+
+    if(!is.null(positive)){
+      test.data[[outcome]] <- factor(test.data[[outcome]])
+      test.data <- fct_reorder(test.data, outcome, c(setdiff(levels(test.data[[outcome]]), positive), positive))
+    }
+
   }else{
     DNAMETEST  <- ""
   }

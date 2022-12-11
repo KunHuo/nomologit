@@ -4,7 +4,14 @@
 \alias{nmtask}
 \title{Task for nomogram}
 \usage{
-nmtask(train.data = NULL, test.data = NULL, outcome = NULL, predictors = NULL)
+nmtask(
+  train.data,
+  test.data = NULL,
+  outcome = NULL,
+  positive = NULL,
+  predictors = NULL,
+  labels = NULL
+)
 }
 \arguments{
 \item{train.data}{train data.}
@@ -14,7 +21,14 @@ If specified, it must have the same data structure as train data.}
 
 \item{outcome}{predict outcome.}
 
+\item{positive}{in which positive of outcome variable to make the comparison.
+By default, positive is automatically defined. If outcome is a factor variable,
+then positive is defined as the highest level. If outcome is a numerical
+variable, then positive is defined as the largest value.}
+
 \item{predictors}{predictors.}
+
+\item{labels}{a list, labels for variables.}
 }
 \value{
 a object of 'nmtask' class.

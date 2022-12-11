@@ -20,7 +20,7 @@ print.nmtask <- function(x, ...){
   test  <- x$test.data
 
   event <- levels(as.factor(train[[x$outcome]]))[2]
-  cat(sprintf("* Event: %s\n", event))
+  cat(sprintf("* Positive event: %s\n", event))
 
   n.train.event <- sum(as.factor(train[[x$outcome]]) == event)
 
