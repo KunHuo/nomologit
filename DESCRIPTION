@@ -21,3 +21,4 @@ Imports:
     tibble
 Depends: 
     R (>= 2.10)
+URI: https://github.com/KunHuo/nomologit
