@@ -208,3 +208,43 @@ nom.nmtask <- function(data,
                  show.explain = show.explain,
                  ...)
 }
+
+
+#' @rdname nom
+#' @export
+nom.glm <- function(data,
+                       outcome = NULL,
+                       predictors = NULL,
+                       points.label = "Points",
+                       total.points.label = "Total points",
+                       funlabel = "Risk",
+                       maxscale = 100,
+                       xfrac = 0.35,
+                       font.size = 12,
+                       fun.at = NULL,
+                       show.points = FALSE,
+                       show.model = FALSE,
+                       show.explain = TRUE,
+                       ...){
+
+  if(data$family[[1]] == "binomial"){
+    train.data <- data$data
+    outcome <- all.vars(data$formula)[1]
+    predictors <- all.vars(data$formula)[-1]
+
+    nom.data.frame(data = train.data,
+                   outcome = outcome,
+                   predictors = predictors,
+                   points.label = points.label,
+                   total.points.label = total.points.label,
+                   funlabel = funlabel,
+                   maxscale = maxscale,
+                   xfrac = xfrac,
+                   font.size = font.size,
+                   fun.at = fun.at,
+                   show.points = show.points,
+                   show.model = show.model,
+                   show.explain = show.explain,
+                   ...)
+  }
+}

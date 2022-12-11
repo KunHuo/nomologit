@@ -220,3 +220,36 @@ plot_cal <- function(cal, linesize = 0.5, linecolor = NULL, linelabel = NULL, xl
     ggplot2::scale_x_continuous(breaks = axis, limits = c(min(axis), max(axis)), expand = c(0, 0)) +
     ggplot2::scale_y_continuous(breaks = axis, limits = c(min(axis), max(axis)), expand = c(0, 0))
 }
+
+
+#' @rdname cal
+#' @export
+cal.glm <- function(data,
+                     outcome = NULL,
+                     predictors = NULL,
+                     newdata = NULL,
+                     B = 1000,
+                     linesize = 0.5,
+                     linecolor = NULL,
+                     linelabel = NULL,
+                     xlab = NULL,
+                     ylab = NULL,
+                     show.explain = TRUE, ...){
+
+  if(data$family[[1]] == "binomial"){
+
+    train.data <- data$data
+    outcome <- all.vars(data$formula)[1]
+    predictors <- all.vars(data$formula)[-1]
+
+    cal.data.frame(data = train.data,
+                   outcome = outcome,
+                   predictors = predictors,
+                   newdata = newdata,
+                   B = B,
+                   xlab = xlab,
+                   ylab = ylab,
+                   show.explain = show.explain, ...)
+  }
+
+}

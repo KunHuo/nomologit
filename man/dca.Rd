@@ -4,6 +4,7 @@
 \alias{dca}
 \alias{dca.data.frame}
 \alias{dca.nmtask}
+\alias{dca.glm}
 \title{Draw decision curves}
 \usage{
 dca(
@@ -37,6 +38,21 @@ dca(
 )
 
 \method{dca}{nmtask}(
+  data,
+  outcome = NULL,
+  predictors = NULL,
+  newdata = NULL,
+  B = 1000,
+  thresholds = seq(0, 1, by = 0.01),
+  linesize = 0.5,
+  linecolor = NULL,
+  linelabel = NULL,
+  xlab = NULL,
+  ylab = NULL,
+  ...
+)
+
+\method{dca}{glm}(
   data,
   outcome = NULL,
   predictors = NULL,

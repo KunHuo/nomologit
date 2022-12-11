@@ -4,6 +4,7 @@
 \alias{cal}
 \alias{cal.data.frame}
 \alias{cal.nmtask}
+\alias{cal.glm}
 \title{Draw calibrate curve}
 \usage{
 cal(
@@ -37,6 +38,21 @@ cal(
 )
 
 \method{cal}{nmtask}(
+  data,
+  outcome = NULL,
+  predictors = NULL,
+  newdata = NULL,
+  B = 1000,
+  linesize = 0.5,
+  linecolor = NULL,
+  linelabel = NULL,
+  xlab = NULL,
+  ylab = NULL,
+  show.explain = TRUE,
+  ...
+)
+
+\method{cal}{glm}(
   data,
   outcome = NULL,
   predictors = NULL,

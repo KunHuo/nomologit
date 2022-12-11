@@ -4,6 +4,7 @@
 \alias{roc}
 \alias{roc.data.frame}
 \alias{roc.nmtask}
+\alias{roc.glm}
 \title{Draw ROC curve}
 \usage{
 roc(
@@ -33,6 +34,19 @@ roc(
 )
 
 \method{roc}{nmtask}(
+  data,
+  outcome = NULL,
+  predictors = NULL,
+  newdata = NULL,
+  linesize = 0.5,
+  linecolor = NULL,
+  xlab = NULL,
+  ylab = NULL,
+  filename = "",
+  ...
+)
+
+\method{roc}{glm}(
   data,
   outcome = NULL,
   predictors = NULL,

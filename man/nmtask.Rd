@@ -50,5 +50,5 @@ cal(tk, B = 10)
 roc(tk)
 
 # Draw decision curve
-dca(tk, B = 10)
+dca(tk)
 }

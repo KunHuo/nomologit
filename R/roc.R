@@ -168,10 +168,42 @@ roc.nmtask <- function(data, outcome = NULL, predictors = NULL, newdata = NULL, 
                  outcome = outcome,
                  predictors = predictors,
                  newdata = newdata,
+                 linesize = linesize,
+                 linecolor = linecolor,
                  xlab = xlab,
                  ylab = ylab,
-                 linesize = linesize,
-                 linecolor = linecolor, filename = filename, ...)
+                 filename = filename,...)
+}
+
+
+#' @rdname roc
+#' @export
+roc.glm <- function(data,
+                    outcome = NULL,
+                    predictors = NULL,
+                    newdata = NULL,
+                    linesize = 0.5,
+                    linecolor = NULL,
+                    xlab = NULL,
+                    ylab = NULL,
+                    filename = "",...){
+
+  if(data$family[[1]] == "binomial"){
+
+    train.data <- data$data
+    outcome <- all.vars(data$formula)[1]
+    predictors <- all.vars(data$formula)[-1]
+
+    roc.data.frame(data = train.data,
+                   outcome = outcome,
+                   predictors = predictors,
+                   newdata = newdata,
+                   xlab = xlab,
+                   ylab = ylab,
+                   linesize = linesize,
+                   linecolor = linecolor, filename = filename, ...)
+  }
+
 }
 
 

@@ -125,6 +125,28 @@ dca.nmtask <- function(data, outcome = NULL, predictors = NULL, newdata = NULL,
 }
 
 
+#' @rdname dca
+#' @export
+dca.glm <- function(data, outcome = NULL, predictors = NULL, newdata = NULL,
+                    B = 1000, thresholds = seq(0, 1, by = 0.01),
+                    linesize = 0.5, linecolor = NULL, linelabel = NULL,
+                    xlab = NULL, ylab = NULL, ...){
+
+  if(data$family[[1]] == "binomial"){
+
+    train.data <- data$data
+    outcome <- all.vars(data$formula)[1]
+    predictors <- all.vars(data$formula)[-1]
+
+    dca.data.frame(data = train.data, outcome = outcome, predictors = predictors, newdata = newdata,
+                   B = B, thresholds = thresholds,
+                   linesize = linesize, linecolor = linecolor, linelabel = linelabel,
+                   xlab = xlab, ylab = ylab, ...)
+  }
+
+}
+
+
 plot_dca <- function(fit, linesize = 0.5, linecolor = NULL, linelabel = NULL, xlab = NULL, ylab = NULL, ...){
 
   if(is.null(linecolor)){

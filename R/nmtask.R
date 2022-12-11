@@ -37,7 +37,7 @@
 #' roc(tk)
 #'
 #' # Draw decision curve
-#' dca(tk, B = 10)
+#' dca(tk)
 nmtask <- function(train.data = NULL, test.data = NULL, outcome = NULL, predictors = NULL){
 
   outcome    <- select_variable(train.data, outcome)
@@ -70,3 +70,5 @@ nmtask <- function(train.data = NULL, test.data = NULL, outcome = NULL, predicto
 
   out
 }
+
+

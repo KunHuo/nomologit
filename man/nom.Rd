@@ -4,6 +4,7 @@
 \alias{nom}
 \alias{nom.data.frame}
 \alias{nom.nmtask}
+\alias{nom.glm}
 \title{Draw a nomogram}
 \usage{
 nom(
@@ -41,6 +42,23 @@ nom(
 )
 
 \method{nom}{nmtask}(
+  data,
+  outcome = NULL,
+  predictors = NULL,
+  points.label = "Points",
+  total.points.label = "Total points",
+  funlabel = "Risk",
+  maxscale = 100,
+  xfrac = 0.35,
+  font.size = 12,
+  fun.at = NULL,
+  show.points = FALSE,
+  show.model = FALSE,
+  show.explain = TRUE,
+  ...
+)
+
+\method{nom}{glm}(
   data,
   outcome = NULL,
   predictors = NULL,
