@@ -9,7 +9,6 @@
 #' By default, positive is automatically defined. If outcome is a factor variable,
 #' then positive is defined as the highest level. If outcome is a numerical
 #' variable, then positive is defined as the largest value.
-#' @param labels a list, labels for variables.
 #'
 #' @return a object of 'nmtask' class.
 #' @export
@@ -43,7 +42,7 @@
 #'
 #' # Draw decision curve
 #' dca(tk)
-nmtask <- function(train.data, test.data = NULL, outcome = NULL, positive = NULL, predictors = NULL, labels = NULL){
+nmtask <- function(train.data, test.data = NULL, outcome = NULL, positive = NULL, predictors = NULL){
 
   outcome    <- select_variable(train.data, outcome)
   predictors <- select_variable(train.data, predictors)
@@ -52,14 +51,6 @@ nmtask <- function(train.data, test.data = NULL, outcome = NULL, positive = NULL
   if(!is.null(positive)){
     train.data[[outcome]] <- factor(train.data[[outcome]])
     train.data <- fct_reorder(train.data, outcome, c(setdiff(levels(train.data[[outcome]]), positive), positive))
-  }
-
-  if(!is.null(labels)){
-    for(i in 1:length(labels)){
-      if(names(labels[i]) %in% names(train.data)){
-        attr(train.data[[names(labels[i])]], "label") <- labels[[i]]
-      }
-    }
   }
 
   if(!is.null(test.data)){

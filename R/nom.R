@@ -7,6 +7,8 @@
 #' all variables and locate the sum on the total points axis, and (4) draw a
 #' straight line from total points down to risk.
 #'
+#' @details Set labels use [set_variable_labels] and [set_category_labels] function.
+#'
 #' @param data a data frame
 #' @param outcome predict outcome.
 #' @param predictors predictors.
@@ -33,10 +35,14 @@
 #'     predictors = c("age", "gender", "place3", "neuro"))
 #'
 #' # Set labels
-#' attr(aps$age, "label") <- "Age at Admission (Years)"
-#' attr(aps$gender, "label") <- "Gender"
-#' attr(aps$place3, "label") <- "Placement"
-#' attr(aps$neuro, "label") <- "Neuropsychiatric Disturbance"
+#' nm <- nom(data = aps,
+#'           outcome = "elope",
+#'           predictors = c("age", "gender", "place3"))
+#' nm |>
+#'   set_variable_labels(age = "Age (years)") |>
+#'   set_variable_labels(gender = "Gender", place3 = "Placement") |>
+#'   set_category_labels("Gender", Male = "M", Female = "F") |>
+#'   set_category_labels("Placement", OutDay = "Outday")
 #'
 #' nom(data = aps,
 #'     outcome = "elope",
@@ -294,6 +300,26 @@ print.nomologit <- function(x, ...){
 }
 
 
+#' Set labels for nomogram
+#'
+#' @param x a nomogram object from nom() function
+#' @param ... "vairable=label"
+#'
+#' @seealso [set_category_labels]
+#'
+#' @return a nomogram.
+#' @export
+#'
+#' @examples
+#' nm <- nom(data = aps,
+#'           outcome = "elope",
+#'           predictors = c("age", "gender", "place3"))
+#'
+#' nm |>
+#'   set_variable_labels(age = "Age (years)") |>
+#'   set_variable_labels(gender = "Gender", place3 = "Placement") |>
+#'   set_category_labels("Gender", Male = "M", Female = "F") |>
+#'   set_category_labels("Placement", OutDay = "Outday")
 set_variable_labels <- function(x, ...){
   labels <- list(...)
   for(i in 1:length(labels)){
@@ -303,6 +329,27 @@ set_variable_labels <- function(x, ...){
 }
 
 
+#' Set labels for category of variable
+#'
+#' @param x a nomogram object from [nom] function
+#' @param variable variable name from nomogram.
+#' @param ... "category=label"
+#'
+#' @seealso [set_variable_labels]
+#'
+#' @return a nomogram.
+#' @export
+#'
+#' @examples
+#' nm <- nom(data = aps,
+#'           outcome = "elope",
+#'           predictors = c("age", "gender", "place3"))
+#'
+#' nm |>
+#'   set_variable_labels(age = "Age (years)") |>
+#'   set_variable_labels(gender = "Gender", place3 = "Placement") |>
+#'   set_category_labels("Gender", Male = "M", Female = "F") |>
+#'   set_category_labels("Placement", OutDay = "Outday")
 set_category_labels <- function(x, variable, ...){
   if(variable %in% names(x)){
     labels <- list(...)

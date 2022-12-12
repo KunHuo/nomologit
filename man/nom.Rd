@@ -117,6 +117,9 @@ variable, (2) repeat this process for each variable, (3) add the points for
 all variables and locate the sum on the total points axis, and (4) draw a
 straight line from total points down to risk.
 }
+\details{
+Set labels use \link{set_variable_labels} and \link{set_category_labels} function.
+}
 \examples{
 head(aps)
 
@@ -126,10 +129,14 @@ nom(data = aps,
     predictors = c("age", "gender", "place3", "neuro"))
 
 # Set labels
-attr(aps$age, "label") <- "Age at Admission (Years)"
-attr(aps$gender, "label") <- "Gender"
-attr(aps$place3, "label") <- "Placement"
-attr(aps$neuro, "label") <- "Neuropsychiatric Disturbance"
+nm <- nom(data = aps,
+          outcome = "elope",
+          predictors = c("age", "gender", "place3"))
+nm |>
+  set_variable_labels(age = "Age (years)") |>
+  set_variable_labels(gender = "Gender", place3 = "Placement") |>
+  set_category_labels("Gender", Male = "M", Female = "F") |>
+  set_category_labels("Placement", OutDay = "Outday")
 
 nom(data = aps,
     outcome = "elope",

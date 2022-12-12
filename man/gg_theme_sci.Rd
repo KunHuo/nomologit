@@ -48,7 +48,7 @@ gg_theme_sci(
 
 \item{plot.margin}{plot margin, top, right, bottom, left.}
 
-\item{...}{further arguments pass to the [ggplot2::theme] function.}
+\item{...}{further arguments pass to the \link[ggplot2:theme]{ggplot2::theme} function.}
 }
 \description{
 ggplo2 theme for SCI

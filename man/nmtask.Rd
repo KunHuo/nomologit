@@ -9,8 +9,7 @@ nmtask(
   test.data = NULL,
   outcome = NULL,
   positive = NULL,
-  predictors = NULL,
-  labels = NULL
+  predictors = NULL
 )
 }
 \arguments{
@@ -27,8 +26,6 @@ then positive is defined as the highest level. If outcome is a numerical
 variable, then positive is defined as the largest value.}
 
 \item{predictors}{predictors.}
-
-\item{labels}{a list, labels for variables.}
 }
 \value{
 a object of 'nmtask' class.

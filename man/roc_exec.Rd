@@ -62,7 +62,7 @@ explained in details.}
 
 \item{smooth}{a logical, indicating whether to smooth a ROC curve.}
 
-\item{smooth.args}{further arguments for smooth, see [pROC::smooth] function.}
+\item{smooth.args}{further arguments for smooth, see \link[pROC:smooth]{pROC::smooth} function.}
 
 \item{digits}{digits, default 2.}
 

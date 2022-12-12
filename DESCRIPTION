@@ -22,3 +22,4 @@ Imports:
 Depends: 
     R (>= 2.10)
 URL: https://github.com/KunHuo/nomologit
+Roxygen: list(markdown = TRUE)
