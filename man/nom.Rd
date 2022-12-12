@@ -18,6 +18,7 @@ nom(
   xfrac = 0.35,
   font.size = 12,
   fun.at = NULL,
+  labels = NULL,
   show.points = FALSE,
   show.model = FALSE,
   show.explain = TRUE,
@@ -35,6 +36,7 @@ nom(
   xfrac = 0.35,
   font.size = 12,
   fun.at = NULL,
+  labels = NULL,
   show.points = FALSE,
   show.model = FALSE,
   show.explain = TRUE,
@@ -52,6 +54,7 @@ nom(
   xfrac = 0.35,
   font.size = 12,
   fun.at = NULL,
+  labels = NULL,
   show.points = FALSE,
   show.model = FALSE,
   show.explain = TRUE,
@@ -69,6 +72,7 @@ nom(
   xfrac = 0.35,
   font.size = 12,
   fun.at = NULL,
+  labels = NULL,
   show.points = FALSE,
   show.model = FALSE,
   show.explain = TRUE,
@@ -95,6 +99,8 @@ nom(
 \item{font.size}{font size.}
 
 \item{fun.at}{function values to label on axis.}
+
+\item{labels}{a list, labels for variables.}
 
 \item{show.points}{show points, default FALSE..}
 

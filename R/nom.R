@@ -17,6 +17,7 @@
 #' @param xfrac fraction of horizontal plot to set aside for axis titles.
 #' @param font.size font size.
 #' @param fun.at function values to label on axis.
+#' @param labels a list, labels for variables.
 #' @param show.points show points, default FALSE..
 #' @param show.model show model, default FALSE.
 #' @param show.explain explain the figure, default TRUE.
@@ -85,6 +86,7 @@ nom <- function(data,
                 xfrac = 0.35,
                 font.size = 12,
                 fun.at = NULL,
+                labels = NULL,
                 show.points = FALSE,
                 show.model = FALSE,
                 show.explain = TRUE,
@@ -106,10 +108,19 @@ nom.data.frame <- function(data,
                            xfrac = 0.35,
                            font.size = 12,
                            fun.at = NULL,
+                           labels = NULL,
                            show.points = FALSE,
                            show.model = FALSE,
                            show.explain = TRUE,
                            ...){
+
+  if(!is.null(labels)){
+    for(i in 1:length(labels)){
+      if(names(labels[i]) %in% names(data)){
+        attr(data[[names(labels[i])]], "label") <- labels[[i]]
+      }
+    }
+  }
 
   pos <- 1
   envir = as.environment(pos)
@@ -178,6 +189,7 @@ nom.nmtask <- function(data,
                         xfrac = 0.35,
                         font.size = 12,
                         fun.at = NULL,
+                        labels = NULL,
                         show.points = FALSE,
                         show.model = FALSE,
                         show.explain = TRUE,
@@ -203,6 +215,7 @@ nom.nmtask <- function(data,
                  xfrac = xfrac,
                  font.size = font.size,
                  fun.at = fun.at,
+                 labels = labels,
                  show.points = show.points,
                  show.model = show.model,
                  show.explain = show.explain,
@@ -222,6 +235,7 @@ nom.glm <- function(data,
                        xfrac = 0.35,
                        font.size = 12,
                        fun.at = NULL,
+                       labels = NULL,
                        show.points = FALSE,
                        show.model = FALSE,
                        show.explain = TRUE,
@@ -242,6 +256,7 @@ nom.glm <- function(data,
                    xfrac = xfrac,
                    font.size = font.size,
                    fun.at = fun.at,
+                   labels = labels,
                    show.points = show.points,
                    show.model = show.model,
                    show.explain = show.explain,

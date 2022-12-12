@@ -8,7 +8,7 @@ Description: Simply draw the nomogram of logistic regression and conduct interna
 License: GPL (>= 3)
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 7.2.2
+RoxygenNote: 7.2.3
 Imports: 
     flextable,
     ggplot2,
