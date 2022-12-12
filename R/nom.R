@@ -161,19 +161,17 @@ nom.data.frame <- function(data,
     suppressWarnings(print(nom))
   }
 
-  if(show.explain){
-    cat(sprintf("Figure: Nomogram of risk model for predicting %s.\n", outcome))
-    cat("The nomogram can be interpreted as follows: (1) for each variable, draw a straight line up to the points axis to determine the points for that variable, (2) repeat this process for each variable, (3) add the points for all variables and locate the sum on the total points axis, and (4) draw a straight line from total points down to risk.")
-  }
+  attr(nom, "xfrac") <- xfrac
+  attr(nom, "points.label") <- points.label
+  attr(nom, "total.points.label") <- total.points.label
+  attr(nom, "cex.var") <- font.size
+  attr(nom, "cex.axis") <- font.size
+  attr(nom, "show.explain") <- show.explain
+  attr(nom, "outcome") <- outcome
 
-  plot(nom,
-       xfrac = xfrac,
-       points.label = points.label,
-       total.points.label = total.points.label,
-       cex.var = font.size,
-       cex.axis = font.size)
+  class(nom) <- c("nomologit", "nomogram")
 
-  invisible(nom)
+  nom
 }
 
 
@@ -262,4 +260,55 @@ nom.glm <- function(data,
                    show.explain = show.explain,
                    ...)
   }
+}
+
+
+#' Print nomogram
+#'
+#' @param x an object of 'nomologit'.
+#' @param ... more arguments
+#'
+#' @keywords internal
+#' @export
+print.nomologit <- function(x, ...){
+
+  xfrac <- attr(x, "xfrac")
+  points.label <- attr(x, "points.label")
+  total.points.label <- attr(x, "total.points.label")
+  font.size <- attr(x, "cex.var")
+
+  show.explain <- attr(x, "show.explain")
+  outcome <- attr(x, "outcome")
+
+  plot(x,
+       xfrac = xfrac,
+       points.label = points.label,
+       total.points.label = total.points.label,
+       cex.var = font.size,
+       cex.axis = font.size, ...)
+
+  if(show.explain){
+    cat(sprintf("Figure: Nomogram of risk model for predicting %s.\n", outcome))
+    cat("The nomogram can be interpreted as follows: (1) for each variable, draw a straight line up to the points axis to determine the points for that variable, (2) repeat this process for each variable, (3) add the points for all variables and locate the sum on the total points axis, and (4) draw a straight line from total points down to risk.")
+  }
+}
+
+
+set_variable_labels <- function(x, ...){
+  labels <- list(...)
+  for(i in 1:length(labels)){
+    names(x)[names(x) == names(labels[i])] <- labels[[i]]
+  }
+  x
+}
+
+
+set_category_labels <- function(x, variable, ...){
+  if(variable %in% names(x)){
+    labels <- list(...)
+    for(i in 1:length(labels)){
+      x[[variable]][[1]][x[[variable]][[1]] == names(labels[i])] <- labels[[i]]
+    }
+  }
+  x
 }
