@@ -69,10 +69,12 @@ hoslem_test_exec <- function (x, y, g = 10) {
   expected <- stats::xtabs(cbind(yhat0 = 1 - yhat, yhat1 = yhat) ~ cutyhat)
   chisq <- sum((observed - expected)^2/expected)
   PVAL = 1 - stats::pchisq(chisq, g - 2)
-  PARAMETER <- g - 2
-  names(chisq) <- "X-squared"
-  names(PARAMETER) <- "df"
-  structure(list(statistic = chisq, parameter = PARAMETER,
-                 p.value = PVAL, method = METHOD, data.name = DNAME, observed = observed,
-                 expected = expected), class = "htest")
+  sprintf("Hosmer and Lemeshow test: X-squared = %.3f, P value = %.3f", chisq, PVAL)
+
+  # PARAMETER <- g - 2
+  # names(chisq) <- "X-squared"
+  # names(PARAMETER) <- "df"
+  # structure(list(statistic = chisq, parameter = PARAMETER,
+  #                p.value = PVAL, method = METHOD, data.name = DNAME, observed = observed,
+  #                expected = expected), class = "htest")
 }
