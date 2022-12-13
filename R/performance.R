@@ -10,15 +10,24 @@
 #' @param ... further arguments.
 #'
 #' @export
-evaluate <- function(data, outcome = NULL, predictors = NULL, newdata = NULL, digits = 3, filename = "", ...){
-  UseMethod("evaluate")
+#'
+#' @examples
+#' tk <- nmtask(train.data = aps,
+#' outcome = "elope",
+#' predictors = c("age", "gender", "place3", "neuro", "danger"))
+#'
+#' performance(tk)
+#'
+#' # Save to word, not run
+#' # performance(tk, filename = "performance")
+performance <- function(data, outcome = NULL, predictors = NULL, newdata = NULL, digits = 3, filename = "", ...){
+  UseMethod("performance")
 }
 
 
-
-#' @rdname evaluate
+#' @rdname performance
 #' @export
-evaluate.data.frame <- function(data, outcome = NULL, predictors = NULL, newdata = NULL, digits = 3, filename = "", ...){
+performance.data.frame <- function(data, outcome = NULL, predictors = NULL, newdata = NULL, digits = 3, filename = "", ...){
 
   outcome    <- select_variable(data, outcome)
   predictors <- select_variable(data, predictors)
@@ -30,10 +39,11 @@ evaluate.data.frame <- function(data, outcome = NULL, predictors = NULL, newdata
                    combine.only = TRUE,
                    digits = digits)
 
-  names(perA) <- c("Items", "Training set")
+  names(perA) <- c("Items", sprintf("Training set (n=%d)", nrow(data)))
 
   if(is.null(newdata)){
     if(filename == ""){
+      class(perA) <- c("performance", class(perA))
       perA
     }else{
       write_docx(perA, path = filename)
@@ -51,12 +61,13 @@ evaluate.data.frame <- function(data, outcome = NULL, predictors = NULL, newdata
                      exposure = ".pre",
                      digits = digits)
 
-    names(perB) <- c("Items", "Validation set")
+    names(perB) <- c("Items", sprintf("Validation set (n=%d)", nrow(newdata)))
 
     per <- merge_left(perA, perB, by = "Items")
     attr(per, "title") <- attr(perB, "title")
     attr(per, "note") <- attr(perB, "note")
     if(filename == ""){
+      class(per) <- c("performance", class(per))
       per
     }else{
       write_docx(per, path = filename)
@@ -65,10 +76,9 @@ evaluate.data.frame <- function(data, outcome = NULL, predictors = NULL, newdata
 }
 
 
-
-#' @rdname evaluate
+#' @rdname performance
 #' @export
-evaluate.nmtask <- function(data, outcome = NULL, predictors = NULL, newdata = NULL, digits = 3, filename = "", ...){
+performance.nmtask <- function(data, outcome = NULL, predictors = NULL, newdata = NULL, digits = 3, filename = "", ...){
 
   train.data <- data$train.data
 
@@ -84,11 +94,44 @@ evaluate.nmtask <- function(data, outcome = NULL, predictors = NULL, newdata = N
     predictors <- data$predictors
   }
 
-  evaluate.data.frame(data = train.data,
+  performance.data.frame(data = train.data,
                       outcome = outcome,
                       predictors = predictors,
                       newdata = newdata,
                       digits = digits,
                       filename = filename,
                       ...)
+}
+
+
+#' @rdname performance
+#' @export
+performance.glm <- function(data, outcome = NULL, predictors = NULL, newdata = NULL, digits = 3, filename = "", ...){
+
+  if(data$family[[1]] == "binomial"){
+
+    train.data <- data$data
+    outcome <- all.vars(data$formula)[1]
+    predictors <- all.vars(data$formula)[-1]
+
+    performance.data.frame(data = train.data,
+                        outcome = outcome,
+                        predictors = predictors,
+                        newdata = newdata,
+                        digits = digits,
+                        filename = filename,
+                        ...)
+  }
+}
+
+
+#' Print performance
+#'
+#' @param x a object of performance
+#' @param ... more.
+#'
+#' @keywords internal
+#' @export
+print.performance <- function(x, ...){
+  print_booktabs(x, adj = c("l", "c"))
 }

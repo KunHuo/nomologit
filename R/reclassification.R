@@ -74,14 +74,14 @@ llist <- function (..., labels = TRUE) {
 }
 
 
-reclassification <- function (outcome, predrisk1, predrisk2, cutoff = NULL, digits = 3) {
+reclass_exec <- function (outcome, predrisk1, predrisk2, cutoff = NULL, digits = 3) {
 
   outcome <- as.numeric(as.factor(outcome)) - 1
 
-  cutoff <- c(0, cutoff, 1)
+  cutoff.new <- c(0, cutoff, 1)
 
-  c1 <- cut(predrisk1, breaks = cutoff, include.lowest = TRUE, right = FALSE)
-  c2 <- cut(predrisk2, breaks = cutoff, include.lowest = TRUE, right = FALSE)
+  c1 <- cut(predrisk1, breaks = cutoff.new, include.lowest = TRUE, right = FALSE)
+  c2 <- cut(predrisk2, breaks = cutoff.new, include.lowest = TRUE, right = FALSE)
 
   c11 <- factor(c1, levels = levels(c1), labels = c(1:length(levels(c1))))
   c22 <- factor(c2, levels = levels(c2), labels = c(1:length(levels(c2))))
@@ -94,25 +94,82 @@ reclassification <- function (outcome, predrisk1, predrisk2, cutoff = NULL, digi
                    x2 = predrisk2,
                    y  = outcome)
 
-  NRI.cat <- sprintf("%.3f (%.3f, %.3f)", x$nri, x$nri - 1.96 * x$se.nri, x$nri + 1.96 * x$se.nri)
-  NRI.con <- sprintf("%.3f (%.3f, %.3f)", y$nri, y$nri - 1.96 * y$se.nri, y$nri + 1.96 * y$se.nri)
-  IDI     <- sprintf("%.3f (%.3f, %.3f)", y$idi, y$idi - 1.96 * y$se.idi, y$idi + 1.96 * y$se.idi)
+  fmt <- fmt_ci_3(digits = digits, sep = ", ")
 
-  NRI.cat.pvalue <- sprintf("%.3f", 2 * stats::pnorm(-abs(x$z.nri)))
-  NRI.con.pvalue <- sprintf("%.3f", 2 * stats::pnorm(-abs(y$z.nri)))
-  IDI.pvalue     <- sprintf("%.3f", 2 * stats::pnorm(-abs(y$z.idi)))
+  NRI.cat <- sprintf(fmt, x$nri, x$nri - 1.96 * x$se.nri, x$nri + 1.96 * x$se.nri)
+  NRI.con <- sprintf(fmt, y$nri, y$nri - 1.96 * y$se.nri, y$nri + 1.96 * y$se.nri)
+  IDI     <- sprintf(fmt, y$idi, y$idi - 1.96 * y$se.idi, y$idi + 1.96 * y$se.idi)
 
+  NRI.cat.pvalue <- format_pvalue(2 * stats::pnorm(-abs(x$z.nri)), digits)
+  NRI.con.pvalue <- format_pvalue(2 * stats::pnorm(-abs(y$z.nri)), digits)
+  IDI.pvalue     <- format_pvalue(2 * stats::pnorm(-abs(y$z.idi)), digits)
 
-  NRI.cat.res <- tibble::tibble("NRI (95% CI)" = NRI.cat, "P for NRI" = NRI.cat.pvalue)
-  NRI.con.res <- tibble::tibble("NRI (95% CI)" = NRI.con, "P for NRI" = NRI.con.pvalue)
+  NRI.cat.res <- tibble::tibble("Categorical NRI (95% CI)" = NRI.cat, "P for NRI" = NRI.cat.pvalue)
+  NRI.con.res <- tibble::tibble("Continuous NRI (95% CI)" = NRI.con, "P for NRI" = NRI.con.pvalue)
   IDI.res     <- tibble::tibble("IDI (95% CI)" = IDI, "P for IDI" = IDI.pvalue)
 
-  cbind(NRI.cat.res, IDI.res)
+  if(is.null(cutoff)){
+    cbind(NRI.con.res, IDI.res)
+  }else{
+    cbind(NRI.cat.res, IDI.res)
+  }
 }
 
 
-
-
+#' Comparision of nomogram models
+#'
+#' @details The function computes the categorical and continuous net reclassification
+#' improvement (NRI) and integrated discrimination improvement (IDI). A reclassification
+#' table indicates the number of individuals who move to another risk category or
+#' remain in the same risk category as a result of updating the risk model.
+#' Categorical NRI equal to x% means that compared with individuals without outcome,
+#' individuals with outcome were almost x% more likely to move up a category than
+#' down. The function also computes continuous NRI, which does not require any
+#' discrete risk categories and relies on the proportions of individuals with
+#' outcome correctly assigned a higher probability and individuals without outcome
+#' correctly assigned a lower probability by an updated model compared with the
+#' initial model. IDI equal to x% means that the difference in average predicted
+#' risks between the individuals with and without the outcome increased by x% in
+#' the updated model.
+#'
+#' @param ... nomogram models.
+#' @param cutoff cutoff values for risk categories NRI.if is NULL, the function will compute continuous NRI.
+#' @param digits digits, default 3.
+#'
+#' @return a data frame.
+#' @export
+#'
+#' @examples
+#'
+#' # From nomogram task
+#' tk1 <- nmtask(train.data = aps,
+#'               outcome = "elope",
+#'               predictors = c("age", "gender"))
+#'
+#' tk2 <- nmtask(train.data = aps,
+#'               outcome = "elope",
+#'               predictors = c("age", "gender", "place3"))
+#'
+#' tk3 <- nmtask(train.data = aps,
+#'               outcome = "elope",
+#'               predictors = c("age", "gender", "place3", "neuro", "danger"))
+#'
+#' # Compute continuous NRI and IDI
+#' compare(tk1, tk2, tk3)
+#' # or
+#' reclassification(tk1, tk2, tk3)
+#'
+#' # Compute categorical NRI and IDI
+#' compare(tk1, tk2, tk3, cutoff = 0.5)
+#' # or
+#' reclassification(tk1, tk2, tk3, cutoff = 0.5)
+#'
+#' # From logistic model
+#' model1 <- glm(elope ~ age + gender + place3 + neuro + danger, data = aps, family = binomial())
+#' model2 <- glm(elope ~ age + gender + place3 + neuro + danger + custd, data = aps, family = binomial())
+#'
+#' compare(model1, model2, cutoff = c(0.2, 0.7))
+#' compare(tk3, model2, cutoff = c(0.2, 0.7))
 compare <- function(..., cutoff = NULL, digits = 3){
   models <- list(...)
 
@@ -131,19 +188,46 @@ compare <- function(..., cutoff = NULL, digits = 3){
   comp <- as.data.frame(comp, stringsAsFactors = FALSE)
 
   out <- lapply(comp, function(x){
-    comparision <- paste(x[2], x[1], sep = " vs ")
 
-    res <- reclassification(outcome = models[[x[1]]]$y,
+    Comparision <- sprintf("Model %d vs. Model %d", x[2], x[1])
+
+    res <- reclass_exec(outcome = models[[x[1]]]$y,
                      predrisk1 = models[[x[1]]]$fitted.values,
                      predrisk2 = models[[x[2]]]$fitted.values,
                      cutoff = cutoff,
                      digits = digits)
-    cbind(comparision, res)
+    cbind(Comparision, res)
   })
 
   out <- do.call(rbind, out)
-  attr(out, "title") <- "Comparision"
+
+  if(!is.null(cutoff)){
+    attr(out, "title") <- "Comparision of models using categorical NRI and IDI"
+  }else{
+    attr(out, "title") <- "Comparision of models using continuous NRI and IDI"
+  }
+
+  attr(out, "note") <- "Abbreviations: NRI, Net reclassification improvement; IDI, Integrated discrimination improvement"
+
+  class(out) <- c("compare", class(out))
+
   out
 }
 
+
+#' @rdname compare
+#' @export
+reclassification <- compare
+
+
+#' Print object
+#'
+#' @param x an object.
+#' @param ... more.
+#'
+#' @keywords internal
+#' @export
+print.compare <- function(x, ...){
+  print_booktabs(x, adj = c("l", "c"), ...)
+}
 

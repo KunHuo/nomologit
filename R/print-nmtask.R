@@ -3,6 +3,8 @@
 #' @param x an object of class 'nmtask'.
 #' @param ... further arguments.
 #'
+#' @keywords internal
+#'
 #' @export
 print.nmtask <- function(x, ...){
   cat("<Nomogram task for logistic>\n")

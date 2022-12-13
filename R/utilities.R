@@ -1000,3 +1000,51 @@ cut2 <- function (x, cuts, m = 150, g, levels.mean = FALSE, digits, minmax = TRU
     label(y) <- xlab
   y
 }
+
+
+format_digits <- function(x, digits){
+  sapply(x, function(i){
+    if(is.na(i)){
+      i
+    }else{
+      fmt <- sprintf("%%.%df", digits)
+      sprintf(fmt = fmt, i)
+    }
+  })
+}
+
+
+format_statistic <- function(x, digits) {
+  fmt <- paste0("%.", digits, "f")
+  pVec <- sapply(x, function(i) {
+    if (is.na(i)) {
+      NA
+    } else {
+      ifelse(i == -1, "NA", sprintf(fmt = fmt, i))
+    }
+  })
+
+  small <- paste0("<0.", paste0(rep("0", digits - 1), collapse = ""), "1")
+  pos.small <- grepl("^0\\.0*$", pVec)
+  pVec[pos.small] <- small
+
+  return(pVec)
+}
+
+
+format_pvalue <- function(x, digits) {
+  fmt  <- paste0("%.", digits, "f")
+
+  pVec <- sapply(x, function(i){
+    if(is.na(i)){
+      NA
+    }else{
+      ifelse(i == -1, "NA", sprintf(fmt = fmt, i))
+    }
+  })
+  smallPString <- paste0("<0.", paste0(rep("0", digits - 1), collapse = ""), "1")
+  posAllZeros <- grepl("^0\\.0*$", pVec)
+
+  pVec[posAllZeros]  <- smallPString
+  return(pVec)
+}
