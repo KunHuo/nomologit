@@ -157,8 +157,7 @@ roc.glm <- function(data,
                     linesize = 0.5,
                     linecolor = NULL,
                     xlab = NULL,
-                    ylab = NULL,
-                    filename = "",...){
+                    ylab = NULL, ...){
 
   if(data$family[[1]] == "binomial"){
 

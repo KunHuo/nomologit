@@ -52,7 +52,6 @@ roc(
   linecolor = NULL,
   xlab = NULL,
   ylab = NULL,
-  filename = "",
   ...
 )
 }

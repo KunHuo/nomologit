@@ -41,8 +41,8 @@ improveProb <- function (x1, x2, y) {
   improveSens <- sum(d[a])/na
   improveSpec <- -sum(d[b])/nb
   idi <- mean(d[a]) - mean(d[b])
-  var.ev <- var(d[a])/na
-  var.ne <- var(d[b])/nb
+  var.ev <- stats::var(d[a])/na
+  var.ne <- stats::var(d[b])/nb
   se.idi <- sqrt(var.ev + var.ne)
   z.idi <- idi/se.idi
   structure(llist(n, na, nb, pup.ev, pup.ne, pdown.ev, pdown.ne,
@@ -165,8 +165,8 @@ reclass_exec <- function (outcome, predrisk1, predrisk2, cutoff = NULL, digits =
 #' reclassification(tk1, tk2, tk3, cutoff = 0.5)
 #'
 #' # From logistic model
-#' model1 <- glm(elope ~ age + gender + place3 + neuro + danger, data = aps, family = binomial())
-#' model2 <- glm(elope ~ age + gender + place3 + neuro + danger + custd, data = aps, family = binomial())
+#' model1 <- glm(elope ~ age + gender, data = aps, family = binomial())
+#' model2 <- glm(elope ~ age + gender + place3 + neuro, data = aps, family = binomial())
 #'
 #' compare(model1, model2, cutoff = c(0.2, 0.7))
 #' compare(tk3, model2, cutoff = c(0.2, 0.7))

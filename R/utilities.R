@@ -860,13 +860,13 @@ fct_reorder <- function(data, varname, order, exclude = NA) {
   data
 }
 
-
+#' @importFrom rlang as_function
 cut2 <- function (x, cuts, m = 150, g, levels.mean = FALSE, digits, minmax = TRUE,
                   oneval = TRUE, onlycuts = FALSE, formatfun = format, ...) {
   if (inherits(formatfun, "formula")) {
     if (!requireNamespace("rlang"))
       stop("Package 'rlang' must be installed to use formula notation")
-    formatfun <- getFromNamespace("as_function", "rlang")(formatfun)
+    formatfun <- utils::getFromNamespace("as_function", "rlang")(formatfun)
   }
   method <- 1
   x.unique <- sort(unique(c(x[!is.na(x)], if (!missing(cuts)) cuts)))
@@ -900,7 +900,7 @@ cut2 <- function (x, cuts, m = 150, g, levels.mean = FALSE, digits, minmax = TRU
     m <- length(xx)
     y <- as.integer(ifelse(is.na(x), NA, 1))
     labs <- character(g)
-    cuts <- approx(cum, xx, xout = (1:g) * nnm/g, method = "constant",
+    cuts <- stats::approx(cum, xx, xout = (1:g) * nnm/g, method = "constant",
                    rule = 2, f = 1)$y
     cuts[length(cuts)] <- max(xx)
     lower <- xx[1]
@@ -923,7 +923,7 @@ cut2 <- function (x, cuts, m = 150, g, levels.mean = FALSE, digits, minmax = TRU
           max(xx)
         else if (sum(s) < 2)
           max(xx)
-        else approx(cum[s] - cum.used, xx[s], xout = (nnm -
+        else stats::approx(cum[s] - cum.used, xx[s], xout = (nnm -
                                                         cum.used)/(g - j + 1), method = "constant",
                     rule = 2, f = 1)$y
       }
@@ -997,7 +997,8 @@ cut2 <- function (x, cuts, m = 150, g, levels.mean = FALSE, digits, minmax = TRU
   }
   attr(y, "class") <- "factor"
   if (length(xlab))
-    label(y) <- xlab
+    # label(y) <- xlab
+    attr(y, "label") <- xlab
   y
 }
 

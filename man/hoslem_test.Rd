@@ -4,7 +4,7 @@
 \alias{hoslem_test}
 \alias{hoslem_test.data.frame}
 \alias{hoslem_test.nmtask}
-\title{Hosmer-Lemeshow Test}
+\title{Hosmer-Lemeshow test}
 \usage{
 hoslem_test(data, outcome = NULL, predictors = NULL, g = 10)
 
@@ -22,7 +22,7 @@ hoslem_test(data, outcome = NULL, predictors = NULL, g = 10)
 \item{g}{number of bins to use to calculate quantiles.}
 }
 \description{
-Hosmer-Lemeshow Test
+Hosmer-Lemeshow test
 }
 \examples{
 head(aps)

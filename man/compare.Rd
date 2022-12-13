@@ -63,8 +63,8 @@ compare(tk1, tk2, tk3, cutoff = 0.5)
 reclassification(tk1, tk2, tk3, cutoff = 0.5)
 
 # From logistic model
-model1 <- glm(elope ~ age + gender + place3 + neuro + danger, data = aps, family = binomial())
-model2 <- glm(elope ~ age + gender + place3 + neuro + danger + custd, data = aps, family = binomial())
+model1 <- glm(elope ~ age + gender, data = aps, family = binomial())
+model2 <- glm(elope ~ age + gender + place3 + neuro, data = aps, family = binomial())
 
 compare(model1, model2, cutoff = c(0.2, 0.7))
 compare(tk3, model2, cutoff = c(0.2, 0.7))
