@@ -1,4 +1,4 @@
-#' Hosmer-Lemeshow Test
+#' Hosmer-Lemeshow test
 #'
 #' @param data data.
 #' @param outcome predict outcome.
