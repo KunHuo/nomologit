@@ -9,7 +9,6 @@
 #' @param linecolor line color.
 #' @param xlab label for X axis.
 #' @param ylab label for Y axis.
-#' @param filename file name to save performance metrics.
 #' @param ... further arguments.
 #'
 #' @export
@@ -44,17 +43,14 @@
 #'              outcome = "elope",
 #'              predictors = c("age", "gender", "place3", "neuro"))
 #' roc(tk)
-#'
-#' # save performance metrics to a word.
-#' # roc(tk, filename = "ROC.docx)
-roc <- function(data, outcome = NULL, predictors = NULL, newdata = NULL, linesize =0.5, linecolor = NULL, xlab = NULL, ylab = NULL, filename = "", ...){
+roc <- function(data, outcome = NULL, predictors = NULL, newdata = NULL, linesize =0.5, linecolor = NULL, xlab = NULL, ylab = NULL, ...){
   UseMethod("roc")
 }
 
 
 #' @rdname roc
 #' @export
-roc.data.frame <- function(data, outcome = NULL, predictors = NULL, newdata = NULL, linesize =0.5, linecolor = NULL, xlab = NULL, ylab = NULL, filename = "", ...){
+roc.data.frame <- function(data, outcome = NULL, predictors = NULL, newdata = NULL, linesize =0.5, linecolor = NULL, xlab = NULL, ylab = NULL, ...){
 
   if(is.null(xlab)){
     xlab <- "1 - Specificity"
@@ -88,19 +84,8 @@ roc.data.frame <- function(data, outcome = NULL, predictors = NULL, newdata = NU
                  combine.only = TRUE,
                  digits = 3)
 
-  names(perA) <- c("Items", "Training set")
-
   if(is.null(newdata)){
-
-    if(filename == ""){
-      print_booktabs(perA)
-      cat("\n")
-    }else{
-      write_docx(perA, path = filename)
-    }
-
     cat("Figure: ROC curves of the nomogram for training set.\n")
-
     plotA
   }else{
     frm <- paste(predictors, collapse = " + ")
@@ -114,20 +99,6 @@ roc.data.frame <- function(data, outcome = NULL, predictors = NULL, newdata = NU
                    outcome = outcome,
                    exposure = ".pre",
                    digits = 3)
-    # perB[1, 2] <- ""
-    names(perB) <- c("Items", "Validation set")
-
-    per <- merge_left(perA, perB, by = "Items")
-    attr(per, "title") <- attr(perB, "title")
-    attr(per, "note") <- attr(perB, "note")
-    if(filename == ""){
-      print_booktabs(per)
-
-      cat("\n")
-    }else{
-      write_docx(per, path = filename)
-    }
-
     cat("Figure: ROC curves of the nomogram for training set (A) and validation set (B).\n")
 
     plotB <- gg_roc(data = newdata,
@@ -150,7 +121,7 @@ roc.data.frame <- function(data, outcome = NULL, predictors = NULL, newdata = NU
 
 #' @rdname roc
 #' @export
-roc.nmtask <- function(data, outcome = NULL, predictors = NULL, newdata = NULL, linesize = 0.5, linecolor = NULL, xlab = NULL, ylab = NULL, filename = "",...){
+roc.nmtask <- function(data, outcome = NULL, predictors = NULL, newdata = NULL, linesize = 0.5, linecolor = NULL, xlab = NULL, ylab = NULL, ...){
   train.data <- data$train.data
 
   if(is.null(newdata)){
@@ -173,7 +144,7 @@ roc.nmtask <- function(data, outcome = NULL, predictors = NULL, newdata = NULL, 
                  linecolor = linecolor,
                  xlab = xlab,
                  ylab = ylab,
-                 filename = filename,...)
+                 ...)
 }
 
 
@@ -202,7 +173,7 @@ roc.glm <- function(data,
                    xlab = xlab,
                    ylab = ylab,
                    linesize = linesize,
-                   linecolor = linecolor, filename = filename, ...)
+                   linecolor = linecolor, ...)
   }
 
 }

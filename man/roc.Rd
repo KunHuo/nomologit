@@ -16,7 +16,6 @@ roc(
   linecolor = NULL,
   xlab = NULL,
   ylab = NULL,
-  filename = "",
   ...
 )
 
@@ -29,7 +28,6 @@ roc(
   linecolor = NULL,
   xlab = NULL,
   ylab = NULL,
-  filename = "",
   ...
 )
 
@@ -42,7 +40,6 @@ roc(
   linecolor = NULL,
   xlab = NULL,
   ylab = NULL,
-  filename = "",
   ...
 )
 
@@ -76,8 +73,6 @@ is printed about which variables were selected in each model re-fit.}
 \item{xlab}{label for X axis.}
 
 \item{ylab}{label for Y axis.}
-
-\item{filename}{file name to save performance metrics.}
 
 \item{...}{further arguments.}
 }
@@ -115,7 +110,4 @@ tk <- nmtask(train.data = train,
              outcome = "elope",
              predictors = c("age", "gender", "place3", "neuro"))
 roc(tk)
-
-# save performance metrics to a word.
-# roc(tk, filename = "ROC.docx)
 }
