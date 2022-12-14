@@ -2,111 +2,59 @@
 % Please edit documentation in R/roc.R
 \name{roc}
 \alias{roc}
-\alias{roc.data.frame}
-\alias{roc.nmtask}
-\alias{roc.glm}
-\title{Draw ROC curve}
+\title{Draw ROC curves}
 \usage{
 roc(
-  data,
-  outcome = NULL,
-  predictors = NULL,
+  ...,
   newdata = NULL,
-  linesize = 0.5,
+  boot = 10,
+  facet = c("data", "model"),
+  linewidth = 0.5,
   linecolor = NULL,
-  xlab = NULL,
-  ylab = NULL,
-  ...
-)
-
-\method{roc}{data.frame}(
-  data,
-  outcome = NULL,
-  predictors = NULL,
-  newdata = NULL,
-  linesize = 0.5,
-  linecolor = NULL,
-  xlab = NULL,
-  ylab = NULL,
-  ...
-)
-
-\method{roc}{nmtask}(
-  data,
-  outcome = NULL,
-  predictors = NULL,
-  newdata = NULL,
-  linesize = 0.5,
-  linecolor = NULL,
-  xlab = NULL,
-  ylab = NULL,
-  ...
-)
-
-\method{roc}{glm}(
-  data,
-  outcome = NULL,
-  predictors = NULL,
-  newdata = NULL,
-  linesize = 0.5,
-  linecolor = NULL,
-  xlab = NULL,
-  ylab = NULL,
-  ...
+  xlab = "1 - Specificity",
+  ylab = "Sensitivity",
+  xbreaks = seq(0, 1, 0.2),
+  ybreaks = seq(0, 1, 0.2),
+  fontfamily = "serif",
+  fontsize = 12,
+  explain = TRUE,
+  seed = 1234
 )
 }
 \arguments{
-\item{data}{data}
+\item{...}{one or more object of 'nmtask' or 'glm'.}
 
-\item{outcome}{predict outcome.}
+\item{newdata}{new data for verification.}
 
-\item{predictors}{predictors.}
+\item{boot}{boot is an upper limit on the number of resamples for which information
+is printed about which variables were selected in each model re-fit, default 1000.}
 
-\item{newdata}{new data for verification.
-is printed about which variables were selected in each model re-fit.}
+\item{facet}{of 'data' or 'model', specifying grouping variables for faceting
+the plot into multiple panels, default 'data'.}
 
-\item{linesize}{line size, default 0.25.}
+\item{linewidth}{line width, default 0.5.}
 
 \item{linecolor}{line color.}
 
-\item{xlab}{label for X axis.}
+\item{xlab}{x axis label.}
 
-\item{ylab}{label for Y axis.}
+\item{ylab}{y axis label.}
 
-\item{...}{further arguments.}
+\item{xbreaks}{x axis breaks.}
+
+\item{ybreaks}{y axis breaks.}
+
+\item{fontfamily}{font family, sefault serif.}
+
+\item{fontsize}{font size, default 12.}
+
+\item{explain}{whether explain the figure, default TRUE.}
+
+\item{seed}{a single value, interpreted as an integer, or NULL, default 1234.}
+}
+\value{
+a ggplot object from the \link{ggplot2} package, or a patchwork object from \link{patchwork} package.
 }
 \description{
-Draw ROC curve
-}
-\examples{
-head(aps)
-
-# Basic usage
-roc(aps,
-    outcome = "elope",
-    predictors = c("age", "gender", "place3", "neuro"))
-
-
-# From a nmtask
-tk <- nmtask(train.data = aps,
-             outcome = "elope",
-             predictors = c("age", "gender", "place3", "neuro"))
-roc(tk)
-
-
-# With validation
-index <- sample(1:nrow(aps), 300)
-train <- aps[index, ]
-test  <- aps[-index, ]
-
-roc(train,
-    outcome = "elope",
-    predictors = c("age", "gender", "place3", "neuro"),
-    newdata = test)
-# or
-tk <- nmtask(train.data = train,
-             test.data = test,
-             outcome = "elope",
-             predictors = c("age", "gender", "place3", "neuro"))
-roc(tk)
+Draw ROC curves
 }

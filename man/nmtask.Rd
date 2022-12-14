@@ -55,7 +55,7 @@ hoslem_test(tk)
 nom(tk)
 
 # Draw calibrate curve
-cal(tk, B = 10)
+cal(tk)
 
 # Draw ROC curve
 roc(tk)

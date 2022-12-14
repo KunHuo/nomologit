@@ -10,8 +10,6 @@
 #' @details Set labels use [set_variable_labels] and [set_category_labels] function.
 #'
 #' @param data a data frame
-#' @param outcome predict outcome.
-#' @param predictors predictors.
 #' @param points.label a character string giving the axis label for the points scale.
 #' @param total.points.label a character string giving the axis label for the total points scale.
 #' @param funlabel label for fun axis.
@@ -29,62 +27,43 @@
 #' @examples
 #' head(aps)
 #'
-#' # Basic usage
-#' nom(data = aps,
-#'     outcome = "elope",
-#'     predictors = c("age", "gender", "place3", "neuro"))
-#'
-#' # Set labels
-#' nm <- nom(data = aps,
-#'           outcome = "elope",
-#'           predictors = c("age", "gender", "place3"))
-#' nm |>
-#'   set_variable_labels(age = "Age (years)") |>
-#'   set_variable_labels(gender = "Gender", place3 = "Placement") |>
-#'   set_category_labels("Gender", Male = "M", Female = "F") |>
-#'   set_category_labels("Placement", OutDay = "Outday")
-#'
-#' nom(data = aps,
-#'     outcome = "elope",
-#'     predictors = c("age", "gender", "place3", "neuro"),
-#'     funlabel = "Risk of Elopement")
+#' # From nmtask
+#' tk <- nmtask(train.data = aps,
+#'              outcome = "elope",
+#'              predictors = c("age", "gender", "place3", "neuro"))
 #'
 #' # Set the scale of the risk axis.
-#' nom(data = aps,
-#'     outcome = "elope",
-#'     predictors = c("age", "gender", "place3", "neuro"),
+#' nom(tk,
 #'     funlabel = "Risk of Elopement",
 #'     fun.at = c(0.1, 0.15, 0.25, 0.35, 0.45, 0.55, 0.65))
 #'
 #' # Fraction of horizontal plot to set aside for axis titles.
-#' nom(data = aps,
-#'     outcome = "elope",
-#'     predictors = c("age", "gender", "place3", "neuro"),
+#' nom(tk,
 #'     funlabel = "Risk of Elopement",
 #'     fun.at = c(0.1, 0.15, 0.25, 0.35, 0.45, 0.55, 0.65),
 #'     xfrac = 0.65)
 #'
 #' # show model and points
-#' nom(data = aps,
-#'     outcome = "elope",
-#'     predictors = c("age", "gender", "place3", "neuro"),
+#' nom(tk,
 #'     funlabel = "Risk of Elopement",
 #'     fun.at = c(0.1, 0.15, 0.25, 0.35, 0.45, 0.55, 0.65),
 #'     xfrac = 0.65,
 #'     show.points = TRUE,
 #'     show.model = TRUE)
 #'
-#' # From nmtask
-#' tk <- nmtask(train.data = aps,
-#'              outcome = "elope",
-#'              predictors = c("age", "gender", "place3", "neuro"))
-#' nom(tk,
-#'     funlabel = "Risk of Elopement",
-#'     fun.at = c(0.1, 0.15, 0.25, 0.35, 0.45, 0.55, 0.65),
-#'     xfrac = 0.65)
+#' nm <- nom(tk,
+#'           funlabel = "Risk of Elopement",
+#'           fun.at = c(0.1, 0.15, 0.25, 0.35, 0.45, 0.55, 0.65),
+#'           xfrac = 0.65)
+#' nm
+#'
+#' # set labels
+#' nm |>
+#'   set_variable_labels(age = "Age (years)") |>
+#'   set_variable_labels(gender = "Gender", place3 = "Placement") |>
+#'   set_category_labels("Gender", Male = "M", Female = "F") |>
+#'   set_category_labels("Placement", OutDay = "Outday")
 nom <- function(data,
-                outcome = NULL,
-                predictors = NULL,
                 points.label = "Points",
                 total.points.label = "Total points",
                 funlabel = "Risk",
@@ -95,30 +74,7 @@ nom <- function(data,
                 labels = NULL,
                 show.points = FALSE,
                 show.model = FALSE,
-                show.explain = TRUE,
-                ...){
-
-  UseMethod("nom")
-}
-
-
-#' @rdname nom
-#' @export
-nom.data.frame <- function(data,
-                           outcome = NULL,
-                           predictors = NULL,
-                           points.label = "Points",
-                           total.points.label = "Total points",
-                           funlabel = "Risk",
-                           maxscale = 100,
-                           xfrac = 0.35,
-                           font.size = 12,
-                           fun.at = NULL,
-                           labels = NULL,
-                           show.points = FALSE,
-                           show.model = FALSE,
-                           show.explain = TRUE,
-                           ...){
+                show.explain = TRUE, ...) {
 
   if(!is.null(labels)){
     for(i in 1:length(labels)){
@@ -128,12 +84,16 @@ nom.data.frame <- function(data,
     }
   }
 
+  train.data <- data$train.data
+  outcome <- data$outcome
+  predictors <- data$predictors
+
   pos <- 1
   envir = as.environment(pos)
-  assign("dddd", rms::datadist(data), envir = envir)
+  assign("dddd", rms::datadist(train.data), envir = envir)
   options(datadist = "dddd")
 
-  model <- logistic(data = data, outcome = outcome, predictors = predictors)
+  model <- logistic(data = train.data, outcome = outcome, predictors = predictors)
 
   if(show.model){
     print(model)
@@ -153,8 +113,6 @@ nom.data.frame <- function(data,
                          maxscale = maxscale,
                          fun.at = fun.at, ...)
   }
-
-
 
   if(exists("dddd")){
     rm("dddd", inherits = TRUE, envir = envir)
@@ -179,95 +137,6 @@ nom.data.frame <- function(data,
 
   nom
 }
-
-
-#' @rdname nom
-#' @export
-nom.nmtask <- function(data,
-                        outcome = NULL,
-                        predictors = NULL,
-                        points.label = "Points",
-                        total.points.label = "Total points",
-                        funlabel = "Risk",
-                        maxscale = 100,
-                        xfrac = 0.35,
-                        font.size = 12,
-                        fun.at = NULL,
-                        labels = NULL,
-                        show.points = FALSE,
-                        show.model = FALSE,
-                        show.explain = TRUE,
-                        ...){
-
-  train.data <- data$train.data
-
-  if(is.null(outcome)){
-    outcome <- data$outcome
-  }
-
-  if(is.null(predictors)){
-    predictors <- data$predictors
-  }
-
-  nom.data.frame(data = train.data,
-                 outcome = outcome,
-                 predictors = predictors,
-                 points.label = points.label,
-                 total.points.label = total.points.label,
-                 funlabel = funlabel,
-                 maxscale = maxscale,
-                 xfrac = xfrac,
-                 font.size = font.size,
-                 fun.at = fun.at,
-                 labels = labels,
-                 show.points = show.points,
-                 show.model = show.model,
-                 show.explain = show.explain,
-                 ...)
-}
-
-
-#' @rdname nom
-#' @export
-nom.glm <- function(data,
-                       outcome = NULL,
-                       predictors = NULL,
-                       points.label = "Points",
-                       total.points.label = "Total points",
-                       funlabel = "Risk",
-                       maxscale = 100,
-                       xfrac = 0.35,
-                       font.size = 12,
-                       fun.at = NULL,
-                       labels = NULL,
-                       show.points = FALSE,
-                       show.model = FALSE,
-                       show.explain = TRUE,
-                       ...){
-
-  if(data$family[[1]] == "binomial"){
-    train.data <- data$data
-    outcome <- all.vars(data$formula)[1]
-    predictors <- all.vars(data$formula)[-1]
-
-    nom.data.frame(data = train.data,
-                   outcome = outcome,
-                   predictors = predictors,
-                   points.label = points.label,
-                   total.points.label = total.points.label,
-                   funlabel = funlabel,
-                   maxscale = maxscale,
-                   xfrac = xfrac,
-                   font.size = font.size,
-                   fun.at = fun.at,
-                   labels = labels,
-                   show.points = show.points,
-                   show.model = show.model,
-                   show.explain = show.explain,
-                   ...)
-  }
-}
-
 
 #' Print nomogram
 #'
@@ -299,7 +168,6 @@ print.nomologit <- function(x, ...){
   }
 }
 
-
 #' Set labels for nomogram
 #'
 #' @param x a nomogram object from nom() function
@@ -311,10 +179,17 @@ print.nomologit <- function(x, ...){
 #' @export
 #'
 #' @examples
-#' nm <- nom(data = aps,
-#'           outcome = "elope",
-#'           predictors = c("age", "gender", "place3"))
+#' tk <- nmtask(train.data = aps,
+#'              outcome = "elope",
+#'              predictors = c("age", "gender", "place3", "neuro"))
 #'
+#' nm <- nom(tk,
+#'           funlabel = "Risk of Elopement",
+#'           fun.at = c(0.1, 0.15, 0.25, 0.35, 0.45, 0.55, 0.65),
+#'           xfrac = 0.65)
+#' nm
+#'
+#' # set labels
 #' nm |>
 #'   set_variable_labels(age = "Age (years)") |>
 #'   set_variable_labels(gender = "Gender", place3 = "Placement") |>
@@ -341,10 +216,17 @@ set_variable_labels <- function(x, ...){
 #' @export
 #'
 #' @examples
-#' nm <- nom(data = aps,
-#'           outcome = "elope",
-#'           predictors = c("age", "gender", "place3"))
+#' tk <- nmtask(train.data = aps,
+#'              outcome = "elope",
+#'              predictors = c("age", "gender", "place3", "neuro"))
 #'
+#' nm <- nom(tk,
+#'           funlabel = "Risk of Elopement",
+#'           fun.at = c(0.1, 0.15, 0.25, 0.35, 0.45, 0.55, 0.65),
+#'           xfrac = 0.65)
+#' nm
+#'
+#' # set labels
 #' nm |>
 #'   set_variable_labels(age = "Age (years)") |>
 #'   set_variable_labels(gender = "Gender", place3 = "Placement") |>

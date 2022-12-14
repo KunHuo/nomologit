@@ -129,8 +129,6 @@ cal <- function(...,
     train.plotdata <- as.data.frame(train.plotdata)
     train.plotdata$group <- "Training set"
 
-    plotdata <- train.plotdata
-
     # test data
     if(!is.null(test.data)){
       test.data <- test.data[c(outcome, predictors)]
@@ -145,9 +143,10 @@ cal <- function(...,
       test.plotdata <- as.data.frame(test.plotdata)
       test.plotdata$group <- "Validation set"
 
-      plotdata <-  rbind(train.plotdata, test.plotdata)
+      rbind(train.plotdata, test.plotdata)
+    }else{
+      train.plotdata
     }
-    plotdata
   })
 
   # set names
@@ -227,8 +226,8 @@ cal <- function(...,
 
 plot_cal <- function(pdata, linewidth, linecolor, xlab, ylab, xbreaks, ybreaks, fontfamily, fontsize, group){
 
-  minaxis <- min(c(pdata$predy, pdata$calibrated.corrected))
-  maxaxis <- max(c(pdata$predy, pdata$calibrated.corrected))
+  minaxis <- min(c(pdata$predy, pdata$calibrated.corrected), na.rm = TRUE)
+  maxaxis <- max(c(pdata$predy, pdata$calibrated.corrected), na.rm = TRUE)
   axis <- pretty(c(minaxis, maxaxis), 4)
 
   if(is.null(xbreaks)){

@@ -2,69 +2,10 @@
 % Please edit documentation in R/nom.R
 \name{nom}
 \alias{nom}
-\alias{nom.data.frame}
-\alias{nom.nmtask}
-\alias{nom.glm}
 \title{Draw a nomogram}
 \usage{
 nom(
   data,
-  outcome = NULL,
-  predictors = NULL,
-  points.label = "Points",
-  total.points.label = "Total points",
-  funlabel = "Risk",
-  maxscale = 100,
-  xfrac = 0.35,
-  font.size = 12,
-  fun.at = NULL,
-  labels = NULL,
-  show.points = FALSE,
-  show.model = FALSE,
-  show.explain = TRUE,
-  ...
-)
-
-\method{nom}{data.frame}(
-  data,
-  outcome = NULL,
-  predictors = NULL,
-  points.label = "Points",
-  total.points.label = "Total points",
-  funlabel = "Risk",
-  maxscale = 100,
-  xfrac = 0.35,
-  font.size = 12,
-  fun.at = NULL,
-  labels = NULL,
-  show.points = FALSE,
-  show.model = FALSE,
-  show.explain = TRUE,
-  ...
-)
-
-\method{nom}{nmtask}(
-  data,
-  outcome = NULL,
-  predictors = NULL,
-  points.label = "Points",
-  total.points.label = "Total points",
-  funlabel = "Risk",
-  maxscale = 100,
-  xfrac = 0.35,
-  font.size = 12,
-  fun.at = NULL,
-  labels = NULL,
-  show.points = FALSE,
-  show.model = FALSE,
-  show.explain = TRUE,
-  ...
-)
-
-\method{nom}{glm}(
-  data,
-  outcome = NULL,
-  predictors = NULL,
   points.label = "Points",
   total.points.label = "Total points",
   funlabel = "Risk",
@@ -81,10 +22,6 @@ nom(
 }
 \arguments{
 \item{data}{a data frame}
-
-\item{outcome}{predict outcome.}
-
-\item{predictors}{predictors.}
 
 \item{points.label}{a character string giving the axis label for the points scale.}
 
@@ -123,57 +60,40 @@ Set labels use \link{set_variable_labels} and \link{set_category_labels} functio
 \examples{
 head(aps)
 
-# Basic usage
-nom(data = aps,
-    outcome = "elope",
-    predictors = c("age", "gender", "place3", "neuro"))
-
-# Set labels
-nm <- nom(data = aps,
-          outcome = "elope",
-          predictors = c("age", "gender", "place3"))
-nm |>
-  set_variable_labels(age = "Age (years)") |>
-  set_variable_labels(gender = "Gender", place3 = "Placement") |>
-  set_category_labels("Gender", Male = "M", Female = "F") |>
-  set_category_labels("Placement", OutDay = "Outday")
-
-nom(data = aps,
-    outcome = "elope",
-    predictors = c("age", "gender", "place3", "neuro"),
-    funlabel = "Risk of Elopement")
+# From nmtask
+tk <- nmtask(train.data = aps,
+             outcome = "elope",
+             predictors = c("age", "gender", "place3", "neuro"))
 
 # Set the scale of the risk axis.
-nom(data = aps,
-    outcome = "elope",
-    predictors = c("age", "gender", "place3", "neuro"),
+nom(tk,
     funlabel = "Risk of Elopement",
     fun.at = c(0.1, 0.15, 0.25, 0.35, 0.45, 0.55, 0.65))
 
 # Fraction of horizontal plot to set aside for axis titles.
-nom(data = aps,
-    outcome = "elope",
-    predictors = c("age", "gender", "place3", "neuro"),
+nom(tk,
     funlabel = "Risk of Elopement",
     fun.at = c(0.1, 0.15, 0.25, 0.35, 0.45, 0.55, 0.65),
     xfrac = 0.65)
 
 # show model and points
-nom(data = aps,
-    outcome = "elope",
-    predictors = c("age", "gender", "place3", "neuro"),
+nom(tk,
     funlabel = "Risk of Elopement",
     fun.at = c(0.1, 0.15, 0.25, 0.35, 0.45, 0.55, 0.65),
     xfrac = 0.65,
     show.points = TRUE,
     show.model = TRUE)
 
-# From nmtask
-tk <- nmtask(train.data = aps,
-             outcome = "elope",
-             predictors = c("age", "gender", "place3", "neuro"))
-nom(tk,
-    funlabel = "Risk of Elopement",
-    fun.at = c(0.1, 0.15, 0.25, 0.35, 0.45, 0.55, 0.65),
-    xfrac = 0.65)
+nm <- nom(tk,
+          funlabel = "Risk of Elopement",
+          fun.at = c(0.1, 0.15, 0.25, 0.35, 0.45, 0.55, 0.65),
+          xfrac = 0.65)
+nm
+
+# set labels
+nm |>
+  set_variable_labels(age = "Age (years)") |>
+  set_variable_labels(gender = "Gender", place3 = "Placement") |>
+  set_category_labels("Gender", Male = "M", Female = "F") |>
+  set_category_labels("Placement", OutDay = "Outday")
 }

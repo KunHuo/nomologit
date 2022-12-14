@@ -20,10 +20,17 @@ a nomogram.
 Set labels for category of variable
 }
 \examples{
-nm <- nom(data = aps,
-          outcome = "elope",
-          predictors = c("age", "gender", "place3"))
+tk <- nmtask(train.data = aps,
+             outcome = "elope",
+             predictors = c("age", "gender", "place3", "neuro"))
 
+nm <- nom(tk,
+          funlabel = "Risk of Elopement",
+          fun.at = c(0.1, 0.15, 0.25, 0.35, 0.45, 0.55, 0.65),
+          xfrac = 0.65)
+nm
+
+# set labels
 nm |>
   set_variable_labels(age = "Age (years)") |>
   set_variable_labels(gender = "Gender", place3 = "Placement") |>
