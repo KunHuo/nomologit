@@ -1,7 +1,34 @@
+#' Draw calibrate curve
+#'
+#' @description
+#' Calibration was quantified by comparing the actual observed progression with
+#' the model-predicted progression, and the results were graphically evaluated
+#' as calibration curves. Perfect calibration would be exhibited by a direct
+#' alignment between the actual observation and nomogram prediction probability
+#' along the 45 degree diagonal line.
+#'
+#' @param ... one or more object of 'nmtask' or 'glm'.
+#' @param newdata new data for verification.
+#' @param boot boot is an upper limit on the number of resamples for which information
+#' is printed about which variables were selected in each model re-fit, default 1000.
+#' @param facet of 'data' or 'model', specifying grouping variables for faceting
+#' the plot into multiple panels, default 'data'.
+#' @param linewidth line width, default 0.5.
+#' @param linecolor line color.
+#' @param xlab x axis label.
+#' @param ylab y axis label.
+#' @param xbreaks x axis breaks.
+#' @param ybreaks y axis breaks.
+#' @param fontfamily font family, sefault serif.
+#' @param fontsize font size, default 12.
+#' @param seed a single value, interpreted as an integer, or NULL, default 1234.
+#'
+#' @return a ggplot object from the [ggplot2] package, or a patchwork object from [patchwork] package.
+#' @export
 cal2 <- function(...,
                  newdata = NULL,
-                 B = 10,
-                 facet = c("data", "model", "both"),
+                 boot = 10,
+                 facet = c("data", "model"),
                  linewidth = 0.5,
                  linecolor = NULL,
                  xlab = "Predicted probability",
@@ -9,7 +36,8 @@ cal2 <- function(...,
                  xbreaks = NULL,
                  ybreaks = NULL,
                  fontfamily = "serif",
-                 fontsize = 12){
+                 fontsize = 12,
+                 seed = 1234){
 
   facet <- match.arg(facet)
 
@@ -42,8 +70,9 @@ cal2 <- function(...,
     dnames      <- names(train.data)[-1][sapply(train.data[-1], \(x) {is.factor(x) | is.character(x)})]
     train.data  <- dummy.data.frame(train.data, varnames = dnames)
 
+    set.seed(seed)
     train.fit <- logistic(data = train.data, outcome = outcome, predictors = names(train.data)[-1])
-    train.cal <- rms::calibrate(train.fit, B = B)
+    train.cal <- rms::calibrate(train.fit, B = boot)
 
     train.plotdata <- train.cal[, 1:3]
     train.plotdata <- as.data.frame(train.plotdata)
@@ -58,7 +87,8 @@ cal2 <- function(...,
       test.pred <- stats::predict(train.fit, test.data)
 
       test.fit <- rms::lrm(test.data[[outcome]] ~ test.pred, data = test.data, x = T, y = T)
-      test.cal <- rms::calibrate(test.fit, B = B)
+      set.seed(seed)
+      test.cal <- rms::calibrate(test.fit, B = boot)
 
       test.plotdata <- test.cal[, 1:3]
       test.plotdata <- as.data.frame(test.plotdata)
@@ -92,10 +122,13 @@ cal2 <- function(...,
   plots <- lapply(plotdata, \(pdata){
           plot_cal2(pdata,
                     linewidth = linewidth,
+                    linecolor = linecolor,
                     xlab = xlab,
                     ylab = ylab,
                     xbreaks =xbreaks,
                     ybreaks = ybreaks,
+                    fontfamily = fontfamily,
+                    fontsize = fontsize,
                     group = group)
   })
 
@@ -110,7 +143,7 @@ cal2 <- function(...,
 }
 
 
-plot_cal2 <- function(pdata, linewidth, xlab, ylab, xbreaks, ybreaks, group){
+plot_cal2 <- function(pdata, linewidth, linecolor, xlab, ylab, xbreaks, ybreaks, fontfamily, fontsize, group){
 
   minaxis <- min(c(pdata$predy, pdata$calibrated.corrected))
   maxaxis <- max(c(pdata$predy, pdata$calibrated.corrected))
@@ -124,14 +157,21 @@ plot_cal2 <- function(pdata, linewidth, xlab, ylab, xbreaks, ybreaks, group){
     ybreaks <- axis
   }
 
-  ggplot2::ggplot(pdata) +
+  p <- ggplot2::ggplot(pdata) +
     ggplot2::geom_abline(intercept = 0, color = "#374E55FF", linetype = 2, linewidth = linewidth)  +
     ggplot2::geom_line(ggplot2::aes_string(x = "predy", y = "calibrated.corrected", color = group), linewidth = linewidth) +
-    gg_theme_sci(legend.key.size = 1.2) +
+    gg_theme_sci(legend.key.size = 1.2, font.family = fontfamily, font.size = fontsize) +
     gg_legend_position(c(1, 0)) +
     gg_delete_legend_title() +
     gg_xlab(xlab) +
     gg_ylab(ylab) +
     ggplot2::scale_x_continuous(breaks = xbreaks, limits = c(min(xbreaks), max(xbreaks)), expand = c(0, 0)) +
     ggplot2::scale_y_continuous(breaks = ybreaks, limits = c(min(ybreaks), max(ybreaks)), expand = c(0, 0))
+
+  if(!is.null(linecolor)){
+    p <- p +
+      ggplot2::scale_color_manual(values = linecolor)
+  }
+
+  p
 }
