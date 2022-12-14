@@ -43,46 +43,55 @@
 #' # Draw decision curve
 #' dca(tk)
 nmtask <- function(train.data, test.data = NULL, outcome = NULL, positive = NULL, predictors = NULL){
-
-  outcome    <- select_variable(train.data, outcome)
-  predictors <- select_variable(train.data, predictors)
-  DNAMETRAIN <- deparse(substitute(train.data))
-
-  if(!is.null(positive)){
-    train.data[[outcome]] <- factor(train.data[[outcome]])
-    train.data <- fct_reorder(train.data, outcome, c(setdiff(levels(train.data[[outcome]]), positive), positive))
-  }
-
-  if(!is.null(test.data)){
-    check_name(test.data, outcome)
-    check_name(test.data, predictors)
-    DNAMETEST  <- deparse(substitute(test.data))
+  if(is.list(predictors)){
+    lapply(predictors, \(x){
+      nmtask(train.data = train.data,
+             test.data = test.data,
+             outcome = outcome,
+             positive = positive,
+             predictors = x)
+    })
+  }else{
+    outcome    <- select_variable(train.data, outcome)
+    predictors <- select_variable(train.data, predictors)
+    DNAMETRAIN <- deparse(substitute(train.data))
 
     if(!is.null(positive)){
-      test.data[[outcome]] <- factor(test.data[[outcome]])
-      test.data <- fct_reorder(test.data, outcome, c(setdiff(levels(test.data[[outcome]]), positive), positive))
+      train.data[[outcome]] <- factor(train.data[[outcome]])
+      train.data <- fct_reorder(train.data, outcome, c(setdiff(levels(train.data[[outcome]]), positive), positive))
     }
 
-  }else{
-    DNAMETEST  <- ""
+    if(!is.null(test.data)){
+      check_name(test.data, outcome)
+      check_name(test.data, predictors)
+      DNAMETEST  <- deparse(substitute(test.data))
+
+      if(!is.null(positive)){
+        test.data[[outcome]] <- factor(test.data[[outcome]])
+        test.data <- fct_reorder(test.data, outcome, c(setdiff(levels(test.data[[outcome]]), positive), positive))
+      }
+
+    }else{
+      DNAMETEST  <- ""
+    }
+
+    if(is.null(predictors)){
+      predictors <- names(train.data)
+    }
+
+    predictors <- setdiff(predictors, outcome)
+
+    out <- list(train.data = train.data,
+                test.data  = test.data,
+                DNAMETRAIN = DNAMETRAIN,
+                DNAMETEST = DNAMETEST,
+                outcome    = outcome,
+                predictors = predictors)
+
+    class(out) <- c("nmtask", "list")
+
+    out
   }
-
-  if(is.null(predictors)){
-    predictors <- names(train.data)
-  }
-
-  predictors <- setdiff(predictors, outcome)
-
-  out <- list(train.data = train.data,
-       test.data  = test.data,
-       DNAMETRAIN = DNAMETRAIN,
-       DNAMETEST = DNAMETEST,
-       outcome    = outcome,
-       predictors = predictors)
-
-  class(out) <- c("nmtask", "list")
-
-  out
 }
 
 

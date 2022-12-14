@@ -1049,3 +1049,26 @@ format_pvalue <- function(x, digits) {
   pVec[posAllZeros]  <- smallPString
   return(pVec)
 }
+
+as_nmtask <- function(x){
+  if("glm" %in% class(x)){
+    if(x$family[[1]] == "binomial"){
+      nmtask(train.data = x$data,
+             outcome = all.vars(x$formula)[1],
+             predictors = all.vars(x$formula)[-1])
+    }
+  }else{
+    stop("the 'x' must be a class of 'glm'.", call. = FALSE)
+  }
+}
+
+flatten_list <- function(x) {
+  morelists <- sapply(x, function(xprime)
+    class(xprime)[1] == "list")
+  out <- c(x[!morelists], unlist(x[morelists], recursive = FALSE))
+  if (sum(morelists)) {
+    Recall(out)
+  } else{
+    return(out)
+  }
+}
