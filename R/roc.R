@@ -309,33 +309,7 @@ gg_roc <- function(data,
 
 }
 
-.pred_prob <- function(data, outcome, exposure, newdata = NULL){
-  frm <- paste(exposure, collapse = " + ")
-  frm <- paste(outcome, frm, sep  = " ~ ")
-  frm <- stats::as.formula(frm)
 
-  fit <- stats::glm(formula = frm, data = data, family = stats::binomial(link = "logit"))
-
-  if(is.null(newdata)){
-    stats::predict(fit, type = "response")
-  }else{
-    stats::predict(fit, type = "response", newdata = newdata)
-  }
-}
-
-
-.auc_string <- function(x, auc.ci = TRUE, digits = 2, method = "delong", boot.n = 1000, seed = 1234, progress = "text"){
-  set.seed(seed)
-  if(auc.ci){
-    res <- pROC::ci.auc(x, method = method, boot.n = boot.n, progress = progress)
-    sprintf("AUC = %s, 95%% CI: %s\u2013%s",
-            format_digits(res[[2]], digits),
-            format_digits(res[[1]], digits),
-            format_digits(res[[3]], digits))
-  }else{
-    sprintf("AUC = %s", format_digits(pROC::auc(x), digits))
-  }
-}
 
 
 #' Build ROCs
@@ -624,57 +598,6 @@ roc_exec <- function(data,
 }
 
 
-.roc <- function(data,
-                 outcome,
-                 exposure,
-                 positive = NULL,
-                 combine = FALSE,
-                 combine.only = FALSE,
-                 smooth = FALSE,
-                 smooth.args = list()){
-
-  if(!is.factor(data[[outcome]])){
-    data[[outcome]] <- factor(data[[outcome]])
-  }
-
-  if(!is.null(positive)){
-    positive <- as.character(positive)
-    negative <- setdiff(unique(data[[outcome]]), positive)
-    data[[outcome]] <-  factor(data[[outcome]],  levels = c(negative, positive))
-  }
-
-  if(combine & length(exposure) != 1L){
-    data$combine <- .pred_prob(data = data, outcome = outcome, exposure = exposure)
-    if(combine.only){
-      exposure <- "combine"
-    }else{
-      exposure <- c(exposure, "combine")
-    }
-  }
-
-  data[exposure] <- lapply(data[exposure], function(x){
-    if(is.factor(x)){
-      factor(x, ordered = TRUE)
-    }else if(is.character(x)){
-      factor(x, ordered = TRUE)
-    }else{
-      x
-    }
-  })
-
-  names(exposure) <- exposure
-
-  lapply(exposure, function(x){
-    res <- pROC::roc(response  = data[[outcome]],
-                     predictor = data[[x]],
-                     direction = "<",
-                     levels    = levels(data[[outcome]]))
-    if(smooth){
-      res <- do_call(pROC::smooth, roc = res, smooth.args)
-    }
-    res
-  })
-}
 
 
 roc_test <- function(object, ...){

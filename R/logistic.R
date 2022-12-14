@@ -1,10 +1,11 @@
-logistic <- function(data, outcome = NULL, predictors = NULL){
-  if(is.null(predictors)){
-    predictors <- names(data)
-  }
-  predictors <- setdiff(predictors, outcome)
+logistic <- function(data, outcome, predictors, method = c("lrm", "glm")){
+  method <- match.arg(method)
 
   frm <- paste(outcome, paste(predictors, collapse = " + "), sep = " ~ ")
   frm <- stats::as.formula(frm)
-  rms::lrm(frm, data = data, x = TRUE, y = TRUE)
+  if(method == "lrm"){
+    rms::lrm(frm, data = data, x = TRUE, y = TRUE)
+  }else{
+    stats::glm(formula = frm, data = data, family = stats::binomial(link = "logit"))
+  }
 }

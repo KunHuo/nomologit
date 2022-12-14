@@ -56,6 +56,7 @@ nmtask <- function(train.data, test.data = NULL, outcome = NULL, positive = NULL
     predictors <- select_variable(train.data, predictors)
     DNAMETRAIN <- deparse(substitute(train.data))
 
+    # as factor
     if(!is.null(positive)){
       train.data[[outcome]] <- factor(train.data[[outcome]])
       train.data <- fct_reorder(train.data, outcome, c(setdiff(levels(train.data[[outcome]]), positive), positive))
