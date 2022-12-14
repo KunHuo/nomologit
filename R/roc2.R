@@ -1,9 +1,3 @@
-#' Title
-#'
-#' @inheritParams cal2
-#' @inherit cal2 return
-#'
-#' @export
 roc2 <- function(...,
                  newdata = NULL,
                  boot = 10,
@@ -16,6 +10,7 @@ roc2 <- function(...,
                  ybreaks = NULL,
                  fontfamily = "serif",
                  fontsize = 12,
+                 explain = TRUE,
                  seed = 1234) {
 
 }

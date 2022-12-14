@@ -7,249 +7,253 @@
 #' alignment between the actual observation and nomogram prediction probability
 #' along the 45 degree diagonal line.
 #'
-#' @param data data
-#' @param outcome predict outcome.
-#' @param predictors predictors.
+#' @param ... one or more object of 'nmtask' or 'glm'.
 #' @param newdata new data for verification.
-#' @param B  B is an upper limit on the number of resamples for which information
+#' @param boot boot is an upper limit on the number of resamples for which information
 #' is printed about which variables were selected in each model re-fit, default 1000.
-#' @param linesize line size, default 0.25.
-#' @param linecolor line color, the length must be 3.
-#' @param linelabel line label,the length must be 3.
-#' @param xlab label for X axis.
-#' @param ylab label for Y axis.
-#' @param show.explain explain the figure, default TRUE.
-#' @param ... further arguments.
+#' @param facet of 'data' or 'model', specifying grouping variables for faceting
+#' the plot into multiple panels, default 'data'.
+#' @param linewidth line width, default 0.5.
+#' @param linecolor line color.
+#' @param xlab x axis label.
+#' @param ylab y axis label.
+#' @param xbreaks x axis breaks.
+#' @param ybreaks y axis breaks.
+#' @param fontfamily font family, sefault serif.
+#' @param fontsize font size, default 12.
+#' @param explain whether explain the figure, default TRUE.
+#' @param seed a single value, interpreted as an integer, or NULL, default 1234.
 #'
+#' @return a ggplot object from the [ggplot2] package, or a patchwork object from [patchwork] package.
 #' @export
+#'
 #' @examples
 #' head(aps)
 #'
-#' # Basic usage
-#' cal(aps,
-#'     outcome = "elope",
-#'     predictors = c("age", "gender", "place3", "neuro"))
-#'
-#'
-#' # From a nmtask
+#' # Without validation
 #' tk <- nmtask(train.data = aps,
 #'              outcome = "elope",
-#'              predictors = c("age", "gender", "place3", "neuro"))
+#'              predictors = c("age", "gender"))
 #' cal(tk)
-#'
 #'
 #' # With validation
 #' index <- sample(1:nrow(aps), 300)
 #' train <- aps[index, ]
 #' test  <- aps[-index, ]
 #'
-#' cal(train,
-#'     outcome = "elope",
-#'     predictors = c("age", "gender", "place3", "neuro"),
-#'     newdata = test)
-#' # or
-#' tk <- nmtask(train.data = train,
-#'              test.data = test,
-#'              outcome = "elope",
-#'              predictors = c("age", "gender", "place3", "neuro"))
-#' cal(tk)
-cal <- function(data,
-                outcome = NULL,
-                predictors = NULL,
+#' tk1 <- nmtask(train.data = train,
+#'               test.data = test,
+#'               outcome = "elope",
+#'               predictors = c("age", "gender"))
+#' tk2 <- nmtask(train.data = train,
+#'               test.data = test,
+#'               outcome = "elope",
+#'               predictors = c("age", "gender", "place3"))
+#'
+#' # facet by data, defalut.
+#' cal(tk1, facet = "d")
+#' # facet by models.
+#' cal(tk1, facet = "m")
+#' # plot two or more models
+#' cal(tk1, tk2)
+#' # rename models
+#' cal("Nomogram 1" = tk1, "Nomogram 2" = tk2)
+#'
+#' # a list of predictors
+#' tks <- nmtask(train.data = train,
+#'               test.data = test,
+#'               outcome = "elope",
+#'               predictors = list("Nomogram 1" = c("age", "gender"),
+#'                                 "Nomogram 2" = c("age", "gender", "place3")))
+#' cal(tks)
+#' cal(tks, facet = "m")
+#'
+#' # support glm
+#' model1 <- glm(elope ~ age + gender + place3 + neuro,
+#'               data = train,
+#'               family = binomial())
+#' cal(model1)
+#' # with new data.
+#' cal(model1, newdata = test)
+cal <- function(...,
                 newdata = NULL,
-                B = 1000,
-                linesize = 0.5,
+                boot = 10,
+                facet = c("data", "model"),
+                linewidth = 0.5,
                 linecolor = NULL,
-                linelabel = NULL,
-                xlab = NULL,
-                ylab = NULL,
-                show.explain = TRUE,...){
-  UseMethod("cal")
-}
+                xlab = "Predicted probability",
+                ylab = "Actual probability",
+                xbreaks = NULL,
+                ybreaks = NULL,
+                fontfamily = "serif",
+                fontsize = 12,
+                explain = TRUE,
+                seed = 1234) {
 
+  facet <- match.arg(facet)
 
-#' @rdname cal
-#' @export
-cal.data.frame <- function(data,
-                           outcome = NULL,
-                           predictors = NULL,
-                           newdata = NULL,
-                           B = 1000,
-                           linesize = 0.5,
-                           linecolor = NULL,
-                           linelabel = NULL,
-                           xlab = NULL,
-                           ylab = NULL,
-                           show.explain = TRUE, ...){
+  tasks <- list(...)
+  tasks <- flatten_list(tasks)
 
-  train  <- data[c(outcome, predictors)]
-  dnames <- names(train)[-1][sapply(train[-1], \(x) {is.factor(x) | is.character(x)})]
-  train  <- dummy.data.frame(train, varnames = dnames)
+  # supoort glm
+  tasks <- lapply(tasks, \(tk){
+    if("glm" %in% class(tk)){
+      as_nmtask(tk)
+    }else{
+      tk
+    }
+  })
 
-  model <- logistic(data = train, outcome = outcome, predictors = names(train)[-1])
+  # plot data
+  plotdata <- lapply(tasks, \(tk){
+    train.data <- tk$train.data
 
-  A <- plot_cal(rms::calibrate(model, B = B),
-                linesize = linesize,
-                linecolor = linecolor,
-                linelabel = linelabel,
-                xlab = xlab,
-                ylab = ylab, ...)
-
-  explain <- sprintf("The gray line represents the ideal nomogram, the blue line represents the observed nomogram, and the orange line represents the corrected observed nomogram with %d bootstrap resamples. The predicted probability of risk by the nomogram is projected onto the x-axis, and the actual risk is projected onto the y-axis.", B)
-
-  if(!is.null(newdata)){
-    test <- newdata[c(outcome, predictors)]
-    test <- dummy.data.frame(test, varnames = dnames)
-    pred_f_validation <- stats::predict(model, test)
-    fit.vad <- rms::lrm(test[[outcome]] ~ pred_f_validation, data = test, x = T, y = T)
-
-    B <- plot_cal(rms::calibrate(fit.vad, B = B),
-             linesize = linesize,
-             linecolor = linecolor,
-             linelabel = linelabel,
-             xlab = xlab,
-             ylab = ylab, ...)
-
-    A <- A + gg_tags("A")
-    B <- B + gg_tags("B")
-
-    if(show.explain){
-      cat("Figure: Calibration plots of the nomogram for training set (A) and validation set (B).\n")
-      cat(explain)
+    if(is.null(newdata)){
+      test.data  <- tk$test.data
+    }else{
+      test.data  <- newdata
     }
 
-    patchwork::wrap_plots(A, B)
+    outcome    <- tk$outcome
+    predictors <- tk$predictors
 
-  }else{
-    if(show.explain){
-      cat("Figure: Calibration plots of the nomogram for training set.\n")
-      cat(explain)
+    train.data  <- train.data[c(outcome, predictors)]
+    dnames      <- names(train.data)[-1][sapply(train.data[-1], \(x) {is.factor(x) | is.character(x)})]
+    train.data  <- dummy.data.frame(train.data, varnames = dnames)
+
+    set.seed(seed)
+    train.fit <- logistic(data = train.data, outcome = outcome, predictors = names(train.data)[-1])
+    train.cal <- rms::calibrate(train.fit, B = boot)
+
+    train.plotdata <- train.cal[, 1:3]
+    train.plotdata <- as.data.frame(train.plotdata)
+    train.plotdata$group <- "Training set"
+
+    plotdata <- train.plotdata
+
+    # test data
+    if(!is.null(test.data)){
+      test.data <- test.data[c(outcome, predictors)]
+      test.data <- dummy.data.frame(test.data, varnames = dnames)
+      test.pred <- stats::predict(train.fit, test.data)
+
+      test.fit <- rms::lrm(test.data[[outcome]] ~ test.pred, data = test.data, x = T, y = T)
+      set.seed(seed)
+      test.cal <- rms::calibrate(test.fit, B = boot)
+
+      test.plotdata <- test.cal[, 1:3]
+      test.plotdata <- as.data.frame(test.plotdata)
+      test.plotdata$group <- "Validation set"
+
+      plotdata <-  rbind(train.plotdata, test.plotdata)
     }
-    A
+    plotdata
+  })
+
+  # set names
+  if(is.null(names(tasks))){
+    names(plotdata) <- sprintf("Model %d", 1:length(tasks))
+  }else{
+    names(plotdata) <- names(tasks)
   }
+
+  levels <- names(plotdata)
+
+  plotdata <- list_rbind(plotdata, varname = "model")
+  plotdata$model <- factor(plotdata$model, levels = levels)
+
+
+
+  if(facet == "data"){
+    plotdata <- split.data.frame(plotdata, plotdata$group)
+    group <- "model"
+
+    if(length(plotdata) == 1L){
+      title <- "Figure: Calibration plots of the nomogram for training set"
+    }else{
+      title <- "Figure: Calibration plots of the nomogram for training set (A) and and validation set (B)"
+    }
+  }else if(facet == "model"){
+    plotdata <- split.data.frame(plotdata, plotdata$model)
+    group <- "group"
+
+    if(length(plotdata) == 1L){
+      title <- "Figure: Calibration plots for nomogram model"
+    }else{
+      title <- sprintf("%s (%s)", levels, LETTERS[1:length(levels)])
+      title <- paste(title, collapse = ", ")
+      title <- paste("Figure: Calibration plots for", title, sep = " ")
+    }
+  }
+
+  plots <- lapply(plotdata, \(pdata) {
+    plot_cal(
+      pdata,
+      linewidth = linewidth,
+      linecolor = linecolor,
+      xlab = xlab,
+      ylab = ylab,
+      xbreaks = xbreaks,
+      ybreaks = ybreaks,
+      fontfamily = fontfamily,
+      fontsize = fontsize,
+      group = group
+    )
+  })
+
+  # set tags
+  if(length(plots) >= 2L){
+    plots <- Map(\(plot, tag){
+      plot + gg_tags(tag)
+    }, plots, LETTERS[1:length(plots)])
+  }
+
+  note <- paste("The gray line represents the ideal nomogram, other line(s)",
+                "represents the corrected observed nomogram with %d bootstrap",
+                "resamples. The predicted probability of risk by the nomogram",
+                "is projected onto the x-axis, and the actual risk is projected",
+                "onto the y-axis.", sep = " ")
+  note <- sprintf(note, boot)
+
+  if(explain){
+    cat(title)
+    cat("\n")
+    cat(note)
+  }
+
+  patchwork::wrap_plots(plots)
 }
 
 
-#' @rdname cal
-#' @export
-cal.nmtask <- function(data,
-                       outcome = NULL,
-                       predictors = NULL,
-                       newdata = NULL,
-                       B = 1000,
-                       linesize = 0.5,
-                       linecolor = NULL,
-                       linelabel = NULL,
-                       xlab = NULL,
-                       ylab = NULL,
-                       show.explain = TRUE, ...){
+plot_cal <- function(pdata, linewidth, linecolor, xlab, ylab, xbreaks, ybreaks, fontfamily, fontsize, group){
 
-  train.data <- data$train.data
+  minaxis <- min(c(pdata$predy, pdata$calibrated.corrected))
+  maxaxis <- max(c(pdata$predy, pdata$calibrated.corrected))
+  axis <- pretty(c(minaxis, maxaxis), 4)
 
-  if(is.null(newdata)){
-    newdata  <- data$test.data
+  if(is.null(xbreaks)){
+    xbreaks <- axis
   }
 
-  if(is.null(outcome)){
-    outcome <- data$outcome
+  if(is.null(ybreaks)){
+    ybreaks <- axis
   }
 
-  if(is.null(predictors)){
-    predictors <- data$predictors
-  }
-
-  cal.data.frame(data = train.data,
-                 outcome = outcome,
-                 predictors = predictors,
-                 newdata = newdata,
-                 B = B,
-                 xlab = xlab,
-                 ylab = ylab,
-                 show.explain = show.explain, ...)
-}
-
-
-plot_cal <- function(cal, linesize = 0.5, linecolor = NULL, linelabel = NULL, xlab = NULL, ylab = NULL, ...){
-
-  if(is.null(linecolor)){
-    linecolor <- c("#374E55FF", "#00A1D5FF", "#DF8F44FF")
-  }else{
-    stopifnot(length(linecolor) == 3L)
-  }
-
-  if(is.null(linelabel)){
-    linelabel <- c("Ideal", "Apparent", "Bias-corrected")
-  }else{
-    stopifnot(length(linelabel) == 3L)
-  }
-
-  if(is.null(xlab)){
-    xlab <- "Predicted probability"
-  }
-
-  if(is.null(ylab)){
-    ylab <- "Actual probability"
-  }
-
-  plotdata <- cal[, 1:3]
-  plotdata <- as.data.frame(plotdata)
-  plotdata$ideal <- plotdata$predy
-
-  plotdata <- reshape_long(plotdata,
-                           cols = c("ideal", "calibrated.orig", "calibrated.corrected"))
-  plotdata <- rbind(plotdata[plotdata$.name != "ideal", ], plotdata[plotdata$.name == "ideal", ][1, ])
-
-  plotdata$.name <- factor(plotdata$.name,
-                           levels = c("ideal", "calibrated.orig", "calibrated.corrected"),
-                           labels = linelabel)
-
-  minaxis <- min(c(plotdata$predy, plotdata$.value))
-  maxaxis <- max(c(plotdata$predy, plotdata$.value))
-  axis <- pretty(c(minaxis, maxaxis), 5)
-
-  ggplot2::ggplot(plotdata) +
-    ggplot2::geom_abline(intercept = 0, color = linecolor[1], linetype = 3, size = linesize)  +
-    ggplot2::geom_line(ggplot2::aes_string(x = "predy", y = ".value", color = ".name", linetype = ".name"), size = linesize) +
-    ggplot2::scale_color_manual(values = linecolor) +
-    ggplot2::scale_linetype_manual(values = c(3, 2, 1)) +
-    gg_theme_sci(legend.key.size = 1.2, ...) +
+  p <- ggplot2::ggplot(pdata) +
+    ggplot2::geom_abline(intercept = 0, color = "#374E55FF", linetype = 2, linewidth = linewidth)  +
+    ggplot2::geom_line(ggplot2::aes_string(x = "predy", y = "calibrated.corrected", color = group), linewidth = linewidth) +
+    gg_theme_sci(legend.key.size = 1.2, font.family = fontfamily, font.size = fontsize) +
     gg_legend_position(c(1, 0)) +
     gg_delete_legend_title() +
     gg_xlab(xlab) +
     gg_ylab(ylab) +
-    ggplot2::scale_x_continuous(breaks = axis, limits = c(min(axis), max(axis)), expand = c(0, 0)) +
-    ggplot2::scale_y_continuous(breaks = axis, limits = c(min(axis), max(axis)), expand = c(0, 0))
-}
+    ggplot2::scale_x_continuous(breaks = xbreaks, limits = c(min(xbreaks), max(xbreaks)), expand = c(0, 0)) +
+    ggplot2::scale_y_continuous(breaks = ybreaks, limits = c(min(ybreaks), max(ybreaks)), expand = c(0, 0))
 
-
-#' @rdname cal
-#' @export
-cal.glm <- function(data,
-                     outcome = NULL,
-                     predictors = NULL,
-                     newdata = NULL,
-                     B = 1000,
-                     linesize = 0.5,
-                     linecolor = NULL,
-                     linelabel = NULL,
-                     xlab = NULL,
-                     ylab = NULL,
-                     show.explain = TRUE, ...){
-
-  if(data$family[[1]] == "binomial"){
-
-    train.data <- data$data
-    outcome <- all.vars(data$formula)[1]
-    predictors <- all.vars(data$formula)[-1]
-
-    cal.data.frame(data = train.data,
-                   outcome = outcome,
-                   predictors = predictors,
-                   newdata = newdata,
-                   B = B,
-                   xlab = xlab,
-                   ylab = ylab,
-                   show.explain = show.explain, ...)
+  if(!is.null(linecolor)){
+    p <- p +
+      ggplot2::scale_color_manual(values = linecolor)
   }
 
+  p
 }

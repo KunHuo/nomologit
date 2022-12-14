@@ -21,23 +21,74 @@
 #' @param ybreaks y axis breaks.
 #' @param fontfamily font family, sefault serif.
 #' @param fontsize font size, default 12.
+#' @param explain whether explain the figure, default TRUE.
 #' @param seed a single value, interpreted as an integer, or NULL, default 1234.
 #'
 #' @return a ggplot object from the [ggplot2] package, or a patchwork object from [patchwork] package.
 #' @export
-cal2 <- function(...,
-                 newdata = NULL,
-                 boot = 10,
-                 facet = c("data", "model"),
-                 linewidth = 0.5,
-                 linecolor = NULL,
-                 xlab = "Predicted probability",
-                 ylab = "Actual probability",
-                 xbreaks = NULL,
-                 ybreaks = NULL,
-                 fontfamily = "serif",
-                 fontsize = 12,
-                 seed = 1234){
+#'
+#' @examples
+#' head(aps)
+#'
+#' # Without validation
+#' tk <- nmtask(train.data = aps,
+#'              outcome = "elope",
+#'              predictors = c("age", "gender"))
+#' cal(tk)
+#'
+#' # With validation
+#' index <- sample(1:nrow(aps), 300)
+#' train <- aps[index, ]
+#' test  <- aps[-index, ]
+#'
+#' tk1 <- nmtask(train.data = train,
+#'               test.data = test,
+#'               outcome = "elope",
+#'               predictors = c("age", "gender"))
+#' tk2 <- nmtask(train.data = train,
+#'               test.data = test,
+#'               outcome = "elope",
+#'               predictors = c("age", "gender", "place3"))
+#'
+#' # facet by data, defalut.
+#' cal(tk1, facet = "d")
+#' # facet by models.
+#' cal(tk1, facet = "m")
+#' # plot two or more models
+#' cal(tk1, tk2)
+#' # rename models
+#' cal("Nomogram 1" = tk1, "Nomogram 2" = tk2)
+#'
+#' # a list of predictors
+#' tks <- nmtask(train.data = train,
+#'               test.data = test,
+#'               outcome = "elope",
+#'               predictors = list("Nomogram 1" = c("age", "gender"),
+#'                                 "Nomogram 2" = c("age", "gender", "place3")))
+#' cal(tks)
+#' cal(tks, facet = "m")
+#'
+#' # support glm
+#' model1 <- glm(elope ~ age + gender + place3 + neuro,
+#'               data = train,
+#'               family = binomial())
+#' cal(model1)
+#' # with new data.
+#' cal(model1, newdata = test)
+cal <- function(...,
+                newdata = NULL,
+                boot = 10,
+                facet = c("data", "model"),
+                linewidth = 0.5,
+                linecolor = NULL,
+                xlab = "Predicted probability",
+                ylab = "Actual probability",
+                xbreaks = NULL,
+                ybreaks = NULL,
+                fontfamily = "serif",
+                fontsize = 12,
+                explain = TRUE,
+                seed = 1234) {
 
   facet <- match.arg(facet)
 
@@ -114,22 +165,38 @@ cal2 <- function(...,
   if(facet == "data"){
     plotdata <- split.data.frame(plotdata, plotdata$group)
     group <- "model"
+
+    if(length(plotdata) == 1L){
+      title <- "Figure: Calibration plots of the nomogram for training set"
+    }else{
+      title <- "Figure: Calibration plots of the nomogram for training set (A) and and validation set (B)"
+    }
   }else if(facet == "model"){
     plotdata <- split.data.frame(plotdata, plotdata$model)
     group <- "group"
+
+    if(length(plotdata) == 1L){
+      title <- "Figure: Calibration plots for nomogram model"
+    }else{
+      title <- sprintf("%s (%s)", levels, LETTERS[1:length(levels)])
+      title <- paste(title, collapse = ", ")
+      title <- paste("Figure: Calibration plots for", title, sep = " ")
+    }
   }
 
-  plots <- lapply(plotdata, \(pdata){
-          plot_cal2(pdata,
-                    linewidth = linewidth,
-                    linecolor = linecolor,
-                    xlab = xlab,
-                    ylab = ylab,
-                    xbreaks =xbreaks,
-                    ybreaks = ybreaks,
-                    fontfamily = fontfamily,
-                    fontsize = fontsize,
-                    group = group)
+  plots <- lapply(plotdata, \(pdata) {
+    plot_cal(
+      pdata,
+      linewidth = linewidth,
+      linecolor = linecolor,
+      xlab = xlab,
+      ylab = ylab,
+      xbreaks = xbreaks,
+      ybreaks = ybreaks,
+      fontfamily = fontfamily,
+      fontsize = fontsize,
+      group = group
+    )
   })
 
   # set tags
@@ -139,11 +206,24 @@ cal2 <- function(...,
     }, plots, LETTERS[1:length(plots)])
   }
 
+  note <- paste("The gray line represents the ideal nomogram, other line(s)",
+                "represents the corrected observed nomogram with %d bootstrap",
+                "resamples. The predicted probability of risk by the nomogram",
+                "is projected onto the x-axis, and the actual risk is projected",
+                "onto the y-axis.", sep = " ")
+  note <- sprintf(note, boot)
+
+  if(explain){
+    cat(title)
+    cat("\n")
+    cat(note)
+  }
+
   patchwork::wrap_plots(plots)
 }
 
 
-plot_cal2 <- function(pdata, linewidth, linecolor, xlab, ylab, xbreaks, ybreaks, fontfamily, fontsize, group){
+plot_cal <- function(pdata, linewidth, linecolor, xlab, ylab, xbreaks, ybreaks, fontfamily, fontsize, group){
 
   minaxis <- min(c(pdata$predy, pdata$calibrated.corrected))
   maxaxis <- max(c(pdata$predy, pdata$calibrated.corrected))
