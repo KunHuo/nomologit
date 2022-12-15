@@ -6,18 +6,49 @@
 #' @param g number of bins to use to calculate quantiles.
 #'
 #' @export
-hoslem_test <- function(data,  outcome = NULL, predictors = NULL, g = 10){
-  frm <- paste(predictors, collapse = " + ")
-  frm <- paste(outcome, frm, sep = " ~ ")
-  frm <- stats::as.formula(frm)
+hoslem_test <- function(..., newdata = NULL, g = 10, digits = 3){
 
-  fit <- stats::glm(formula = frm, family = stats::binomial(), data = data)
+  tasks <- flatten_list(list(...))
 
-  hoslem_test_exec(fit$y, stats::fitted(fit), g = g)
+  tasks <- lapply(tasks, \(tk){
+    if("glm" %in% class(tk)){
+      as_nmtask(tk)
+    }else{
+      tk
+    }
+  })
+
+  exec <- function(tk){
+    train.data <- tk$train.data
+    outcome    <- tk$outcome
+    predictors <- tk$predictors
+
+    train.fit <- logistic(data = train.data,
+                          outcome = outcome,
+                          predictors = predictors,
+                          method = "glm")
+
+    train.res <- hoslem_test_exec(x = train.fit$y,
+                                  y = stats::fitted(train.fit),
+                                  g = g,
+                                  digits = digits)
+    if(is.null(newdata)){
+      test.data  <- tk$test.data
+    }else{
+      test.data <- newdata
+    }
+
+    train.res
+  }
+
+
+  out <- lapply(tasks, exec)
+
+  out
 }
 
 
-hoslem_test_exec <- function (x, y, g = 10) {
+hoslem_test_exec <- function (x, y, g = 10, digits = 3) {
   yhat <- y
   y    <- x
 
@@ -30,5 +61,6 @@ hoslem_test_exec <- function (x, y, g = 10) {
   chisq   <- sum((observed - expected) ^ 2 / expected)
   pvalue  <- 1 - stats::pchisq(chisq, g - 2)
 
-  sprintf("Hosmer and Lemeshow test: X-squared = %.3f, P value = %.3f", chisq, pvalue)
+  data.frame(chisq  = format_statistic(chisq, digits),
+             pvalue = format_pvalue(pvalue, 3))
 }

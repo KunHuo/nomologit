@@ -395,9 +395,6 @@ roc_test <- function(object, ...){
     }
   }
 
-
-  print(data)
-
   data[exposure] <- lapply(data[exposure], function(x){
     if(is.factor(x)){
       factor(x, ordered = TRUE)
