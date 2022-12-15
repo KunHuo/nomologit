@@ -2,15 +2,9 @@
 % Please edit documentation in R/hoslem_test.R
 \name{hoslem_test}
 \alias{hoslem_test}
-\alias{hoslem_test.data.frame}
-\alias{hoslem_test.nmtask}
 \title{Hosmer-Lemeshow test}
 \usage{
 hoslem_test(data, outcome = NULL, predictors = NULL, g = 10)
-
-\method{hoslem_test}{data.frame}(data, outcome = NULL, predictors = NULL, g = 10)
-
-\method{hoslem_test}{nmtask}(data, outcome = NULL, predictors = NULL, g = 10)
 }
 \arguments{
 \item{data}{data.}
@@ -23,18 +17,4 @@ hoslem_test(data, outcome = NULL, predictors = NULL, g = 10)
 }
 \description{
 Hosmer-Lemeshow test
-}
-\examples{
-head(aps)
-
-# Basic usage
-hoslem_test(aps,
-           outcome = "elope",
-           predictors = c("age", "gender", "place3", "neuro"))
-
-# From a nmtask
-tk <- nmtask(train.data = aps,
-             outcome = "elope",
-             predictors = c("age", "gender", "place3", "neuro"))
-hoslem_test(tk)
 }

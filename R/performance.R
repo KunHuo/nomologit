@@ -39,7 +39,7 @@ performance <- function(...,  newdata = NULL, digits = 3, filename = ""){
       digits = digits
     )
 
-    names(train.roc) <- c("Items", sprintf("Training set (n=%d)", nrow(train.roc)))
+    names(train.roc) <- c("Items", sprintf("Training set (n=%d)", nrow(train.data)))
 
 
     if(!is.null(test.data)){
@@ -53,7 +53,7 @@ performance <- function(...,  newdata = NULL, digits = 3, filename = ""){
                            exposure = ".pred",
                            digits = digits)
 
-      names(test.roc) <- c("Items", sprintf("Validation set (n=%d)", nrow(test.roc)))
+      names(test.roc) <- c("Items", sprintf("Validation set (n=%d)", nrow(test.data)))
       merge_left(train.roc, test.roc, by = "Items")
     }else{
       train.roc

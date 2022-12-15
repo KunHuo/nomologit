@@ -3,8 +3,6 @@
 S3method(dca,data.frame)
 S3method(dca,glm)
 S3method(dca,nmtask)
-S3method(hoslem_test,data.frame)
-S3method(hoslem_test,nmtask)
 S3method(print,compare)
 S3method(print,nmtask)
 S3method(print,nomologit)

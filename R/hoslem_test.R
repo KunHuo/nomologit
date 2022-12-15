@@ -6,27 +6,7 @@
 #' @param g number of bins to use to calculate quantiles.
 #'
 #' @export
-#' @examples
-#' head(aps)
-#'
-#' # Basic usage
-#' hoslem_test(aps,
-#'            outcome = "elope",
-#'            predictors = c("age", "gender", "place3", "neuro"))
-#'
-#' # From a nmtask
-#' tk <- nmtask(train.data = aps,
-#'              outcome = "elope",
-#'              predictors = c("age", "gender", "place3", "neuro"))
-#' hoslem_test(tk)
-hoslem_test <- function(data, outcome = NULL, predictors = NULL, g = 10){
-  UseMethod("hoslem_test")
-}
-
-
-#' @rdname hoslem_test
-#' @export
-hoslem_test.data.frame <- function(data,  outcome = NULL, predictors = NULL, g = 10){
+hoslem_test <- function(data,  outcome = NULL, predictors = NULL, g = 10){
   frm <- paste(predictors, collapse = " + ")
   frm <- paste(outcome, frm, sep = " ~ ")
   frm <- stats::as.formula(frm)
@@ -37,44 +17,18 @@ hoslem_test.data.frame <- function(data,  outcome = NULL, predictors = NULL, g =
 }
 
 
-#' @rdname hoslem_test
-#' @export
-hoslem_test.nmtask <- function(data, outcome = NULL, predictors = NULL, g = 10){
-
-  train.data <- data$train.data
-
-  if(is.null(outcome)){
-    outcome <- data$outcome
-  }
-
-  if(is.null(predictors)){
-    predictors <- data$predictors
-  }
-
-  hoslem_test.data.frame(data = train.data,
-                         outcome = outcome,
-                         predictors = predictors,
-                         g = g)
-}
-
-
 hoslem_test_exec <- function (x, y, g = 10) {
-  DNAME <- paste(deparse(substitute(x)), deparse(substitute(y)), sep = ", ")
-  METHOD <- "Hosmer and Lemeshow goodness of fit (GOF) test"
   yhat <- y
-  y <- x
-  qq <- unique(stats::quantile(yhat, probs = seq(0, 1, 1/g)))
-  cutyhat <- cut(yhat, breaks = qq, include.lowest = TRUE)
+  y    <- x
+
+  qq       <- unique(stats::quantile(yhat, probs = seq(0, 1, 1 / g)))
+  cutyhat  <- cut(yhat, breaks = qq, include.lowest = TRUE)
+
   observed <- stats::xtabs(cbind(y0 = 1 - y, y1 = y) ~ cutyhat)
   expected <- stats::xtabs(cbind(yhat0 = 1 - yhat, yhat1 = yhat) ~ cutyhat)
-  chisq <- sum((observed - expected)^2/expected)
-  PVAL = 1 - stats::pchisq(chisq, g - 2)
-  sprintf("Hosmer and Lemeshow test: X-squared = %.3f, P value = %.3f", chisq, PVAL)
 
-  # PARAMETER <- g - 2
-  # names(chisq) <- "X-squared"
-  # names(PARAMETER) <- "df"
-  # structure(list(statistic = chisq, parameter = PARAMETER,
-  #                p.value = PVAL, method = METHOD, data.name = DNAME, observed = observed,
-  #                expected = expected), class = "htest")
+  chisq   <- sum((observed - expected) ^ 2 / expected)
+  pvalue  <- 1 - stats::pchisq(chisq, g - 2)
+
+  sprintf("Hosmer and Lemeshow test: X-squared = %.3f, P value = %.3f", chisq, pvalue)
 }
