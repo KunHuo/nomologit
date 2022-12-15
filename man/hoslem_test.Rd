@@ -4,17 +4,49 @@
 \alias{hoslem_test}
 \title{Hosmer-Lemeshow test}
 \usage{
-hoslem_test(data, outcome = NULL, predictors = NULL, g = 10)
+hoslem_test(..., newdata = NULL, g = 10, digits = 3)
 }
 \arguments{
-\item{data}{data.}
+\item{...}{one or more object of 'nmtask' or 'glm'.}
 
-\item{outcome}{predict outcome.}
+\item{newdata}{new data for verification.}
 
-\item{predictors}{predictors.}
+\item{g}{number of bins to use to calculate quantiles. As far as I have seen,
+there is little guidance as to how to choose the number of groups g.
+Hosmer and Lemeshow’s conclusions from simulations were based on using g>p+1,
+suggesting that if we have 10 covariates in the model, we should choose g>11,
+although this doesn’t appear to be mentioned in text books or software packages.}
 
-\item{g}{number of bins to use to calculate quantiles.}
+\item{digits}{digits for p value, default 3.}
 }
 \description{
 Hosmer-Lemeshow test
+}
+\details{
+The Hosmer-Lemeshow test is a statistical test for goodness of fit for logistic
+regression models. This means that given our fitted model, the p-value can be
+calculated as the right hand tail probability of the corresponding chi-squared
+distribution using the calculated test statistic. If the p-value is small,
+this is indicative of poor fit. It should be emphasized that a large p-value
+does not mean the model fits well, since lack of evidence against a null
+hypothesis is not equivalent to evidence in favour of the alternative hypothesis.
+In particular, if our sample size is small, a high p-value from the test may
+simply be a consequence of the test having lower power to detect mis-specification,
+rather than being indicative of good fit.
+
+About number of groups:
+Intuitively, using a small value of g ought to give less opportunity to detect
+mis-specification. However, if we choose g to large, the numbers in each group
+may be so small that it will be difficult to determine whether differences
+between observed and expected are due to chance or indicative or model
+mis-specification.
+
+A further problem, highlighted by many others (e.g. Paul Allison) is that,
+for a given dataset, if one changes g, sometimes one obtains a quite different
+p-value, such that with one choice of g we might conclude our model does not
+fit well, yet with another we conclude there is no evidence of poor fit.
+This is indeed a troubling aspect of the test.
+}
+\references{
+Hosmer D W, Lemeshow S 2000. Applied Logistic Regression. New York, USA: John Wiley and Sons.
 }
