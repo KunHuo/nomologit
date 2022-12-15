@@ -49,9 +49,6 @@ performance <- function(...,  newdata = NULL, digits = 3, filename = ""){
       test.pre <- stats::predict(train.fit, newdata = test.data, type = "response")
 
       test.data$.pred <- test.pre
-
-      # print(test.data)
-
       test.roc <- roc_exec(data = test.data,
                            outcome = outcome,
                            exposure = ".pred",

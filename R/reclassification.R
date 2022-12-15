@@ -1,3 +1,119 @@
+#' Comparision of nomogram models
+#'
+#' @details The function computes the categorical and continuous net reclassification
+#' improvement (NRI) and integrated discrimination improvement (IDI). A reclassification
+#' table indicates the number of individuals who move to another risk category or
+#' remain in the same risk category as a result of updating the risk model.
+#' Categorical NRI equal to x% means that compared with individuals without outcome,
+#' individuals with outcome were almost x% more likely to move up a category than
+#' down. The function also computes continuous NRI, which does not require any
+#' discrete risk categories and relies on the proportions of individuals with
+#' outcome correctly assigned a higher probability and individuals without outcome
+#' correctly assigned a lower probability by an updated model compared with the
+#' initial model. IDI equal to x% means that the difference in average predicted
+#' risks between the individuals with and without the outcome increased by x% in
+#' the updated model.
+#'
+#' @param ... nomogram models.
+#' @param cutoff cutoff values for risk categories NRI.if is NULL, the function will compute continuous NRI.
+#' @param digits digits, default 3.
+#'
+#' @return a data frame.
+#' @export
+#'
+#' @examples
+#'
+#' # From nomogram task
+#' tk1 <- nmtask(train.data = aps,
+#'               outcome = "elope",
+#'               predictors = c("age", "gender"))
+#'
+#' tk2 <- nmtask(train.data = aps,
+#'               outcome = "elope",
+#'               predictors = c("age", "gender", "place3"))
+#'
+#' tk3 <- nmtask(train.data = aps,
+#'               outcome = "elope",
+#'               predictors = c("age", "gender", "place3", "neuro", "danger"))
+#'
+#' # Compute continuous NRI and IDI
+#' compare(tk1, tk2, tk3)
+#' # or
+#' reclassification(tk1, tk2, tk3)
+#'
+#' # Compute categorical NRI and IDI
+#' compare(tk1, tk2, tk3, cutoff = 0.5)
+#' # or
+#' reclassification(tk1, tk2, tk3, cutoff = 0.5)
+#'
+#' # From logistic model
+#' model1 <- glm(elope ~ age + gender, data = aps, family = binomial())
+#' model2 <- glm(elope ~ age + gender + place3 + neuro, data = aps, family = binomial())
+#'
+#' compare(model1, model2, cutoff = c(0.2, 0.7))
+#' compare(tk3, model2, cutoff = c(0.2, 0.7))
+compare <- function(..., cutoff = NULL, digits = 3){
+  models <- list(...)
+
+  models <- lapply(models, function(m){
+    if("nmtask" %in% class(m)){
+      frm <- paste(m$predictors, collapse = " + ")
+      frm <- paste(m$outcome, frm, sep = " ~ ")
+      frm <- stats::as.formula(frm)
+      stats::glm(formula = frm, data = m$train.data, family = stats::binomial())
+    }else{
+      m
+    }
+  })
+
+  comp <- utils::combn(1:length(models), 2)
+  comp <- as.data.frame(comp, stringsAsFactors = FALSE)
+
+  out <- lapply(comp, function(x){
+
+    Comparision <- sprintf("Model %d vs. Model %d", x[2], x[1])
+
+    res <- reclass_exec(outcome = models[[x[1]]]$y,
+                     predrisk1 = models[[x[1]]]$fitted.values,
+                     predrisk2 = models[[x[2]]]$fitted.values,
+                     cutoff = cutoff,
+                     digits = digits)
+    cbind(Comparision, res)
+  })
+
+  out <- do.call(rbind, out)
+
+  if(!is.null(cutoff)){
+    attr(out, "title") <- "Comparision of models using categorical NRI and IDI"
+  }else{
+    attr(out, "title") <- "Comparision of models using continuous NRI and IDI"
+  }
+
+  attr(out, "note") <- "Abbreviations: NRI, Net reclassification improvement; IDI, Integrated discrimination improvement"
+
+  class(out) <- c("compare", class(out))
+
+  out
+}
+
+
+#' @rdname compare
+#' @export
+reclassification <- compare
+
+
+#' Print object
+#'
+#' @param x an object.
+#' @param ... more.
+#'
+#' @keywords internal
+#' @export
+print.compare <- function(x, ...){
+  print_booktabs(x, adj = c("l", "c"), ...)
+}
+
+
 improveProb <- function (x1, x2, y) {
   s <- is.na(x1 + x2 + y)
   if (any(s)) {
@@ -113,121 +229,5 @@ reclass_exec <- function (outcome, predrisk1, predrisk2, cutoff = NULL, digits =
   }else{
     cbind(NRI.cat.res, IDI.res)
   }
-}
-
-
-#' Comparision of nomogram models
-#'
-#' @details The function computes the categorical and continuous net reclassification
-#' improvement (NRI) and integrated discrimination improvement (IDI). A reclassification
-#' table indicates the number of individuals who move to another risk category or
-#' remain in the same risk category as a result of updating the risk model.
-#' Categorical NRI equal to x% means that compared with individuals without outcome,
-#' individuals with outcome were almost x% more likely to move up a category than
-#' down. The function also computes continuous NRI, which does not require any
-#' discrete risk categories and relies on the proportions of individuals with
-#' outcome correctly assigned a higher probability and individuals without outcome
-#' correctly assigned a lower probability by an updated model compared with the
-#' initial model. IDI equal to x% means that the difference in average predicted
-#' risks between the individuals with and without the outcome increased by x% in
-#' the updated model.
-#'
-#' @param ... nomogram models.
-#' @param cutoff cutoff values for risk categories NRI.if is NULL, the function will compute continuous NRI.
-#' @param digits digits, default 3.
-#'
-#' @return a data frame.
-#' @export
-#'
-#' @examples
-#'
-#' # From nomogram task
-#' tk1 <- nmtask(train.data = aps,
-#'               outcome = "elope",
-#'               predictors = c("age", "gender"))
-#'
-#' tk2 <- nmtask(train.data = aps,
-#'               outcome = "elope",
-#'               predictors = c("age", "gender", "place3"))
-#'
-#' tk3 <- nmtask(train.data = aps,
-#'               outcome = "elope",
-#'               predictors = c("age", "gender", "place3", "neuro", "danger"))
-#'
-#' # Compute continuous NRI and IDI
-#' compare(tk1, tk2, tk3)
-#' # or
-#' reclassification(tk1, tk2, tk3)
-#'
-#' # Compute categorical NRI and IDI
-#' compare(tk1, tk2, tk3, cutoff = 0.5)
-#' # or
-#' reclassification(tk1, tk2, tk3, cutoff = 0.5)
-#'
-#' # From logistic model
-#' model1 <- glm(elope ~ age + gender, data = aps, family = binomial())
-#' model2 <- glm(elope ~ age + gender + place3 + neuro, data = aps, family = binomial())
-#'
-#' compare(model1, model2, cutoff = c(0.2, 0.7))
-#' compare(tk3, model2, cutoff = c(0.2, 0.7))
-compare <- function(..., cutoff = NULL, digits = 3){
-  models <- list(...)
-
-  models <- lapply(models, function(m){
-    if("nmtask" %in% class(m)){
-      frm <- paste(m$predictors, collapse = " + ")
-      frm <- paste(m$outcome, frm, sep = " ~ ")
-      frm <- stats::as.formula(frm)
-      stats::glm(formula = frm, data = m$train.data, family = stats::binomial())
-    }else{
-      m
-    }
-  })
-
-  comp <- utils::combn(1:length(models), 2)
-  comp <- as.data.frame(comp, stringsAsFactors = FALSE)
-
-  out <- lapply(comp, function(x){
-
-    Comparision <- sprintf("Model %d vs. Model %d", x[2], x[1])
-
-    res <- reclass_exec(outcome = models[[x[1]]]$y,
-                     predrisk1 = models[[x[1]]]$fitted.values,
-                     predrisk2 = models[[x[2]]]$fitted.values,
-                     cutoff = cutoff,
-                     digits = digits)
-    cbind(Comparision, res)
-  })
-
-  out <- do.call(rbind, out)
-
-  if(!is.null(cutoff)){
-    attr(out, "title") <- "Comparision of models using categorical NRI and IDI"
-  }else{
-    attr(out, "title") <- "Comparision of models using continuous NRI and IDI"
-  }
-
-  attr(out, "note") <- "Abbreviations: NRI, Net reclassification improvement; IDI, Integrated discrimination improvement"
-
-  class(out) <- c("compare", class(out))
-
-  out
-}
-
-
-#' @rdname compare
-#' @export
-reclassification <- compare
-
-
-#' Print object
-#'
-#' @param x an object.
-#' @param ... more.
-#'
-#' @keywords internal
-#' @export
-print.compare <- function(x, ...){
-  print_booktabs(x, adj = c("l", "c"), ...)
 }
 
