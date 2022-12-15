@@ -2,77 +2,19 @@
 % Please edit documentation in R/performance.R
 \name{performance}
 \alias{performance}
-\alias{performance.data.frame}
-\alias{performance.nmtask}
-\alias{performance.glm}
 \title{Evaluate model performance}
 \usage{
-performance(
-  data,
-  outcome = NULL,
-  predictors = NULL,
-  newdata = NULL,
-  digits = 3,
-  filename = "",
-  ...
-)
-
-\method{performance}{data.frame}(
-  data,
-  outcome = NULL,
-  predictors = NULL,
-  newdata = NULL,
-  digits = 3,
-  filename = "",
-  ...
-)
-
-\method{performance}{nmtask}(
-  data,
-  outcome = NULL,
-  predictors = NULL,
-  newdata = NULL,
-  digits = 3,
-  filename = "",
-  ...
-)
-
-\method{performance}{glm}(
-  data,
-  outcome = NULL,
-  predictors = NULL,
-  newdata = NULL,
-  digits = 3,
-  filename = "",
-  ...
-)
+performance(..., newdata = NULL, digits = 3, filename = "")
 }
 \arguments{
-\item{data}{data}
+\item{...}{one or more object of 'nmtask' or 'glm'.}
 
-\item{outcome}{predict outcome.}
+\item{newdata}{new data for verification.}
 
-\item{predictors}{predictors.}
+\item{digits}{digits, default 3.}
 
-\item{newdata}{new data for verification.
-is printed about which variables were selected in each model re-fit.}
-
-\item{digits}{digits, defalut 3.}
-
-\item{filename}{file name to save performance metrics.}
-
-\item{...}{further arguments.}
+\item{filename}{filename}
 }
 \description{
 Evaluate model performance
-}
-\examples{
-tk <- nmtask(train.data = aps,
-outcome = "elope",
-predictors = c("age", "gender", "place3", "neuro", "danger"))
-
-performance(tk)
-
-# Save to word, not run
-# performance(tk, filename = "performance")
 }
