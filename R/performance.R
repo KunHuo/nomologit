@@ -39,14 +39,18 @@ performance <- function(...,  newdata = NULL, digits = 3, filename = ""){
       digits = digits
     )
 
+    # print(train.data)
+
     names(train.roc) <- c("Items", sprintf("Training set (n=%d)", nrow(train.data)))
 
 
     if(!is.null(test.data)){
-      test.fit <- logistic(data = test.data, outcome = outcome, predictors = predictors, method = "glm")
-      test.pre <- stats::predict(test.fit, newdata = test.data, type = "response")
+      train.fit <- logistic(data = train.data, outcome = outcome, predictors = predictors, method = "glm")
+      test.pre <- stats::predict(train.fit, newdata = test.data, type = "response")
 
       test.data$.pred <- test.pre
+
+      # print(test.data)
 
       test.roc <- roc_exec(data = test.data,
                            outcome = outcome,
@@ -393,6 +397,9 @@ roc_test <- function(object, ...){
       exposure <- c(exposure, "combine")
     }
   }
+
+
+  print(data)
 
   data[exposure] <- lapply(data[exposure], function(x){
     if(is.factor(x)){

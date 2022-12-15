@@ -47,14 +47,14 @@ roc <- function(...,
     predictors <- tk$predictors
 
     train.fit <- logistic(data = train.data, outcome = outcome, predictors = predictors, method = "glm")
-    train.roc <- suppressMessages(pROC::roc(response = train.data[[outcome]], predictor = train.fit$fitted.values))
+    train.roc <- suppressMessages(pROC::roc(response = train.data[[outcome]], predictor = train.fit$fitted.values, direction = "<"))
 
     train.plotdata <- roc_plotdata(train.roc)
     train.plotdata$group <- "Training set"
 
     if(!is.null(test.data)){
       test.pred <- stats::predict(train.fit, test.data)
-      test.roc  <- suppressMessages(pROC::roc(response = test.data[[outcome]], predictor = test.pred))
+      test.roc  <- suppressMessages(pROC::roc(response = test.data[[outcome]], predictor = test.pred, direction = "<"))
       test.plotdata <- roc_plotdata(test.roc)
       test.plotdata$group <- "Validation set"
       rbind(train.plotdata, test.plotdata)

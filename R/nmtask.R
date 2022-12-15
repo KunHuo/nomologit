@@ -74,7 +74,7 @@ nmtask <- function(train.data, test.data = NULL, outcome = NULL, positive = NULL
       check_name(test.data, predictors)
       DNAMETEST  <- deparse(substitute(test.data))
 
-      test.data[[outcome]] <-  ifelse(test.data[[outcome]] == positive, 1, 0)
+      test.data[[outcome]] <- ifelse(test.data[[outcome]] == positive, 1, 0)
 
     }else{
       DNAMETEST  <- ""
