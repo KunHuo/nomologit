@@ -149,7 +149,11 @@ performance <- function(...,  newdata = NULL, cutoff = "best", digits = 3, filen
   attr(out, "title") <- string_title_roc(language = "en")
   attr(out, "note")  <- "Abbreviations: AUC, Area under the curve; PPV, Positive predictive value; NPV, Negative predictive value.\n* The best cut-off value is the predicted probability by the logistic model."
 
-  out
+  if(filename == ""){
+    out
+  }else{
+    write_docx.data.frame(out, path = filename)
+  }
 }
 
 
