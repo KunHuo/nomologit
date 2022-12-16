@@ -1,12 +1,60 @@
 #' Evaluate model performance
 #'
+#' @description
+#' Evaluate the performance of the model, including the area under the ROC curve,
+#' accuracy, sensitivity, specificity, positive predictive value, negative
+#' predictive value, and Brier score.
+#'
 #' @param ... one or more object of 'nmtask' or 'glm'.
 #' @param newdata new data for verification.
+#' @param cutoff Cutoff is the prediction probability of logistic regression model,
+#' between 0 and 1. By default, the best cut-off value is calculated according to
+#' the maximum Yodon index.
 #' @param digits digits, default 3.
-#' @param filename filename
+#' @param filename filename, if you want to save to word.
+#'
+#' @details
+#' About Brier score:
+#'
+#' The Brier score is a proper score function that measures the accuracy of
+#' probabilistic predictions. It is applicable to tasks in which predictions
+#' must assign probabilities to a set of mutually exclusive discrete outcomes.
+#' The set of possible outcomes can be either binary or categorical in nature,
+#' and the probabilities assigned to this set of outcomes must sum to one (where
+#' each individual probability is in the range of 0 to 1).
+#'
+#' The lower the Brier score is for a set of predictions, the better the
+#' predictions are calibrated. Note that the Brier score, in its most common
+#' formulation, takes on a value between zero and one, since this is the largest
+#' possible difference between a predicted probability (which must be between zero
+#' and one) and the actual outcome (which can take on values of only 0 and 1).
+#' (In the original (1950) formulation of the Brier score, the range is double,
+#' from zero to two.)
+#'
+#' @references
+#' Brier, G. W. (1950) Verification of forecasts expressed in terms of probability. Monthly Weather Review, 78, 1-3.
 #'
 #' @export
-performance <- function(...,  newdata = NULL, digits = 3, filename = ""){
+#'
+#' @examples
+#'
+#' head(aps)
+#'
+#' index <- sample(1:nrow(aps), 300)
+#' train <- aps[index, ]
+#' test  <- aps[-index, ]
+#'
+#' tk1 <- nmtask(train.data = train,
+#'               test.data = test,
+#'               outcome = "elope",
+#'               predictors = c("age"))
+#' tk2 <- nmtask(train.data = train,
+#'               test.data = test,
+#'               outcome = "elope",
+#'               predictors = c("age", "gender", "place3", "danger"))
+#'
+#' performance(tk1, tk2)
+performance <- function(...,  newdata = NULL, cutoff = "best", digits = 3, filename = ""){
 
   tasks <- flatten_list(list(...))
 
@@ -30,31 +78,51 @@ performance <- function(...,  newdata = NULL, digits = 3, filename = ""){
     outcome <- tk$outcome
     predictors <- tk$predictors
 
+    train.fit <- logistic(data = train.data, outcome = outcome, predictors = predictors, method = "glm")
+    train.data$.pred <- train.fit$fitted.values
+
     train.roc <- roc_exec(
       data = train.data,
       outcome = outcome,
-      exposure = predictors,
-      combine = TRUE,
-      combine.only = TRUE,
+      exposure = ".pred",
+      threshold = cutoff,
       digits = digits
     )
-
-    # print(train.data)
-
     names(train.roc) <- c("Items", sprintf("Training set (n=%d)", nrow(train.data)))
+    train.roc[1, 1] <- "Cut-off *"
 
+    # Brier score
+    train.brier <- brier_score(train.data[[outcome]], train.fit$fitted.values)
+    train.brier <- format_digits(train.brier, digits = digits)
+    train.brier <- data.frame(brier = "Brier score", value = train.brier)
+    names(train.brier) <- names(train.roc)
+    train.roc <- rbind(train.roc, train.brier)
 
     if(!is.null(test.data)){
-      train.fit <- logistic(data = train.data, outcome = outcome, predictors = predictors, method = "glm")
       test.pre <- stats::predict(train.fit, newdata = test.data, type = "response")
+      test.fit <- stats::glm(test.data[[outcome]] ~ test.pre, family = stats::binomial())
+      test.data$.pred <- test.fit$fitted.values
 
-      test.data$.pred <- test.pre
+      threshold <- as.numeric(train.roc[1, 2][[1]])
+
       test.roc <- roc_exec(data = test.data,
                            outcome = outcome,
                            exposure = ".pred",
+                           threshold = threshold,
                            digits = digits)
 
+
+      test.roc[1, 2] <- "-"
+      test.roc[1, 1] <- "Cut-off *"
       names(test.roc) <- c("Items", sprintf("Validation set (n=%d)", nrow(test.data)))
+
+      # Brier score
+      test.brier <- brier_score(test.data[[outcome]], test.fit$fitted.values)
+      test.brier <- format_digits(test.brier, digits = digits)
+      test.brier <- data.frame(brier = "Brier score", value = test.brier)
+      names(test.brier) <- names(test.roc)
+      test.roc <- rbind(test.roc, test.brier)
+
       merge_left(train.roc, test.roc, by = "Items")
     }else{
       train.roc
@@ -70,11 +138,16 @@ performance <- function(...,  newdata = NULL, digits = 3, filename = ""){
     names(out) <- names(tasks)
   }
 
-  out <- list_rbind(out, collapse.names = TRUE)
+  if(length(tasks) == 1L){
+    out <- list_rbind(out, collapse.names = FALSE, names.as.column = FALSE)
+  }else{
+    out <- list_rbind(out, collapse.names = TRUE, varname = "Models")
+  }
+
   class(out) <- c("performance", class(out))
 
   attr(out, "title") <- string_title_roc(language = "en")
-  attr(out, "note")  <- string_note_roc(language = "en")
+  attr(out, "note")  <- "Abbreviations: AUC, Area under the curve; PPV, Positive predictive value; NPV, Negative predictive value.\n* The best cut-off value is the predicted probability by the logistic model."
 
   out
 }
@@ -89,6 +162,17 @@ performance <- function(...,  newdata = NULL, digits = 3, filename = ""){
 #' @export
 print.performance <- function(x, ...){
   print_booktabs(x, adj = c("l", "c"))
+}
+
+
+brier_score <-function (resp, pred, scaled = FALSE, ...){
+  res <- mean(resp * (1 - pred)^2 + (1 - resp) * pred^2)
+  if (scaled) {
+    mean_y <- mean(resp)
+    Bmax <- mean_y * (1 - mean_y)^2 + (1 - mean_y) * mean_y^2
+    res <- 1 - res/Bmax
+  }
+  return(res)
 }
 
 
@@ -459,7 +543,7 @@ string_variable <- function(language){
 
 string_threshold <- function(language){
   switch(language,
-         en = "Threshold",
+         en = "Cut-off",
          zh = "\u4e34\u754c\u503c")
 }
 

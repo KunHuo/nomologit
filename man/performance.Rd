@@ -4,17 +4,63 @@
 \alias{performance}
 \title{Evaluate model performance}
 \usage{
-performance(..., newdata = NULL, digits = 3, filename = "")
+performance(..., newdata = NULL, cutoff = "best", digits = 3, filename = "")
 }
 \arguments{
 \item{...}{one or more object of 'nmtask' or 'glm'.}
 
 \item{newdata}{new data for verification.}
 
+\item{cutoff}{Cutoff is the prediction probability of logistic regression model,
+between 0 and 1. By default, the best cut-off value is calculated according to
+the maximum Yodon index.}
+
 \item{digits}{digits, default 3.}
 
-\item{filename}{filename}
+\item{filename}{filename, if you want to save to word.}
 }
 \description{
-Evaluate model performance
+Evaluate the performance of the model, including the area under the ROC curve,
+accuracy, sensitivity, specificity, positive predictive value, negative
+predictive value, and Brier score.
+}
+\details{
+About Brier score:
+
+The Brier score is a proper score function that measures the accuracy of
+probabilistic predictions. It is applicable to tasks in which predictions
+must assign probabilities to a set of mutually exclusive discrete outcomes.
+The set of possible outcomes can be either binary or categorical in nature,
+and the probabilities assigned to this set of outcomes must sum to one (where
+each individual probability is in the range of 0 to 1).
+
+The lower the Brier score is for a set of predictions, the better the
+predictions are calibrated. Note that the Brier score, in its most common
+formulation, takes on a value between zero and one, since this is the largest
+possible difference between a predicted probability (which must be between zero
+and one) and the actual outcome (which can take on values of only 0 and 1).
+(In the original (1950) formulation of the Brier score, the range is double,
+from zero to two.)
+}
+\examples{
+
+head(aps)
+
+index <- sample(1:nrow(aps), 300)
+train <- aps[index, ]
+test  <- aps[-index, ]
+
+tk1 <- nmtask(train.data = train,
+              test.data = test,
+              outcome = "elope",
+              predictors = c("age"))
+tk2 <- nmtask(train.data = train,
+              test.data = test,
+              outcome = "elope",
+              predictors = c("age", "gender", "place3", "danger"))
+
+performance(tk1, tk2)
+}
+\references{
+Brier, G. W. (1950) Verification of forecasts expressed in terms of probability. Monthly Weather Review, 78, 1-3.
 }

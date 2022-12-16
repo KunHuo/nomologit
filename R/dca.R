@@ -43,7 +43,7 @@
 #'              outcome = "elope",
 #'              predictors = c("age", "gender", "place3", "neuro"))
 #' dca(tk)
-dca <- function(data, outcome = NULL, predictors = NULL, newdata = NULL, B = 1000,
+dca <- function(data, outcome = NULL, predictors = NULL, newdata = NULL, B = 10,
                 thresholds = seq(0, 1, by = 0.01), linesize = 0.5,
                 linecolor = NULL, linelabel = NULL, xlab = NULL, ylab = NULL, ...){
   UseMethod("dca")
@@ -53,7 +53,7 @@ dca <- function(data, outcome = NULL, predictors = NULL, newdata = NULL, B = 100
 #' @rdname dca
 #' @export
 dca.data.frame <- function(data, outcome = NULL, predictors = NULL, newdata = NULL,
-                           B = 1000, thresholds = seq(0, 1, by = 0.01),
+                           B = 10, thresholds = seq(0, 1, by = 0.01),
                            linesize = 0.5, linecolor = NULL, linelabel = NULL, xlab = NULL, ylab = NULL, ...){
 
   options( warn = -1)
@@ -92,7 +92,7 @@ dca.data.frame <- function(data, outcome = NULL, predictors = NULL, newdata = NU
 #' @rdname dca
 #' @export
 dca.nmtask <- function(data, outcome = NULL, predictors = NULL, newdata = NULL,
-                       B = 1000, thresholds = seq(0, 1, by = 0.01),
+                       B = 10, thresholds = seq(0, 1, by = 0.01),
                        linesize = 0.5, linecolor = NULL, linelabel = NULL,
                        xlab = NULL, ylab = NULL, ...){
 
@@ -128,7 +128,7 @@ dca.nmtask <- function(data, outcome = NULL, predictors = NULL, newdata = NULL,
 #' @rdname dca
 #' @export
 dca.glm <- function(data, outcome = NULL, predictors = NULL, newdata = NULL,
-                    B = 1000, thresholds = seq(0, 1, by = 0.01),
+                    B = 10, thresholds = seq(0, 1, by = 0.01),
                     linesize = 0.5, linecolor = NULL, linelabel = NULL,
                     xlab = NULL, ylab = NULL, ...){
 
