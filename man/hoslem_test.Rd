@@ -50,7 +50,7 @@ This is indeed a troubling aspect of the test.
 \examples{
 tk1 <- nmtask(train.data = aps,
               outcome = "elope",
-              redictors = c("age", "gender", "place3"))
+              predictors = c("age", "gender", "place3"))
 
 hoslem_test(tk1)
 }
