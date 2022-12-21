@@ -44,8 +44,8 @@
 #'               outcome = "elope",
 #'               predictors = c("age", "gender", "place3"))
 #'
-#' hoslem_test(tk1)
-hoslem_test <- function(..., newdata = NULL, g = 10, digits = 3){
+#' hl_test(tk1)
+hl_test <- function(..., newdata = NULL, g = 10, digits = 3){
 
   tasks <- flatten_list(list(...))
 

@@ -29,7 +29,7 @@
 #' tk
 #'
 #' # Hosmer-Lemeshow test
-#' hoslem_test(tk)
+#' hl_test(tk)
 #'
 #' # Draw a nomogram
 #' nom(tk)

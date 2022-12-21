@@ -2,12 +2,9 @@
 % Please edit documentation in R/compare.R
 \name{compare}
 \alias{compare}
-\alias{reclassification}
 \title{Comparision of nomogram models}
 \usage{
 compare(..., cutoff = NULL, digits = 3)
-
-reclassification(..., cutoff = NULL, digits = 3)
 }
 \arguments{
 \item{...}{nomogram models.}

@@ -53,8 +53,8 @@
 #'               outcome = "elope",
 #'               predictors = c("age", "gender", "place3", "danger"))
 #'
-#' performance(tk1, tk2)
-performance <- function(...,  newdata = NULL, cutoff = "best", digits = 3, filename = ""){
+#' perf(tk1, tk2)
+perf <- function(...,  newdata = NULL, cutoff = "best", digits = 3, filename = ""){
 
   tasks <- flatten_list(list(...))
 

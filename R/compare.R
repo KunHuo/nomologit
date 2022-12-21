@@ -97,11 +97,6 @@ compare <- function(..., cutoff = NULL, digits = 3){
 }
 
 
-#' @rdname compare
-#' @export
-reclassification <- compare
-
-
 #' Print object
 #'
 #' @param x an object.
