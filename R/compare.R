@@ -17,6 +17,7 @@
 #' @param ... nomogram models.
 #' @param cutoff cutoff values for risk categories NRI.if is NULL, the function will compute continuous NRI.
 #' @param digits digits, default 3.
+#' @param filename filename, if you want to save to word.
 #'
 #' @return a data frame.
 #' @export
@@ -38,13 +39,9 @@
 #'
 #' # Compute continuous NRI and IDI
 #' compare(tk1, tk2, tk3)
-#' # or
-#' reclassification(tk1, tk2, tk3)
 #'
 #' # Compute categorical NRI and IDI
 #' compare(tk1, tk2, tk3, cutoff = 0.5)
-#' # or
-#' reclassification(tk1, tk2, tk3, cutoff = 0.5)
 #'
 #' # From logistic model
 #' model1 <- glm(elope ~ age + gender, data = aps, family = binomial())
@@ -52,18 +49,24 @@
 #'
 #' compare(model1, model2, cutoff = c(0.2, 0.7))
 #' compare(tk3, model2, cutoff = c(0.2, 0.7))
-compare <- function(..., cutoff = NULL, digits = 3){
-  models <- list(...)
+compare <- function(..., cutoff = NULL, digits = 3, filename = ""){
+  tasks <- list(...)
+  tasks <- flatten_list(tasks)
 
-  models <- lapply(models, function(m){
-    if("nmtask" %in% class(m)){
-      frm <- paste(m$predictors, collapse = " + ")
-      frm <- paste(m$outcome, frm, sep = " ~ ")
-      frm <- stats::as.formula(frm)
-      stats::glm(formula = frm, data = m$train.data, family = stats::binomial())
+  # supoort glm
+  tasks <- lapply(tasks, \(tk){
+    if("glm" %in% class(tk)){
+      as_nmtask(tk)
     }else{
-      m
+      tk
     }
+  })
+
+  models <- lapply(tasks, function(tk){
+    logistic(data = tk$train.data,
+             outcome = tk$outcome,
+             predictors = tk$predictors,
+             method = "glm")
   })
 
   comp <- utils::combn(1:length(models), 2)
@@ -93,7 +96,11 @@ compare <- function(..., cutoff = NULL, digits = 3){
 
   class(out) <- c("compare", class(out))
 
-  out
+  if(filename == ""){
+    out
+  }else{
+    write_docx.data.frame(out, path = filename)
+  }
 }
 
 

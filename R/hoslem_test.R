@@ -8,6 +8,7 @@
 #' Hosmer and Lemeshow’s conclusions from simulations were based on using g>p+1,
 #' suggesting that if we have 10 covariates in the model, we should choose g>11,
 #' although this doesn’t appear to be mentioned in text books or software packages.
+#' @param filename filename, if you want to save to word.
 #'
 #' @details
 #' The Hosmer-Lemeshow test is a statistical test for goodness of fit for logistic
@@ -45,7 +46,7 @@
 #'               predictors = c("age", "gender", "place3"))
 #'
 #' hl_test(tk1)
-hl_test <- function(..., newdata = NULL, g = 10, digits = 3){
+hl_test <- function(..., newdata = NULL, g = 10, digits = 3, filename = ""){
 
   tasks <- flatten_list(list(...))
 
@@ -118,7 +119,12 @@ hl_test <- function(..., newdata = NULL, g = 10, digits = 3){
   out <- add_title(out, "Hosmer-Lemeshow goodness of fit test")
   out <- add_note(out, "P value > 0.05 indicating no evidence of poor fit.")
   class(out) <- c("hoslem", class(out))
-  out
+
+  if(filename == ""){
+    out
+  }else{
+    write_docx.data.frame(out, path = filename)
+  }
 }
 
 

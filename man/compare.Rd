@@ -4,7 +4,7 @@
 \alias{compare}
 \title{Comparision of nomogram models}
 \usage{
-compare(..., cutoff = NULL, digits = 3)
+compare(..., cutoff = NULL, digits = 3, filename = "")
 }
 \arguments{
 \item{...}{nomogram models.}
@@ -12,6 +12,8 @@ compare(..., cutoff = NULL, digits = 3)
 \item{cutoff}{cutoff values for risk categories NRI.if is NULL, the function will compute continuous NRI.}
 
 \item{digits}{digits, default 3.}
+
+\item{filename}{filename, if you want to save to word.}
 }
 \value{
 a data frame.
@@ -51,13 +53,9 @@ tk3 <- nmtask(train.data = aps,
 
 # Compute continuous NRI and IDI
 compare(tk1, tk2, tk3)
-# or
-reclassification(tk1, tk2, tk3)
 
 # Compute categorical NRI and IDI
 compare(tk1, tk2, tk3, cutoff = 0.5)
-# or
-reclassification(tk1, tk2, tk3, cutoff = 0.5)
 
 # From logistic model
 model1 <- glm(elope ~ age + gender, data = aps, family = binomial())

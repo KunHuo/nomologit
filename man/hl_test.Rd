@@ -4,7 +4,7 @@
 \alias{hl_test}
 \title{Hosmer-Lemeshow test}
 \usage{
-hl_test(..., newdata = NULL, g = 10, digits = 3)
+hl_test(..., newdata = NULL, g = 10, digits = 3, filename = "")
 }
 \arguments{
 \item{...}{one or more object of 'nmtask' or 'glm'.}
@@ -18,6 +18,8 @@ suggesting that if we have 10 covariates in the model, we should choose g>11,
 although this doesn’t appear to be mentioned in text books or software packages.}
 
 \item{digits}{digits for p value, default 3.}
+
+\item{filename}{filename, if you want to save to word.}
 }
 \description{
 Hosmer-Lemeshow test
