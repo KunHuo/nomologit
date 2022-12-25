@@ -74,7 +74,7 @@ compare <- function(..., cutoff = NULL, digits = 3, filename = ""){
 
   out <- lapply(comp, function(x){
 
-    Comparision <- sprintf("Model %d vs. Model %d", x[2], x[1])
+    Comparision <- sprintf("Nomogram %d vs. Nomogram %d", x[2], x[1])
 
     res <- reclass_exec(outcome = models[[x[1]]]$y,
                      predrisk1 = models[[x[1]]]$fitted.values,

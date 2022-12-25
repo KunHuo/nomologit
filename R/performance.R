@@ -108,7 +108,7 @@ perf <- function(...,  newdata = NULL, cutoff = "best", digits = 3, filename = "
       test.roc <- roc_exec(data = test.data,
                            outcome = outcome,
                            exposure = ".pred",
-                           threshold = threshold,
+                           threshold = cutoff,
                            digits = digits)
 
 
@@ -133,7 +133,7 @@ perf <- function(...,  newdata = NULL, cutoff = "best", digits = 3, filename = "
 
   # set names
   if(is.null(names(tasks))){
-    names(out) <- sprintf("Model %d", 1:length(tasks))
+    names(out) <- sprintf("Nomogram %d", 1:length(tasks))
   }else{
     names(out) <- names(tasks)
   }

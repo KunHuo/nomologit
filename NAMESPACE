@@ -2,6 +2,7 @@
 
 S3method(print,compare)
 S3method(print,hoslem)
+S3method(print,nmplot)
 S3method(print,nmtask)
 S3method(print,nomologit)
 S3method(print,performance)

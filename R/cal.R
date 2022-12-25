@@ -221,13 +221,19 @@ cal <- function(...,
                 "onto the y-axis.", sep = " ")
   note <- sprintf(note, boot)
 
-  if(explain){
-    cat(title)
-    cat("\n")
-    cat(note)
-  }
+  # if(explain){
+  #   cat(title)
+  #   cat("\n")
+  #   cat(note)
+  # }
 
-  patchwork::wrap_plots(plots)
+  plots <- patchwork::wrap_plots(plots)
+
+  attr(plots, "explain") <- explain
+  plots <- add_title(plots, title)
+  plots <- add_note(plots, note)
+  class(plots) <- c("nmplot", class(plots))
+  plots
 }
 
 
