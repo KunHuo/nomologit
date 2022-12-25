@@ -6,6 +6,7 @@
 #' @export
 roc <- function(...,
                 newdata = NULL,
+                model.names = NULL,
                 boot = 10,
                 facet = c("data", "model"),
                 linewidth = 0.5,
@@ -64,10 +65,15 @@ roc <- function(...,
   })
 
   # set names
-  if(is.null(names(tasks))){
-    names(plotdata) <- sprintf("Model %d", 1:length(tasks))
+  if(is.null(model.names)){
+    if(is.null(names(tasks))){
+      names(plotdata) <- sprintf("Nomogram %d", 1:length(tasks))
+    }else{
+      names(plotdata) <- names(tasks)
+    }
   }else{
-    names(plotdata) <- names(tasks)
+    stopifnot(length(model.names) == length(plotdata))
+    names(plotdata) <- model.names
   }
 
   levels <- names(plotdata)

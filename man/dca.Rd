@@ -7,6 +7,7 @@
 dca(
   ...,
   newdata = NULL,
+  model.names = NULL,
   boot = 10,
   thresholds = seq(0, 1, by = 0.01),
   facet = c("data"),
@@ -26,6 +27,8 @@ dca(
 \item{...}{one or more object of 'nmtask' or 'glm'.}
 
 \item{newdata}{new data for verification.}
+
+\item{model.names}{vector of model's names to use when plotting legends.}
 
 \item{boot}{boot is an upper limit on the number of resamples for which information
 is printed about which variables were selected in each model re-fit, default 1000.}

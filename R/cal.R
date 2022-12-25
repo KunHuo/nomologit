@@ -9,6 +9,7 @@
 #'
 #' @param ... one or more object of 'nmtask' or 'glm'.
 #' @param newdata new data for verification.
+#' @param model.names vector of model's names to use when plotting legends.
 #' @param boot boot is an upper limit on the number of resamples for which information
 #' is printed about which variables were selected in each model re-fit, default 1000.
 #' @param facet of 'data' or 'model', specifying grouping variables for faceting
@@ -77,6 +78,7 @@
 #' cal(model1, newdata = test)
 cal <- function(...,
                 newdata = NULL,
+                model.names = NULL,
                 boot = 10,
                 facet = c("data", "model"),
                 linewidth = 0.5,
@@ -150,10 +152,15 @@ cal <- function(...,
   })
 
   # set names
-  if(is.null(names(tasks))){
-    names(plotdata) <- sprintf("Model %d", 1:length(tasks))
+  if(is.null(model.names)){
+    if(is.null(names(tasks))){
+      names(plotdata) <- sprintf("Nomogram %d", 1:length(tasks))
+    }else{
+      names(plotdata) <- names(tasks)
+    }
   }else{
-    names(plotdata) <- names(tasks)
+    stopifnot(length(model.names) == length(plotdata))
+    names(plotdata) <- model.names
   }
 
   levels <- names(plotdata)

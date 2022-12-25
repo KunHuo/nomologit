@@ -8,6 +8,7 @@
 #' @export
 dca <- function(...,
                 newdata = NULL,
+                model.names = NULL,
                 boot = 10,
                 thresholds = seq(0, 1, by = 0.01),
                 facet = c("data"),

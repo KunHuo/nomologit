@@ -7,6 +7,7 @@
 cal(
   ...,
   newdata = NULL,
+  model.names = NULL,
   boot = 10,
   facet = c("data", "model"),
   linewidth = 0.5,
@@ -25,6 +26,8 @@ cal(
 \item{...}{one or more object of 'nmtask' or 'glm'.}
 
 \item{newdata}{new data for verification.}
+
+\item{model.names}{vector of model's names to use when plotting legends.}
 
 \item{boot}{boot is an upper limit on the number of resamples for which information
 is printed about which variables were selected in each model re-fit, default 1000.}
