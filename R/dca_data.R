@@ -1,3 +1,4 @@
+# Extract from rmda package version 1.0
 dca_data <- function (formula,
                       data,
                       family = stats::binomial(link = "logit"),
@@ -72,7 +73,7 @@ dca_data <- function (formula,
   }
   else if (length(strsplit(predictors[[1]], "+", fixed = TRUE)[[1]]) >
            1) {
-    message("Note:  The data provided is used to both fit a prediction model and to estimate the respective decision curve. This may cause bias in decision curve estimates leading to over-confidence in model performance. ")
+    # message("Note:  The data provided is used to both fit a prediction model and to estimate the respective decision curve. This may cause bias in decision curve estimates leading to over-confidence in model performance. ")
   }
   formula.ind <- c(ifelse(fitted.risk, FALSE, TRUE), FALSE,
                    FALSE)

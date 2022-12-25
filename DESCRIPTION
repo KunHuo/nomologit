@@ -1,7 +1,7 @@
 Package: nomologit
 Type: Package
 Title: Nomogram for logistic regression
-Version: 0.1.4
+Version: 0.1.5
 Author: Rongrui Huo
 Maintainer: Rongrui Huo <huorongrui@sr.gxmu.edu.cn>
 Description: Simply draw the nomogram of logistic regression and conduct internal and external verification, including ROC curve, calibration curve, decision curve, and SHAP.
@@ -17,7 +17,6 @@ Imports:
     pROC,
     R.utils,
     rlang,
-    rmda,
     rms,
     tibble
 Depends: 

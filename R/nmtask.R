@@ -41,7 +41,7 @@
 #' roc(tk)
 #'
 #' # Draw decision curve
-#' dca(tk)
+#' # dca(tk)
 nmtask <- function(train.data, test.data = NULL, outcome = NULL, positive = NULL, predictors = NULL){
   if(is.list(predictors)){
     lapply(predictors, \(x){

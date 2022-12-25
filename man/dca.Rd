@@ -2,126 +2,63 @@
 % Please edit documentation in R/dca.R
 \name{dca}
 \alias{dca}
-\alias{dca.data.frame}
-\alias{dca.nmtask}
-\alias{dca.glm}
-\title{Draw decision curves}
+\title{Draw DCA curves}
 \usage{
 dca(
-  data,
-  outcome = NULL,
-  predictors = NULL,
+  ...,
   newdata = NULL,
-  B = 10,
+  boot = 10,
   thresholds = seq(0, 1, by = 0.01),
-  linesize = 0.5,
+  facet = c("data"),
+  linewidth = 0.5,
   linecolor = NULL,
-  linelabel = NULL,
-  xlab = NULL,
-  ylab = NULL,
-  ...
-)
-
-\method{dca}{data.frame}(
-  data,
-  outcome = NULL,
-  predictors = NULL,
-  newdata = NULL,
-  B = 10,
-  thresholds = seq(0, 1, by = 0.01),
-  linesize = 0.5,
-  linecolor = NULL,
-  linelabel = NULL,
-  xlab = NULL,
-  ylab = NULL,
-  ...
-)
-
-\method{dca}{nmtask}(
-  data,
-  outcome = NULL,
-  predictors = NULL,
-  newdata = NULL,
-  B = 10,
-  thresholds = seq(0, 1, by = 0.01),
-  linesize = 0.5,
-  linecolor = NULL,
-  linelabel = NULL,
-  xlab = NULL,
-  ylab = NULL,
-  ...
-)
-
-\method{dca}{glm}(
-  data,
-  outcome = NULL,
-  predictors = NULL,
-  newdata = NULL,
-  B = 10,
-  thresholds = seq(0, 1, by = 0.01),
-  linesize = 0.5,
-  linecolor = NULL,
-  linelabel = NULL,
-  xlab = NULL,
-  ylab = NULL,
-  ...
+  xlab = "Risk threshold",
+  ylab = "Standardized net benefit",
+  xbreaks = NULL,
+  ybreaks = NULL,
+  fontfamily = "serif",
+  fontsize = 12,
+  explain = TRUE,
+  seed = 1234
 )
 }
 \arguments{
-\item{data}{data}
-
-\item{outcome}{predict outcome.}
-
-\item{predictors}{predictors.}
+\item{...}{one or more object of 'nmtask' or 'glm'.}
 
 \item{newdata}{new data for verification.}
 
-\item{B}{Number of bootstrap replicates to use to calculate confidence intervals (default 1000).}
+\item{boot}{boot is an upper limit on the number of resamples for which information
+is printed about which variables were selected in each model re-fit, default 1000.}
 
-\item{thresholds}{thresholds.}
+\item{thresholds}{Numeric vector of high risk thresholds to use when plotting
+and calculating net benefit values.}
 
-\item{linesize}{line size, default 0.25.}
+\item{facet}{of 'data' or 'model', specifying grouping variables for faceting
+the plot into multiple panels, default 'data'.}
 
-\item{linecolor}{line color, the length must be 3.}
+\item{linewidth}{line width, default 0.5.}
 
-\item{linelabel}{line label,the length must be 3.}
+\item{linecolor}{line color.}
 
-\item{xlab}{label for X axis.}
+\item{xlab}{x axis label.}
 
-\item{ylab}{label for Y axis.}
+\item{ylab}{y axis label.}
 
-\item{...}{further arguments.}
+\item{xbreaks}{x axis breaks.}
+
+\item{ybreaks}{y axis breaks.}
+
+\item{fontfamily}{font family, sefault serif.}
+
+\item{fontsize}{font size, default 12.}
+
+\item{explain}{whether explain the figure, default TRUE.}
+
+\item{seed}{a single value, interpreted as an integer, or NULL, default 1234.}
+}
+\value{
+a ggplot object from the \link{ggplot2} package, or a patchwork object from \link{patchwork} package.
 }
 \description{
-Draw decision curves
-}
-\examples{
-head(aps)
-
-# Basic usage
-dca(aps,
-    outcome = "elope",
-    predictors = c("age", "gender", "place3", "neuro"))
-
-# From a nmtask
-tk <- nmtask(train.data = aps,
-             outcome = "elope",
-             predictors = c("age", "gender", "place3", "neuro"))
-dca(tk)
-
-# With validation
-index <- sample(1:nrow(aps), 300)
-train <- aps[index, ]
-test  <- aps[-index, ]
-
-dca(train,
-    outcome = "elope",
-    predictors = c("age", "gender", "place3", "neuro"),
-    newdata = test)
-# or
-tk <- nmtask(train.data = train,
-             test.data = test,
-             outcome = "elope",
-             predictors = c("age", "gender", "place3", "neuro"))
-dca(tk)
+Draw DCA curves
 }

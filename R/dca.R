@@ -1,187 +1,139 @@
-#' Draw decision curves
+#' Draw DCA curves
 #'
-#' @param data data
-#' @param outcome predict outcome.
-#' @param predictors predictors.
-#' @param newdata new data for verification.
-#' @param B  Number of bootstrap replicates to use to calculate confidence intervals (default 1000).
-#' @param thresholds thresholds.
-#' @param xlab label for X axis.
-#' @param ylab label for Y axis.
-#' @param linesize line size, default 0.25.
-#' @param linecolor line color, the length must be 3.
-#' @param linelabel line label,the length must be 3.
-#' @param ... further arguments.
+#' @inheritParams cal
+#' @param thresholds Numeric vector of high risk thresholds to use when plotting
+#' and calculating net benefit values.
 #'
+#' @inherit cal return
 #' @export
-#' @examples
-#' head(aps)
-#'
-#' # Basic usage
-#' dca(aps,
-#'     outcome = "elope",
-#'     predictors = c("age", "gender", "place3", "neuro"))
-#'
-#' # From a nmtask
-#' tk <- nmtask(train.data = aps,
-#'              outcome = "elope",
-#'              predictors = c("age", "gender", "place3", "neuro"))
-#' dca(tk)
-#'
-#' # With validation
-#' index <- sample(1:nrow(aps), 300)
-#' train <- aps[index, ]
-#' test  <- aps[-index, ]
-#'
-#' dca(train,
-#'     outcome = "elope",
-#'     predictors = c("age", "gender", "place3", "neuro"),
-#'     newdata = test)
-#' # or
-#' tk <- nmtask(train.data = train,
-#'              test.data = test,
-#'              outcome = "elope",
-#'              predictors = c("age", "gender", "place3", "neuro"))
-#' dca(tk)
-dca <- function(data, outcome = NULL, predictors = NULL, newdata = NULL, B = 10,
-                thresholds = seq(0, 1, by = 0.01), linesize = 0.5,
-                linecolor = NULL, linelabel = NULL, xlab = NULL, ylab = NULL, ...){
-  UseMethod("dca")
-}
+dca <- function(...,
+                newdata = NULL,
+                boot = 10,
+                thresholds = seq(0, 1, by = 0.01),
+                facet = c("data"),
+                linewidth = 0.5,
+                linecolor = NULL,
+                xlab = "Risk threshold",
+                ylab = "Standardized net benefit",
+                xbreaks = NULL,
+                ybreaks = NULL,
+                fontfamily = "serif",
+                fontsize = 12,
+                explain = TRUE,
+                seed = 1234) {
 
+  facet <- match.arg(facet)
 
-#' @rdname dca
-#' @export
-dca.data.frame <- function(data, outcome = NULL, predictors = NULL, newdata = NULL,
-                           B = 10, thresholds = seq(0, 1, by = 0.01),
-                           linesize = 0.5, linecolor = NULL, linelabel = NULL, xlab = NULL, ylab = NULL, ...){
+  tasks <- list(...)
+  tasks <- flatten_list(tasks)
 
-  options( warn = -1)
+  # supoort glm
+  tasks <- lapply(tasks, \(tk){
+    if("glm" %in% class(tk)){
+      as_nmtask(tk)
+    }else{
+      tk
+    }
+  })
 
-  data[[outcome]] <- as.numeric(as.factor(data[[outcome]])) - 1
-  frm <- paste(predictors, collapse = " + ")
-  frm <- paste(outcome, frm, sep = " ~ ")
-  frm <- stats::as.formula(frm)
-  fitA <- rmda::decision_curve(formula = frm, data = data, thresholds = thresholds, bootstraps = B)
-  dcaA <- plot_dca(fitA, linesize = linesize, linecolor = linecolor, xlab = xlab, ylab = ylab)
+  plotdata <- lapply(tasks, \(tk){
+    train.data <- tk$train.data
 
-  if(is.null(newdata)){
-    cat("Figure: Decision curves of the nomogram for training set.\n")
-    dcaA
+    if(is.null(newdata)){
+      test.data  <- tk$test.data
+    }else{
+      test.data  <- newdata
+    }
+
+    outcome    <- tk$outcome
+    predictors <- tk$predictors
+
+    train.frm <- paste(predictors, collapse = " + ")
+    train.frm <- paste(outcome, train.frm, sep = " ~ ")
+    train.frm <- stats::as.formula(train.frm)
+    set.seed(seed)
+    train.dca <- dca_data(formula = train.frm, data = train.data, thresholds = thresholds, bootstraps = boot)
+
+    train.plotdata <- train.dca$derived.data
+    train.plotdata$group <- "Training set"
+
+    if(!is.null(test.data)){
+
+      train.fit <- logistic(data = train.data, outcome = outcome, predictors = predictors, method = "glm")
+      test.pred <- stats::predict(train.fit, test.data)
+
+      test.data$.pre <- test.pred
+      test.frm <- paste(outcome, ".pre", sep = " ~ ")
+      test.frm <- stats::as.formula(test.frm)
+      set.seed(seed)
+      test.dca <- dca_data(formula = test.frm, data = test.data, thresholds = thresholds, bootstraps = boot)
+
+      test.plotdata <- test.dca$derived.data
+      test.plotdata$group <- "Validation set"
+      rbind(train.plotdata, test.plotdata)
+
+    }else{
+      train.plotdata
+    }
+  })
+
+  # set names
+  if(is.null(names(tasks))){
+    names(plotdata) <- sprintf("Model %d", 1:length(tasks))
   }else{
-    newdata[[outcome]] <- as.numeric(as.factor(newdata[[outcome]])) - 1
-    fitg <- stats::glm(formula = frm, family = stats::binomial(), data = data)
-    pre <- stats::predict(fitg, newdata = newdata, type = "response")
-    newdata$.pre <- pre
-    frmB <- paste(outcome, ".pre", sep = " ~ ")
-    frmB <- stats::as.formula(frmB)
-    fitB <- rmda::decision_curve(formula = frmB, data = newdata, thresholds = thresholds, bootstraps = B)
-
-    dcaB <- plot_dca(fitB, linesize = linesize, linecolor = linecolor, xlab = xlab, ylab = ylab)
-
-    dcaA <- dcaA + gg_tags("A")
-    dcaB <- dcaB + gg_tags("B")
-
-    cat("Figure: Decision curves of the nomogram for training set (A) and validation set (B).\n")
-    suppressMessages(patchwork::wrap_plots(dcaA, dcaB))
+    names(plotdata) <- names(tasks)
   }
 
+  plotdata <- Map(function(d, name){
+    d$model[!(d$model == "None" | d$model == "All")] <- name
+    d
+  }, plotdata, names(plotdata))
+
+  plotdata <- list_rbind(plotdata, names.as.column = FALSE)
+  plotdata <- split.data.frame(plotdata, plotdata[["group"]])
+
+
+  plots <- lapply(plotdata, \(pdata){
+    plot_dca(pdata,
+              linewidth = linewidth,
+              linecolor = linecolor,
+              xlab = xlab,
+              ylab = ylab,
+              xbreaks = xbreaks,
+              ybreaks = ybreaks,
+              fontfamily = fontfamily,
+              fontsize = fontsize,
+              group = "model")
+  })
+
+  # set tags
+  if(length(plots) >= 2L){
+    plots <- Map(\(plot, tag){
+      plot + gg_tags(tag)
+    }, plots, LETTERS[1:length(plots)])
+  }
+
+  patchwork::wrap_plots(plots)
 }
 
 
-#' @rdname dca
-#' @export
-dca.nmtask <- function(data, outcome = NULL, predictors = NULL, newdata = NULL,
-                       B = 10, thresholds = seq(0, 1, by = 0.01),
-                       linesize = 0.5, linecolor = NULL, linelabel = NULL,
-                       xlab = NULL, ylab = NULL, ...){
 
-  train.data <- data$train.data
+plot_dca <- function(pdata, linewidth, linecolor, xlab, ylab, xbreaks, ybreaks, fontfamily, fontsize, group){
 
-  if(is.null(newdata)){
-    newdata  <- data$test.data
-  }
-
-  if(is.null(outcome)){
-    outcome <- data$outcome
-  }
-
-  if(is.null(predictors)){
-    predictors <- data$predictors
-  }
-
-  dca.data.frame(data = train.data,
-                 outcome = outcome,
-                 predictors = predictors,
-                 newdata = newdata,
-                 B = B,
-                 thresholds = thresholds,
-                 linesize = linesize,
-                 linecolor = linecolor,
-                 linelabel = linelabel,
-                 xlab = xlab,
-                 ylab = ylab,
-                 ...)
-}
-
-
-#' @rdname dca
-#' @export
-dca.glm <- function(data, outcome = NULL, predictors = NULL, newdata = NULL,
-                    B = 10, thresholds = seq(0, 1, by = 0.01),
-                    linesize = 0.5, linecolor = NULL, linelabel = NULL,
-                    xlab = NULL, ylab = NULL, ...){
-
-  if(data$family[[1]] == "binomial"){
-
-    train.data <- data$data
-    outcome <- all.vars(data$formula)[1]
-    predictors <- all.vars(data$formula)[-1]
-
-    dca.data.frame(data = train.data, outcome = outcome, predictors = predictors, newdata = newdata,
-                   B = B, thresholds = thresholds,
-                   linesize = linesize, linecolor = linecolor, linelabel = linelabel,
-                   xlab = xlab, ylab = ylab, ...)
-  }
-
-}
-
-
-plot_dca <- function(fit, linesize = 0.5, linecolor = NULL, linelabel = NULL, xlab = NULL, ylab = NULL, ...){
-
-  if(is.null(linecolor)){
-    linecolor <- c("#DF8F44FF", "#00A1D5FF", "#374E55FF")
-  }else{
-    stopifnot(length(linecolor) == 3L)
-  }
-
-  if(is.null(linelabel)){
-    linelabel <- c("Nomogram", "All", "None")
-  }else{
-    stopifnot(length(linelabel) == 3L)
-  }
-
-  if(is.null(xlab)){
-    xlab <- "Risk threshold"
-  }
-
-  if(is.null(ylab)){
-    ylab <- "Standardized net benefit"
-  }
-
-  plotdata <- fit$derived.data
-  plotdata$model[!(plotdata$model == "None" | plotdata$model == "All")] <- "Nomogram"
-  plotdata$model <- factor(plotdata$model, levels = c("Nomogram", "All", "None"), labels = linelabel)
-
-  ggplot2::ggplot(plotdata) +
-    ggplot2::geom_line(ggplot2::aes_string(x = "thresholds", y = "sNB", color = "model", linetype = "model"), size = linesize) +
-    gg_theme_sci(legend.key.size = 1.2, ...) +
-    ggplot2::scale_x_continuous(breaks = seq(0, 1, 0.2), limits = c(0, 1), expand = c(0, 0)) +
-    ggplot2::scale_y_continuous(breaks = seq(-0.2, 1, 0.2), limits = c(-0.2, 1), expand = c(0, 0)) +
-    ggplot2::scale_color_manual(values = linecolor) +
-    ggplot2::scale_linetype_manual(values = c(1, 2, 3)) +
+  p <- ggplot2::ggplot(pdata) +
+    ggplot2::geom_line(ggplot2::aes_string(x = "thresholds", y = "sNB", color = group), linewidth = linewidth) +
+    gg_theme_sci(legend.key.size = 1.2, font.family = fontfamily, font.size = fontsize) +
     gg_legend_position(c(1, 1)) +
     gg_delete_legend_title() +
     gg_xlab(xlab) +
-    gg_ylab(ylab)
+    gg_ylab(ylab) +
+    ggplot2::scale_x_continuous(breaks = seq(0, 1, 0.2), limits = c(0, 1), expand = c(0, 0)) +
+    ggplot2::scale_y_continuous(breaks = seq(-0.2, 1, 0.2), limits = c(-0.2, 1), expand = c(0, 0))
+
+  if(!is.null(linecolor)){
+    p <- p +
+      ggplot2::scale_color_manual(values = linecolor)
+  }
+
+  p
 }

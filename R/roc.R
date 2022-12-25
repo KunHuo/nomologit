@@ -140,7 +140,7 @@ plot_roc <- function(pdata, linewidth, linecolor, xlab, ylab, xbreaks, ybreaks, 
 
   p <- ggplot2::ggplot(pdata) +
     ggplot2::geom_abline(intercept = 0, color = "#374E55FF", linetype = 2, linewidth = linewidth)  +
-    ggplot2::geom_line(ggplot2::aes_string(y = "sensitivity", x = "specificity", color = group), linewidth = linewidth) +
+    ggplot2::geom_line(ggplot2::aes_string(x = "specificity", y = "sensitivity",  color = group), linewidth = linewidth) +
     gg_theme_sci(legend.key.size = 1.2, font.family = fontfamily, font.size = fontsize) +
     gg_legend_position(c(1, 0)) +
     gg_delete_legend_title() +

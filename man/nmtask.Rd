@@ -61,5 +61,5 @@ cal(tk)
 roc(tk)
 
 # Draw decision curve
-dca(tk)
+# dca(tk)
 }
