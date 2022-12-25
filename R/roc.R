@@ -125,11 +125,13 @@ roc <- function(...,
     }, plots, LETTERS[1:length(plots)])
   }
 
-  if(explain){
-    cat(title)
-  }
+  plots <- patchwork::wrap_plots(plots)
 
-  patchwork::wrap_plots(plots)
+  attr(plots, "explain") <- explain
+  plots <- add_title(plots, title)
+  # plots <- add_note(plots, note)
+  class(plots) <- c("nmplot", class(plots))
+  plots
 }
 
 

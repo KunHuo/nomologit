@@ -168,8 +168,6 @@ cal <- function(...,
   plotdata <- list_rbind(plotdata, varname = "model")
   plotdata$model <- factor(plotdata$model, levels = levels)
 
-
-
   if(facet == "data"){
     plotdata <- split.data.frame(plotdata, plotdata$group)
     group <- "model"
@@ -220,12 +218,6 @@ cal <- function(...,
                 "is projected onto the x-axis, and the actual risk is projected",
                 "onto the y-axis.", sep = " ")
   note <- sprintf(note, boot)
-
-  # if(explain){
-  #   cat(title)
-  #   cat("\n")
-  #   cat(note)
-  # }
 
   plots <- patchwork::wrap_plots(plots)
 

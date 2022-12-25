@@ -16,8 +16,8 @@ dca <- function(...,
                 linecolor = NULL,
                 xlab = "Risk threshold",
                 ylab = "Standardized net benefit",
-                xbreaks = NULL,
-                ybreaks = NULL,
+                xbreaks = seq(0, 1, 0.2),
+                ybreaks = seq(-0.2, 1, 0.2),
                 fontfamily = "serif",
                 fontsize = 12,
                 explain = TRUE,
@@ -79,20 +79,29 @@ dca <- function(...,
   })
 
   # set names
-  if(is.null(names(tasks))){
-    names(plotdata) <- sprintf("Model %d", 1:length(tasks))
+  if(is.null(model.names)){
+    if(is.null(names(tasks))){
+      names(plotdata) <- sprintf("Nomogram %d", 1:length(tasks))
+    }else{
+      names(plotdata) <- names(tasks)
+    }
   }else{
-    names(plotdata) <- names(tasks)
+    stopifnot(length(model.names) == length(plotdata))
+    names(plotdata) <- model.names
   }
+
+  levels <- names(plotdata)
 
   plotdata <- Map(function(d, name){
     d$model[!(d$model == "None" | d$model == "All")] <- name
     d
   }, plotdata, names(plotdata))
 
-  plotdata <- list_rbind(plotdata, names.as.column = FALSE)
-  plotdata <- split.data.frame(plotdata, plotdata[["group"]])
 
+  plotdata <- list_rbind(plotdata, names.as.column = FALSE)
+  plotdata[["model"]] <- factor(plotdata[["model"]], levels = c("None", "All", levels))
+
+  plotdata <- split.data.frame(plotdata, plotdata[["group"]])
 
   plots <- lapply(plotdata, \(pdata){
     plot_dca(pdata,
@@ -114,7 +123,13 @@ dca <- function(...,
     }, plots, LETTERS[1:length(plots)])
   }
 
-  patchwork::wrap_plots(plots)
+  plots <- patchwork::wrap_plots(plots)
+
+  attr(plots, "explain") <- explain
+  plots <- add_title(plots, "title")
+  plots <- add_note(plots, "note")
+  class(plots) <- c("nmplot", class(plots))
+  plots
 }
 
 
@@ -128,8 +143,8 @@ plot_dca <- function(pdata, linewidth, linecolor, xlab, ylab, xbreaks, ybreaks, 
     gg_delete_legend_title() +
     gg_xlab(xlab) +
     gg_ylab(ylab) +
-    ggplot2::scale_x_continuous(breaks = seq(0, 1, 0.2), limits = c(0, 1), expand = c(0, 0)) +
-    ggplot2::scale_y_continuous(breaks = seq(-0.2, 1, 0.2), limits = c(-0.2, 1), expand = c(0, 0))
+    ggplot2::scale_x_continuous(breaks = xbreaks, limits = c(min(xbreaks), max(xbreaks)), expand = c(0, 0)) +
+    ggplot2::scale_y_continuous(breaks = ybreaks, limits = c(min(ybreaks), max(ybreaks)), expand = c(0, 0))
 
   if(!is.null(linecolor)){
     p <- p +
