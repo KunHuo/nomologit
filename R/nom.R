@@ -24,45 +24,6 @@
 #' @param ... settings of variables to use in constructing axes.
 #'
 #' @export
-#' @examples
-#' head(aps)
-#'
-#' # From nmtask
-#' tk <- nmtask(train.data = aps,
-#'              outcome = "elope",
-#'              predictors = c("age", "gender", "place3", "neuro"))
-#'
-#' # Set the scale of the risk axis.
-#' nom(tk,
-#'     funlabel = "Risk of Elopement",
-#'     fun.at = c(0.1, 0.15, 0.25, 0.35, 0.45, 0.55, 0.65))
-#'
-#' # Fraction of horizontal plot to set aside for axis titles.
-#' nom(tk,
-#'     funlabel = "Risk of Elopement",
-#'     fun.at = c(0.1, 0.15, 0.25, 0.35, 0.45, 0.55, 0.65),
-#'     xfrac = 0.65)
-#'
-#' # show model and points
-#' nom(tk,
-#'     funlabel = "Risk of Elopement",
-#'     fun.at = c(0.1, 0.15, 0.25, 0.35, 0.45, 0.55, 0.65),
-#'     xfrac = 0.65,
-#'     show.points = TRUE,
-#'     show.model = TRUE)
-#'
-#' nm <- nom(tk,
-#'           funlabel = "Risk of Elopement",
-#'           fun.at = c(0.1, 0.15, 0.25, 0.35, 0.45, 0.55, 0.65),
-#'           xfrac = 0.65)
-#' nm
-#'
-#' # set labels
-#' nm |>
-#'   set_variable_labels(age = "Age (years)") |>
-#'   set_variable_labels(gender = "Gender", place3 = "Placement") |>
-#'   set_category_labels("Gender", Male = "M", Female = "F") |>
-#'   set_category_labels("Placement", OutDay = "Outday")
 nom <- function(data,
                 points.label = "Points",
                 total.points.label = "Total points",
@@ -168,34 +129,16 @@ print.nomologit <- function(x, ...){
   }
 }
 
-#' Set labels for nomogram
+#' Set labels for variable of nomogram
 #'
 #' @param x a nomogram object from nom() function
 #' @param ... "vairable=label"
 #'
-#' @seealso [set_category_labels]
+#' @seealso [label_category]
 #'
 #' @return a nomogram.
 #' @export
-#'
-#' @examples
-#' tk <- nmtask(train.data = aps,
-#'              outcome = "elope",
-#'              predictors = c("age", "gender", "place3", "neuro"))
-#'
-#' nm <- nom(tk,
-#'           funlabel = "Risk of Elopement",
-#'           fun.at = c(0.1, 0.15, 0.25, 0.35, 0.45, 0.55, 0.65),
-#'           xfrac = 0.65)
-#' nm
-#'
-#' # set labels
-#' nm |>
-#'   set_variable_labels(age = "Age (years)") |>
-#'   set_variable_labels(gender = "Gender", place3 = "Placement") |>
-#'   set_category_labels("Gender", Male = "M", Female = "F") |>
-#'   set_category_labels("Placement", OutDay = "Outday")
-set_variable_labels <- function(x, ...){
+label_variable <- function(x, ...){
   labels <- list(...)
   for(i in 1:length(labels)){
     names(x)[names(x) == names(labels[i])] <- labels[[i]]
@@ -204,35 +147,17 @@ set_variable_labels <- function(x, ...){
 }
 
 
-#' Set labels for category of variable
+#' Set labels for category of nomogram
 #'
 #' @param x a nomogram object from [nom] function
 #' @param variable variable name from nomogram.
 #' @param ... "category=label"
 #'
-#' @seealso [set_variable_labels]
+#' @seealso [label_variable]
 #'
 #' @return a nomogram.
 #' @export
-#'
-#' @examples
-#' tk <- nmtask(train.data = aps,
-#'              outcome = "elope",
-#'              predictors = c("age", "gender", "place3", "neuro"))
-#'
-#' nm <- nom(tk,
-#'           funlabel = "Risk of Elopement",
-#'           fun.at = c(0.1, 0.15, 0.25, 0.35, 0.45, 0.55, 0.65),
-#'           xfrac = 0.65)
-#' nm
-#'
-#' # set labels
-#' nm |>
-#'   set_variable_labels(age = "Age (years)") |>
-#'   set_variable_labels(gender = "Gender", place3 = "Placement") |>
-#'   set_category_labels("Gender", Male = "M", Female = "F") |>
-#'   set_category_labels("Placement", OutDay = "Outday")
-set_category_labels <- function(x, variable, ...){
+label_category <- function(x, variable, ...){
   if(variable %in% names(x)){
     labels <- list(...)
     for(i in 1:length(labels)){

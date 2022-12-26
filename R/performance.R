@@ -35,25 +35,6 @@
 #' Brier, G. W. (1950) Verification of forecasts expressed in terms of probability. Monthly Weather Review, 78, 1-3.
 #'
 #' @export
-#'
-#' @examples
-#'
-#' head(aps)
-#'
-#' index <- sample(1:nrow(aps), 300)
-#' train <- aps[index, ]
-#' test  <- aps[-index, ]
-#'
-#' tk1 <- nmtask(train.data = train,
-#'               test.data = test,
-#'               outcome = "elope",
-#'               predictors = c("age"))
-#' tk2 <- nmtask(train.data = train,
-#'               test.data = test,
-#'               outcome = "elope",
-#'               predictors = c("age", "gender", "place3", "danger"))
-#'
-#' perf(tk1, tk2)
 perf <- function(...,  newdata = NULL, cutoff = "best", digits = 3, filename = ""){
 
   tasks <- flatten_list(list(...))

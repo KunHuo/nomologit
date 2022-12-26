@@ -12,36 +12,6 @@
 #'
 #' @return a object of 'nmtask' class.
 #' @export
-#'
-#' @examples
-#' index <- sample(1:nrow(aps), 300)
-#' # Training set
-#' train <- aps[index, ]
-#' # Validation set
-#' test  <- aps[-index, ]
-#'
-#' # Set task of nomogram model
-#' tk <- nmtask(train.data = train,
-#'              test.data = test,
-#'              outcome = "elope",
-#'              predictors = c("age", "gender", "place3"))
-#' # View task
-#' tk
-#'
-#' # Hosmer-Lemeshow test
-#' hl_test(tk)
-#'
-#' # Draw a nomogram
-#' nom(tk)
-#'
-#' # Draw calibrate curve
-#' cal(tk)
-#'
-#' # Draw ROC curve
-#' roc(tk)
-#'
-#' # Draw decision curve
-#' # dca(tk)
 nmtask <- function(train.data, test.data = NULL, outcome = NULL, positive = NULL, predictors = NULL){
   if(is.list(predictors)){
     lapply(predictors, \(x){

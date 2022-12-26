@@ -3,6 +3,8 @@
 #' @param x an object of 'nmplot'.
 #' @param ... more.
 #'
+#' @keywords internal
+#'
 #' @export
 print.nmplot <- function(x, ...){
   if(attr(x, "explain")){
@@ -12,5 +14,6 @@ print.nmplot <- function(x, ...){
     cat(attr(x, "note"))
     cat("\n\n")
   }
-  plot(x)
+
+  suppressWarnings(plot(x))
 }

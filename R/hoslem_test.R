@@ -39,13 +39,6 @@
 #' Hosmer D W, Lemeshow S 2000. Applied Logistic Regression. New York, USA: John Wiley and Sons.
 #'
 #' @export
-#'
-#' @examples
-#' tk1 <- nmtask(train.data = aps,
-#'               outcome = "elope",
-#'               predictors = c("age", "gender", "place3"))
-#'
-#' hl_test(tk1)
 hl_test <- function(..., newdata = NULL, g = 10, digits = 3, filename = ""){
 
   tasks <- flatten_list(list(...))

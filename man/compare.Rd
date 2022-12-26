@@ -36,31 +36,3 @@ initial model. IDI equal to x\% means that the difference in average predicted
 risks between the individuals with and without the outcome increased by x\% in
 the updated model.
 }
-\examples{
-
-# From nomogram task
-tk1 <- nmtask(train.data = aps,
-              outcome = "elope",
-              predictors = c("age", "gender"))
-
-tk2 <- nmtask(train.data = aps,
-              outcome = "elope",
-              predictors = c("age", "gender", "place3"))
-
-tk3 <- nmtask(train.data = aps,
-              outcome = "elope",
-              predictors = c("age", "gender", "place3", "neuro", "danger"))
-
-# Compute continuous NRI and IDI
-compare(tk1, tk2, tk3)
-
-# Compute categorical NRI and IDI
-compare(tk1, tk2, tk3, cutoff = 0.5)
-
-# From logistic model
-model1 <- glm(elope ~ age + gender, data = aps, family = binomial())
-model2 <- glm(elope ~ age + gender + place3 + neuro, data = aps, family = binomial())
-
-compare(model1, model2, cutoff = c(0.2, 0.7))
-compare(tk3, model2, cutoff = c(0.2, 0.7))
-}

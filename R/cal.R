@@ -27,55 +27,6 @@
 #'
 #' @return a ggplot object from the [ggplot2] package, or a patchwork object from [patchwork] package.
 #' @export
-#'
-#' @examples
-#' head(aps)
-#'
-#' # Without validation
-#' tk <- nmtask(train.data = aps,
-#'              outcome = "elope",
-#'              predictors = c("age", "gender"))
-#' cal(tk)
-#'
-#' # With validation
-#' index <- sample(1:nrow(aps), 300)
-#' train <- aps[index, ]
-#' test  <- aps[-index, ]
-#'
-#' tk1 <- nmtask(train.data = train,
-#'               test.data = test,
-#'               outcome = "elope",
-#'               predictors = c("age", "gender"))
-#' tk2 <- nmtask(train.data = train,
-#'               test.data = test,
-#'               outcome = "elope",
-#'               predictors = c("age", "gender", "place3"))
-#'
-#' # facet by data, defalut.
-#' cal(tk1, facet = "d")
-#' # facet by models.
-#' cal(tk1, facet = "m")
-#' # plot two or more models
-#' cal(tk1, tk2)
-#' # rename models
-#' cal("Nomogram 1" = tk1, "Nomogram 2" = tk2)
-#'
-#' # a list of predictors
-#' tks <- nmtask(train.data = train,
-#'               test.data = test,
-#'               outcome = "elope",
-#'               predictors = list("Nomogram 1" = c("age", "gender"),
-#'                                 "Nomogram 2" = c("age", "gender", "place3")))
-#' cal(tks)
-#' cal(tks, facet = "m")
-#'
-#' # support glm
-#' model1 <- glm(elope ~ age + gender + place3 + neuro,
-#'               data = train,
-#'               family = binomial())
-#' cal(model1)
-#' # with new data.
-#' cal(model1, newdata = test)
 cal <- function(...,
                 newdata = NULL,
                 model.names = NULL,

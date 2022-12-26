@@ -49,13 +49,6 @@ p-value, such that with one choice of g we might conclude our model does not
 fit well, yet with another we conclude there is no evidence of poor fit.
 This is indeed a troubling aspect of the test.
 }
-\examples{
-tk1 <- nmtask(train.data = aps,
-              outcome = "elope",
-              predictors = c("age", "gender", "place3"))
-
-hl_test(tk1)
-}
 \references{
 Hosmer D W, Lemeshow S 2000. Applied Logistic Regression. New York, USA: John Wiley and Sons.
 }

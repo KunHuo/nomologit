@@ -42,25 +42,6 @@ and one) and the actual outcome (which can take on values of only 0 and 1).
 (In the original (1950) formulation of the Brier score, the range is double,
 from zero to two.)
 }
-\examples{
-
-head(aps)
-
-index <- sample(1:nrow(aps), 300)
-train <- aps[index, ]
-test  <- aps[-index, ]
-
-tk1 <- nmtask(train.data = train,
-              test.data = test,
-              outcome = "elope",
-              predictors = c("age"))
-tk2 <- nmtask(train.data = train,
-              test.data = test,
-              outcome = "elope",
-              predictors = c("age", "gender", "place3", "danger"))
-
-perf(tk1, tk2)
-}
 \references{
 Brier, G. W. (1950) Verification of forecasts expressed in terms of probability. Monthly Weather Review, 78, 1-3.
 }
