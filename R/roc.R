@@ -48,7 +48,9 @@ roc <- function(...,
     predictors <- tk$predictors
 
     train.fit <- logistic(data = train.data, outcome = outcome, predictors = predictors, method = "glm")
-    train.roc <- suppressMessages(pROC::roc(response = train.data[[outcome]], predictor = train.fit$fitted.values, direction = "<"))
+    train.roc <- suppressMessages(pROC::roc(response = train.data[[outcome]],
+                                            predictor = train.fit$fitted.values,
+                                            direction = "<"))
 
     train.plotdata <- roc_plotdata(train.roc)
     train.plotdata$group <- "Training set"
