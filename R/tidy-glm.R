@@ -238,6 +238,24 @@ extract_varnames <- function(fit, data = NULL, varnames = NULL){
   varnames
 }
 
+format_variable_coefs <- function(data, varnames, fold, coefs){
+  add.first <- NULL
+  add.last <- NULL
+  if("(Intercept)" %in% coefs$term){
+    add.first <- "(Intercept)"
+  }
+
+  if(any(regex_detect(coefs$term, pattern = ":", fixed = TRUE))){
+    add.last <- coefs$term[regex_detect(coefs$term, pattern = ":", fixed = TRUE)]
+  }
+
+  format_variable(data = data,
+                  varnames = varnames,
+                  fold = fold,
+                  add.first = add.first,
+                  add.last = add.last)
+}
+
 
 format_coefs <- function(x,
                          conf.brackets = NULL,
@@ -429,4 +447,137 @@ freq <- function(x, g = NULL, type = 1, digits = NULL){
   freqs <- as.data.frame(freqs, stringsAsFactors = FALSE)
   cbind(data.frame(term = rname, stringsAsFactors = FALSE), freqs)
 }
+
+
+subset_stat <- function(data, values){
+
+  values <- tolower(values)
+  values <- sapply(values, function(x){
+    if(x %in% c("b", "estimate")){
+      "estimate"
+    }else if(x %in% c("se", "std.error")){
+      "std.error"
+    }else if(x %in% c("effect", "e", "hr", "or", "rr", "pr")){
+      "effect"
+    }else if(x %in% c("stat", "statistic", "wald", "t", "t.value")){
+      "statistic"
+    }else if( x %in% c("p", "p.value", "pvalue")){
+      "p.value"
+    }else if(x %in% c("n.total", "ntotal", "total", "n", "nt")) {
+      "n.total"
+    }else if(x %in% c("n.event", "nevent", "event", "ne")) {
+      "n.event"
+    }else if(x %in% c("n.nonevent", "nnonevent", "nonevent", "nne")) {
+      "n.non.event"
+    }else if(x %in% c("n.event.total", "neventtotal", "net")) {
+      "n.event.total"
+    }else{
+      NA
+    }
+  })
+  values <- unique(values)
+  values <- values[!is.na(values)]
+  values <- values[values %in% names(data)]
+  data <- data[c("term", "varname", "ref", "variable", values)]
+  data
+}
+
+
+set_reference <- function(data, value, digits.effect = 2){
+  if(is.numeric(value)){
+    value <- format_digits(value, digits.effect)
+  }
+  if(!is.null(data$estimate)){
+    data$estimate[data$ref] <- format_digits(0, digits.effect)
+  }
+  if(!is.null(data$effect)){
+    data$effect[data$ref] <- value
+  }
+  data
+}
+
+
+rename_output <- function(out,
+                          variable = "Variable",
+                          estimate = "Estimate",
+                          effect = "Effect",
+                          statistic = "Statistic",
+                          std.error = "Std. error",
+                          p.value = "P value",
+                          conf.level = 0.95){
+
+  names(out)[which(names(out) == "variable")] <- variable
+  names(out)[which(names(out) == "estimate")] <- estimate
+  names(out)[which(names(out) == "effect")] <- sprintf("%s (%d%% CI)", effect, conf.level * 100)
+  names(out)[which(names(out) == "std.error")] <- std.error
+  names(out)[which(names(out) == "statistic")] <- statistic
+  names(out)[which(names(out) == "p.value")] <- p.value
+
+  names(out)[which(names(out) == "n.total")] <- "No. of total"
+  names(out)[which(names(out) == "n.event")] <- "No. of event"
+  names(out)[which(names(out) == "n.non.event")] <- "No. of nonevent"
+  names(out)[which(names(out) == "n.event.total")] <- "No. of event/total"
+
+  out
+}
+
+delete_terms <- function(data, term = FALSE){
+  if(!term){
+    if("term" %in% names(data)){
+      data <- delete_column_by_name(data, "term")
+    }
+    if("varname" %in% names(data)){
+      data <- delete_column_by_name(data, "varname")
+    }
+    if("ref" %in% names(data)){
+      data <- delete_column_by_name(data, "ref")
+    }
+  }
+  data
+}
+
+
+delete_column_by_name <- function(data, varnames){
+  index <- sapply(varnames, function(x) { which(names(data) == x) })
+  data[, -index, drop = FALSE]
+}
+
+
+
+warn_on_subclass <- function(x) {
+  if (length(class(x)) > 1 && class(x)[1] != "glm") {
+    subclass <- class(x)[1]
+    dispatched_method <- class(x)[class(x) %in% c("glm", "lm")][1]
+
+    warning(
+      "Tidiers for objects of class ",
+      subclass,
+      " are not maintained by the broom team, and are only supported through ",
+      "the ",
+      dispatched_method,
+      " tidier method. Please be cautious in interpreting and reporting ",
+      "broom output.",
+      call. = FALSE
+    )
+  }
+}
+
+
+confint_terms <- function(x, ...) {
+  # warn on arguments silently being ignored
+  ci <- suppressMessages(stats::confint.default(x, ...))
+
+  # confint called on models with a single predictor
+  # often returns a named vector rather than a matrix :(
+  if (is.null(dim(ci))) {
+    ci <- matrix(ci, nrow = 1)
+    rownames(ci) <- names(stats::coef(x))[1]
+  }
+  ci <- as.data.frame(ci)
+  ci <- cbind(data.frame(term = row.names(ci)), ci)
+  row.names(ci) <- NULL
+  names(ci) <- c("term", "conf.low", "conf.high")
+  ci
+}
+
 
