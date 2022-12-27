@@ -63,8 +63,14 @@
 #' # Evaluate model performance
 #' perf(tk1)
 #'
+#' # Save results to word, not run.
+#' # perf(tk1, filename = "performance.docx")
+#'
 #' # Hosmer-Lemeshow test
 #' hl_test(tk1)
+#'
+#' # Save results to word, not run.
+#' # hl_test(tk1, filename = "Hosmer-Lemeshow test.docx")
 #'
 #' # Develop a prediction model task.
 #' # The prediction outcome is status,
