@@ -74,11 +74,13 @@
 #'
 #' # Develop a prediction model task.
 #' # The prediction outcome is status,
-#' # and the prediction variables are AJCC_T, AJCC_M, AJCC_N, Grade, metastasis, tumor_size, Surg_Prim.
+#' # and the prediction variables are AJCC_T, AJCC_M, AJCC_N, Grade, metastasis,
+#' # tumor_size, Surg_Prim.
 #' tk2 <- nmtask(train.data = train,
 #'               test.data  = test,
 #'               outcome    = "status",
-#'               predictors = c("AJCC_T", "AJCC_M", "AJCC_N", "Grade", "metastasis", "tumor_size", "Surg_Prim"))
+#'               predictors = c("AJCC_T", "AJCC_M", "AJCC_N", "Grade",
+#'                              "metastasis", "tumor_size", "Surg_Prim"))
 #' # View task
 #' tk2
 #'
