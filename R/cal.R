@@ -27,6 +27,9 @@
 #'
 #' @return a ggplot object from the [ggplot2] package, or a patchwork object from [patchwork] package.
 #' @export
+#'
+#' @examples
+#' # Examples see in [nmtask] function.
 cal <- function(...,
                 newdata = NULL,
                 model.names = NULL,

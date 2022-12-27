@@ -36,3 +36,6 @@ initial model. IDI equal to x\% means that the difference in average predicted
 risks between the individuals with and without the outcome increased by x\% in
 the updated model.
 }
+\examples{
+# Examples see in [nmtask] function.
+}

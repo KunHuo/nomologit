@@ -65,3 +65,6 @@ a ggplot object from the \link{ggplot2} package, or a patchwork object from \lin
 \description{
 Draw DCA curves
 }
+\examples{
+# Examples see in [nmtask] function.
+}

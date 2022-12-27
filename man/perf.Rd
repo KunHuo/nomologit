@@ -42,6 +42,9 @@ and one) and the actual outcome (which can take on values of only 0 and 1).
 (In the original (1950) formulation of the Brier score, the range is double,
 from zero to two.)
 }
+\examples{
+# Examples see in [nmtask] function.
+}
 \references{
 Brier, G. W. (1950) Verification of forecasts expressed in terms of probability. Monthly Weather Review, 78, 1-3.
 }

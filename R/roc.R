@@ -4,6 +4,9 @@
 #'
 #' @inherit cal return
 #' @export
+#'
+#' @examples
+#' # Examples see in [nmtask] function.
 roc <- function(...,
                 newdata = NULL,
                 model.names = NULL,

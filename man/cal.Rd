@@ -65,3 +65,6 @@ as calibration curves. Perfect calibration would be exhibited by a direct
 alignment between the actual observation and nomogram prediction probability
 along the 45 degree diagonal line.
 }
+\examples{
+# Examples see in [nmtask] function.
+}

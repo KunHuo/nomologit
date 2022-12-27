@@ -25,11 +25,91 @@ By default, positive is automatically defined. If outcome is a factor variable,
 then positive is defined as the highest level. If outcome is a numerical
 variable, then positive is defined as the largest value.}
 
-\item{predictors}{predictors.}
+\item{predictors}{variable names of predictors.}
 }
 \value{
 a object of 'nmtask' class.
 }
 \description{
 Task for nomogram
+}
+\examples{
+# View data
+head(HCC)
+
+# Randomly divide the data into training set and verification set
+index <- sample(1:nrow(HCC), 12000)
+train <- HCC[index, ]
+test  <- HCC[-index, ]
+
+# Develop a prediction model task.
+# The prediction outcome is status,
+# and the prediction variables are AJCC_T, AJCC_M, and AJCC_N.
+tk1 <- nmtask(train.data = train,
+              test.data  = test,
+              outcome    = "status",
+              predictors = c("AJCC_T", "AJCC_M", "AJCC_N"))
+# View task
+tk1
+
+# Draw a nomogram
+nom(tk1)
+
+# Set function values to label on axis
+nom(tk1,
+    fun.at = c(0.5, 0.6, 0.7, 0.8, 0.85, 0.9, 0.95))
+
+# Set labels
+nom(tk1,
+    fun.at = c(0.5, 0.6, 0.7, 0.8, 0.85, 0.9, 0.95),
+    funlabel = "Risk of death") |>
+  label_variable(AJCC_T = "T stage of AJCC") |>
+  label_variable(AJCC_M = "M stage of AJCC") |>
+  label_variable(AJCC_N = "N stage of AJCC") |>
+  label_category(variable = "N stage of AJCC",
+                 N0 = "N0 stage",
+                 N1 = "N1 stage",
+                 NX = "NX stage")
+
+# Draw calibrate curve
+cal(tk1)
+
+# Draw ROC curves
+roc(tk1)
+
+# Draw DCA curves
+dca(tk1)
+
+# Evaluate model performance
+perf(tk1)
+
+# Hosmer-Lemeshow test
+hl_test(tk1)
+
+# Develop a prediction model task.
+# The prediction outcome is status,
+# and the prediction variables are AJCC_T, AJCC_M, AJCC_N, Grade, metastasis, tumor_size, Surg_Prim.
+tk2 <- nmtask(train.data = train,
+              test.data  = test,
+              outcome    = "status",
+              predictors = c("AJCC_T", "AJCC_M", "AJCC_N", "Grade", "metastasis", "tumor_size", "Surg_Prim"))
+# View task
+tk2
+
+# Comparision of nomogram models
+compare(tk1, tk2)
+
+# Draw calibrate curve
+cal(tk1, tk2)
+
+# Draw ROC curves
+roc(tk1, tk2)
+
+# Draw DCA curves
+dca(tk1, tk2)
+
+perf(tk1, tk2)
+
+# Hosmer-Lemeshow test
+hl_test(tk1, tk2)
 }

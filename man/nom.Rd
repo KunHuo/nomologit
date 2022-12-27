@@ -55,5 +55,31 @@ all variables and locate the sum on the total points axis, and (4) draw a
 straight line from total points down to risk.
 }
 \details{
-Set labels use \link{set_variable_labels} and \link{set_category_labels} function.
+Set labels use \link{label_variable} and \link{label_category} function.
+}
+\examples{
+# View data
+head(HCC)
+
+# Randomly divide the data into training set and verification set
+index <- sample(1:nrow(HCC), 12000)
+train <- HCC[index, ]
+test  <- HCC[-index, ]
+
+# Develop a prediction model task.
+# The prediction outcome is status,
+# and the prediction variables are AJCC_T, AJCC_M, and AJCC_N.
+tk1 <- nmtask(train.data = train,
+              test.data  = test,
+              outcome    = "status",
+              predictors = c("AJCC_T", "AJCC_M", "AJCC_N"))
+# View task
+tk1
+
+# Draw a nomogram
+nom(tk1)
+
+# Set function values to label on axis
+nom(tk1,
+    fun.at = c(0.5, 0.6, 0.7, 0.8, 0.85, 0.9, 0.95))
 }

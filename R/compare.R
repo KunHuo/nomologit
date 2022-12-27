@@ -21,6 +21,9 @@
 #'
 #' @return a data frame.
 #' @export
+#'
+#' @examples
+#' # Examples see in [nmtask] function.
 compare <- function(..., cutoff = NULL, digits = 3, filename = ""){
   tasks <- list(...)
   tasks <- flatten_list(tasks)

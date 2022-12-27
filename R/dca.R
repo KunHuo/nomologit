@@ -6,6 +6,9 @@
 #'
 #' @inherit cal return
 #' @export
+#'
+#' @examples
+#' # Examples see in [nmtask] function.
 dca <- function(...,
                 newdata = NULL,
                 model.names = NULL,
