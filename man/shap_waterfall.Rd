@@ -4,14 +4,14 @@
 \alias{shap_waterfall}
 \title{SHAP waterfall plot}
 \usage{
-shap_waterfall(x, row_id = 1L, fill.colors = c("#f7d13d", "#a52c60"), ...)
+shap_waterfall(x, row_id = 1L, colors = c("#f7d13d", "#a52c60"), ...)
 }
 \arguments{
 \item{x}{An object from \link{shap} function.}
 
 \item{row_id}{A single row number to plot.}
 
-\item{fill.colors}{A vector of exactly two fill colors: the first for positive
+\item{colors}{A vector of exactly two fill colors: the first for positive
 SHAP values, the other for negative ones.}
 
 \item{...}{More arguments.}

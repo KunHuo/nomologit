@@ -72,7 +72,7 @@ shap <- function(task, newdata = NULL, nsim = 100){
 #'
 #' @param x An object from [shap] function.
 #' @param row_id 	A single row number to plot.
-#' @param fill.colors A vector of exactly two fill colors: the first for positive
+#' @param colors A vector of exactly two fill colors: the first for positive
 #' SHAP values, the other for negative ones.
 #' @param ... More arguments.
 #'
@@ -80,7 +80,7 @@ shap <- function(task, newdata = NULL, nsim = 100){
 #'
 #' @return An object of class "ggplot" representing a force plot.
 #' @export
-shap_force <- function(x, row_id = 1L, fill.colors = c("#f7d13d", "#a52c60"), ...){
+shap_force <- function(x, row_id = 1L, colors = c("#f7d13d", "#a52c60"), ...){
 
 }
 
@@ -98,7 +98,7 @@ shap_force <- function(x, row_id = 1L, fill.colors = c("#f7d13d", "#a52c60"), ..
 #'
 #' @return An object of class "ggplot" representing a waterfall plot.
 #' @export
-shap_waterfall <- function(x, row_id = 1L, fill.colors = c("#f7d13d", "#a52c60"), ...){
+shap_waterfall <- function(x, row_id = 1L, colors = c("#f7d13d", "#a52c60"), ...){
 
 }
 
@@ -119,13 +119,35 @@ shap_waterfall <- function(x, row_id = 1L, fill.colors = c("#f7d13d", "#a52c60")
 #' @param kind Should a "beeswarm" plot (the default), a "bar" plot, or "both" be
 #' shown? Set to "no" in order to suppress plotting. In that case, the sorted
 #' SHAP feature importances of all variables are returned.
-#' @param fill Color used to fill the bars (only used if bars are shown).
+#' @param colors Color used to fill the bars (only used if bars are shown).
 #' @param ... More arguments.
 #'
 #' @return A "ggplot" object representing an importance plot, or - if kind =
 #' "no" - a named numeric vector of sorted SHAP feature importances.
 #'
 #' @export
-shap_impoertance <- function(x, kind = c("beeswarm", "bar", "both", "no"), fill = "#fca50a", ...){
+shap_impoertance <- function(x, kind = c("beeswarm", "bar", "both", "no"), colors = "#fca50a", ...){
+
+}
+
+
+#' SHAP dependence plots
+#'
+#' @description
+#' Creates a scatter plot of the SHAP values of a feature against its feature
+#' values. A second variable, color_var, can be selected to be used on the color
+#' axis. In this way, one can get a sense of possible interaction effects. Set
+#' color_var = "auto" to use a simple heuristic to select the color feature with
+#' the strongest apparent interaction. With discrete v, horizontal jitter is
+#' added by default.
+#'
+#' @param x An object from [shap] function.
+#' @param colors Color used to fill the bars (only used if bars are shown).
+#' @param ... More arguments.
+#'
+#' @return An object of class ggplot representing a dependence plot.
+#'
+#' @export
+shap_dependence <- function(x, colors = "#3b528b", ...){
 
 }

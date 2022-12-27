@@ -7,7 +7,7 @@
 shap_impoertance(
   x,
   kind = c("beeswarm", "bar", "both", "no"),
-  fill = "#fca50a",
+  colors = "#fca50a",
   ...
 )
 }
@@ -18,7 +18,7 @@ shap_impoertance(
 shown? Set to "no" in order to suppress plotting. In that case, the sorted
 SHAP feature importances of all variables are returned.}
 
-\item{fill}{Color used to fill the bars (only used if bars are shown).}
+\item{colors}{Color used to fill the bars (only used if bars are shown).}
 
 \item{...}{More arguments.}
 }
