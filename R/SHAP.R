@@ -41,6 +41,37 @@ shap_exec <- function(data, outcome, predictors, newdata = NULL, nsim = 100){
 #' * X: A data.frame containing the feature values corresponding to S.
 #' * baseline: Baseline value, representing the average prediction at the scale of the SHAP values.
 #' @export
+#'
+#' @examples
+#' \dontrun{
+#' index <- sample(1:nrow(HCC), 12000)
+#' train <- HCC[index, ]
+#' test  <- HCC[-index, ]
+#'
+#' # Develop a prediction model task.
+#' # The prediction outcome is status,
+#' # and the prediction variables are AJCC_T, AJCC_M, and AJCC_N.
+#' tk1 <- nmtask(train.data = train,
+#'               test.data  = test,
+#'               outcome    = "status",
+#'               predictors = c("AJCC_T", "AJCC_M", "AJCC_N"))
+#' # View task
+#' tk1
+#'
+#' sp <- shap(tk1)
+#'
+#' # SHAP force plot
+#' shap_force(sp)
+#'
+#' # SHAP waterfall plot
+#' shap_waterfall(sp)
+#'
+#' # SHAP importance plots
+#' shap_shap_importance(sp)
+#'
+#' # SHAP dependence plots
+#' shap_dependence(sp, variable = "AJCC_M")
+#' }
 shap <- function(task, newdata = NULL, nsim = 100){
   train.data <- task$train.data
 
@@ -71,7 +102,10 @@ shap <- function(task, newdata = NULL, nsim = 100){
 #' baseline SHAP value.
 #'
 #' @param x An object from [shap] function.
-#' @param row_id 	A single row number to plot.
+#' @param row.id 	A single row number to plot.
+#' @param max.display Maximum number of features (with largest absolute SHAP
+#' values) should be plotted? If there are more features, they will be collapsed
+#' to one feature. Set to Inf to show all features.
 #' @param colors A vector of exactly two fill colors: the first for positive
 #' SHAP values, the other for negative ones.
 #' @param ... More arguments.
@@ -80,8 +114,14 @@ shap <- function(task, newdata = NULL, nsim = 100){
 #'
 #' @return An object of class "ggplot" representing a force plot.
 #' @export
-shap_force <- function(x, row_id = 1L, colors = c("#f7d13d", "#a52c60"), ...){
-
+#'
+#' @examples
+#' # Examples see in [shap] function.
+shap_force <- function(x, row.id = 1L, max.display = 6L, colors = c("#f7d13d", "#a52c60"), ...){
+  shapviz::sv_force(x,
+                    row_id = row.id,
+                    max_display = max.display,
+                    fill_colors = colors, ...)
 }
 
 
@@ -98,8 +138,15 @@ shap_force <- function(x, row_id = 1L, colors = c("#f7d13d", "#a52c60"), ...){
 #'
 #' @return An object of class "ggplot" representing a waterfall plot.
 #' @export
-shap_waterfall <- function(x, row_id = 1L, colors = c("#f7d13d", "#a52c60"), ...){
-
+#'
+#' @examples
+#' # Examples see in [shap] function.
+shap_waterfall <- function(x, row.id = 1L, max.display = 6L, colors = c("#f7d13d", "#a52c60"), ...){
+  shapviz::sv_waterfall(object = x,
+                        row_id = row.id,
+                        max_display = max.display,
+                        fill_colors = colors,
+                        ...)
 }
 
 
@@ -120,14 +167,27 @@ shap_waterfall <- function(x, row_id = 1L, colors = c("#f7d13d", "#a52c60"), ...
 #' shown? Set to "no" in order to suppress plotting. In that case, the sorted
 #' SHAP feature importances of all variables are returned.
 #' @param colors Color used to fill the bars (only used if bars are shown).
+#' @param max.display Maximum number of features (with highest importance) should
+#' be plotted? If there are more, the least important variables are collapsed:
+#' their SHAP values are added and their min-max-scaled feature values are added
+#' as well (and the resulting vector is min-max-scaled again). Set to Inf to
+#' show all features. Has no effect if kind = "no".
 #' @param ... More arguments.
 #'
 #' @return A "ggplot" object representing an importance plot, or - if kind =
 #' "no" - a named numeric vector of sorted SHAP feature importances.
 #'
 #' @export
-shap_importance <- function(x, kind = c("beeswarm", "bar", "both", "no"), colors = "#fca50a", ...){
-
+#'
+#' @examples
+#' # Examples see in [shap] function.
+shap_importance <- function(x, kind = c("beeswarm", "bar", "both", "no"), max.display = 15L, colors = "#fca50a", ...){
+  kind <- match.arg(kind)
+  shapviz::sv_importance(object = x,
+                         kind = kind,
+                         max_display = max.display,
+                         fill = colors,
+                         ...)
 }
 
 
@@ -142,12 +202,24 @@ shap_importance <- function(x, kind = c("beeswarm", "bar", "both", "no"), colors
 #' added by default.
 #'
 #' @param x An object from [shap] function.
+#' @param variable Column name of feature to be plotted.
+#' @param color.var eature name to be used on the color scale to investigate
+#' interactions. The default is NULL (no color feature). An experimental option
+#' is "auto", which selects - by a simple heuristic - a variable with seemingly
+#' strongest interaction. Check details for how to change the color scale.
 #' @param colors Color used to fill the bars (only used if bars are shown).
 #' @param ... More arguments.
 #'
 #' @return An object of class ggplot representing a dependence plot.
 #'
 #' @export
-shap_dependence <- function(x, colors = "#3b528b", ...){
-
+#'
+#' @examples
+#' # Examples see in [shap] function.
+shap_dependence <- function(x, variable, color.var = NULL, colors = "#3b528b", ...){
+  shapviz::sv_dependence(object = x,
+                         v = variable,
+                         color_var = color.var,
+                         color = colors,
+                         ...)
 }

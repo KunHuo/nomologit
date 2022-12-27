@@ -4,10 +4,17 @@
 \alias{shap_dependence}
 \title{SHAP dependence plots}
 \usage{
-shap_dependence(x, colors = "#3b528b", ...)
+shap_dependence(x, variable, color.var = NULL, colors = "#3b528b", ...)
 }
 \arguments{
 \item{x}{An object from \link{shap} function.}
+
+\item{variable}{Column name of feature to be plotted.}
+
+\item{color.var}{eature name to be used on the color scale to investigate
+interactions. The default is NULL (no color feature). An experimental option
+is "auto", which selects - by a simple heuristic - a variable with seemingly
+strongest interaction. Check details for how to change the color scale.}
 
 \item{colors}{Color used to fill the bars (only used if bars are shown).}
 
@@ -23,4 +30,7 @@ axis. In this way, one can get a sense of possible interaction effects. Set
 color_var = "auto" to use a simple heuristic to select the color feature with
 the strongest apparent interaction. With discrete v, horizontal jitter is
 added by default.
+}
+\examples{
+# Examples see in [shap] function.
 }

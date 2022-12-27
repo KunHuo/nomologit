@@ -14,6 +14,7 @@
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' # View data
 #' head(HCC)
 #'
@@ -101,6 +102,7 @@
 #'
 #' # Hosmer-Lemeshow test
 #' hl_test(tk1, tk2)
+#' }
 nmtask <- function(train.data, test.data = NULL, outcome = NULL, positive = NULL, predictors = NULL){
   if(is.list(predictors)){
     lapply(predictors, \(x){

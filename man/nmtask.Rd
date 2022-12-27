@@ -34,6 +34,7 @@ a object of 'nmtask' class.
 Task for nomogram
 }
 \examples{
+\dontrun{
 # View data
 head(HCC)
 
@@ -120,4 +121,5 @@ perf(tk1, tk2)
 
 # Hosmer-Lemeshow test
 hl_test(tk1, tk2)
+}
 }
