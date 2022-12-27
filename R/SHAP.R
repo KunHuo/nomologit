@@ -126,7 +126,7 @@ shap_waterfall <- function(x, row_id = 1L, colors = c("#f7d13d", "#a52c60"), ...
 #' "no" - a named numeric vector of sorted SHAP feature importances.
 #'
 #' @export
-shap_impoertance <- function(x, kind = c("beeswarm", "bar", "both", "no"), colors = "#fca50a", ...){
+shap_importance <- function(x, kind = c("beeswarm", "bar", "both", "no"), colors = "#fca50a", ...){
 
 }
 
