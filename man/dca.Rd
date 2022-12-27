@@ -19,7 +19,7 @@ dca(
   ybreaks = seq(-0.2, 1, 0.2),
   fontfamily = "serif",
   fontsize = 12,
-  explain = TRUE,
+  explain = FALSE,
   seed = 1234
 )
 }
@@ -63,7 +63,8 @@ the plot into multiple panels, default 'data'.}
 a ggplot object from the \link{ggplot2} package, or a patchwork object from \link{patchwork} package.
 }
 \description{
-Draw DCA curves
+This function calculates decision curves, which are estimates of the standardized
+net benefit by the probability threshold used to categorize observations as 'high risk.'
 }
 \examples{
 # Examples see in [nmtask] function.

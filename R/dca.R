@@ -1,5 +1,9 @@
 #' Draw DCA curves
 #'
+#' @description
+#' This function calculates decision curves, which are estimates of the standardized
+#' net benefit by the probability threshold used to categorize observations as 'high risk.'
+#'
 #' @inheritParams cal
 #' @param thresholds Numeric vector of high risk thresholds to use when plotting
 #' and calculating net benefit values.
@@ -23,7 +27,7 @@ dca <- function(...,
                 ybreaks = seq(-0.2, 1, 0.2),
                 fontfamily = "serif",
                 fontsize = 12,
-                explain = TRUE,
+                explain = FALSE,
                 seed = 1234) {
 
   facet <- match.arg(facet)
