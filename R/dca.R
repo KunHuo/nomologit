@@ -84,7 +84,11 @@ dca <- function(...,
   # set names
   if(is.null(model.names)){
     if(is.null(names(tasks))){
-      names(plotdata) <- sprintf("Nomogram %d", 1:length(tasks))
+      if(length(tasks) == 1L){
+        names(plotdata) <- "Nomogram"
+      }else{
+        names(plotdata) <- sprintf("Nomogram %d", 1:length(tasks))
+      }
     }else{
       names(plotdata) <- names(tasks)
     }
