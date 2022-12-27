@@ -4,12 +4,22 @@
 \alias{shap_waterfall}
 \title{SHAP waterfall plot}
 \usage{
-shap_waterfall(x, row_id = 1L, colors = c("#f7d13d", "#a52c60"), ...)
+shap_waterfall(
+  x,
+  row.id = 1L,
+  max.display = 6L,
+  colors = c("#f7d13d", "#a52c60"),
+  ...
+)
 }
 \arguments{
 \item{x}{An object from \link{shap} function.}
 
-\item{row_id}{A single row number to plot.}
+\item{row.id}{A single row number to plot.}
+
+\item{max.display}{Maximum number of features (with largest absolute SHAP
+values) should be plotted? If there are more features, they will be collapsed
+to one feature. Set to Inf to show all features.}
 
 \item{colors}{A vector of exactly two fill colors: the first for positive
 SHAP values, the other for negative ones.}
@@ -23,6 +33,9 @@ An object of class "ggplot" representing a waterfall plot.
 Creates a waterfall plot of SHAP values of one single observation. The value
 of f(x) denotes the prediction on the SHAP scale, while E(f(x)) refers to the
 baseline SHAP value. The plot has to be read from bottom to top.
+}
+\examples{
+# Examples see in [shap] function.
 }
 \seealso{
 \link{shap_force}
