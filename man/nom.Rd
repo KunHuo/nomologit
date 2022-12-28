@@ -79,6 +79,9 @@ tk1
 # Draw a nomogram
 nom(tk1)
 
+# Show points
+nom(tk1, show.points = TRUE)
+
 # Set function values to label on axis
 nom(tk1,
     fun.at = c(0.5, 0.6, 0.7, 0.8, 0.85, 0.9, 0.95))
