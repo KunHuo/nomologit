@@ -1,43 +1,96 @@
-#' Typeset a(n) glm object
+#' Model coefficients of logistic regression
 #'
-#' @param x
-#' a(n) glm object.
-#' @param data
-#' a data frame of fitted models.
-#' @param outcome
-#' outcome variable name.
-#' @param varnames
-#' variable names.
-#' @param conf.level
-#' The confidence level to use for the confidence interval if conf.int = TRUE.
-#' Must be strictly greater than 0 and less than 1. Defaults to 0.95, which
-#' corresponds to a 95 percent confidence interval.
-#' @param conf.brackets
-#' brackets of CI format.
-#' @param conf.separator
-#' separate of CI format.
-#' @param digits.pvalue
-#' digits for P value, default 3.
-#' @param digits.effect
-#' digits for effect value, default 2.
-#' @param ref.value
-#' reference value, default 1.
-#' @param select
-#' statistic
-#' @param filter
-#' filter.
-#' @param fold
-#' fold variables, default FALSE.
-#' @param exp
-#' not used here.
-#' @param term
-#' whether to show the columns of term, varname, and ref, default FALSE.
-#' @param ...
-#' Additional arguments.
+#' @param ... one or more object of 'nmtask' or 'glm'.
+#' @param multivariable logical variable indicating whether to perform univariable
+#' logistic analysis or multivariable logistic analysis (default).
+#' @param effect.values Effect value.
+#' @param conf.level Effect value level, defalut 0.95.
+#' @param conf.brackets Confidence interval bracket, default '('.
+#' @param conf.separator Confidence interval separator.
+#' @param digits.pvalue digits for p value, default 3.
+#' @param digits.effect digits for effect value, default 2.
+#' @param ref.value Reference Category name, default 'Reference'.
+#' @param filename filename, if you want to save to word.
 #'
-#' @return a data frame.
-#' @seealso [stats::glm()]
-#' @keywords internal
+#' @return a list.
+#' @export
+coefs <- function(...,
+                  multivariable = TRUE,
+                  effect.values = c("net", "b", "se", "OR", "p"),
+                  conf.level = 0.95,
+                  conf.brackets = "()",
+                  conf.separator = NULL,
+                  digits.pvalue = 3,
+                  digits.effect = 2,
+                  ref.value = "Reference",
+                  filename = "") {
+
+  tasks <- list(...)
+  tasks <- flatten_list(tasks)
+
+  # supoort glm
+  tasks <- lapply(tasks, \(tk){
+    if("glm" %in% class(tk)){
+      as_nmtask(tk)
+    }else{
+      tk
+    }
+  })
+
+  out <- lapply(tasks, \(tk){
+    data <- tk$train.data
+    outcome <- tk$outcome
+    predictors <- tk$predictors
+
+    if(multivariable){
+      model <- logistic(data = data,
+                        outcome = outcome,
+                        predictors = predictors,
+                        method = "glm")
+      res <- typeset.glm(model,
+                  conf.level = conf.level,
+                  conf.brackets = conf.brackets,
+                  conf.separator = conf.separator,
+                  digits.pvalue = digits.pvalue,
+                  digits.effect = digits.effect,
+                  ref.value = ref.value,
+                  select = effect.values)
+      attr(res, "title") <- "Multivariable logistic regression analysis results"
+      res
+    }else{
+      res <- lapply(predictors, \(x){
+        model <- logistic(data = data,
+                          outcome = outcome,
+                          predictors = x,
+                          method = "glm")
+        typeset.glm(model,
+                    conf.level = conf.level,
+                    conf.brackets = conf.brackets,
+                    conf.separator = conf.separator,
+                    digits.pvalue = digits.pvalue,
+                    digits.effect = digits.effect,
+                    ref.value = ref.value,
+                    select = effect.values,
+                    filter = x)
+
+      })
+      res <- do.call(rbind, res)
+      attr(res, "title") <- "Univariable logistic regression analysis results"
+      res
+    }
+  })
+
+  class(out) <- c("coefs", "list")
+
+  if(filename == ""){
+    out
+  }else{
+
+  }
+
+}
+
+
 typeset.glm <- function(x,
                         data = NULL,
                         outcome = NULL,
