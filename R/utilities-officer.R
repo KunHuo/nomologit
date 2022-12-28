@@ -322,7 +322,7 @@ write_docx.list <- function(x, path = "", landscape = FALSE, ...){
       }
       if(i != 1L){
         if(is.data.frame(x[[i-1]])){
-          doc <- body_add_par2(doc, value = " ")
+          # doc <- body_add_par2(doc, value = " ")
         }
       }
       doc <- body_add_dataframe(doc, value = x[[i]])

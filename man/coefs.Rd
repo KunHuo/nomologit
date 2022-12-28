@@ -8,6 +8,7 @@ coefs(
   ...,
   multivariable = TRUE,
   effect.values = c("net", "b", "se", "OR", "p"),
+  model.names = NULL,
   conf.level = 0.95,
   conf.brackets = "()",
   conf.separator = NULL,
@@ -24,6 +25,8 @@ coefs(
 logistic analysis or multivariable logistic analysis (default).}
 
 \item{effect.values}{Effect value.}
+
+\item{model.names}{vector of model's names.}
 
 \item{conf.level}{Effect value level, defalut 0.95.}
 
@@ -44,4 +47,22 @@ a list.
 }
 \description{
 Model coefficients of logistic regression
+}
+\examples{
+tk <- nmtask(train.data = HCC,
+             outcome    = "status",
+             predictors = c("AJCC_T", "AJCC_M", "AJCC_N", "Grade", "metastasis",
+                            "tumor_size", "Surg_Prim"))
+
+# Multivariable logistic regression, default.
+coefs(tk)
+
+# Support for 'glm'
+model <- glm(status ~ AJCC_T + AJCC_M + AJCC_N, data = HCC, family = binomial())
+coefs(model)
+
+coefs(tk, model, model.names = c("Model 1", "Model 2"))
+
+# Univariable logistic regression
+coefs(tk, multivariable = FALSE)
 }

@@ -15,6 +15,24 @@
 #'
 #' @return a list.
 #' @export
+#'
+#' @examples
+#' tk <- nmtask(train.data = HCC,
+#'              outcome    = "status",
+#'              predictors = c("AJCC_T", "AJCC_M", "AJCC_N", "Grade", "metastasis",
+#'                             "tumor_size", "Surg_Prim"))
+#'
+#' # Multivariable logistic regression, default.
+#' coefs(tk)
+#'
+#' # Support for 'glm'
+#' model <- glm(status ~ AJCC_T + AJCC_M + AJCC_N, data = HCC, family = binomial())
+#' coefs(model)
+#'
+#' coefs(tk, model, model.names = c("Model 1", "Model 2"))
+#'
+#' # Univariable logistic regression
+#' coefs(tk, multivariable = FALSE)
 coefs <- function(...,
                   multivariable = TRUE,
                   effect.values = c("net", "b", "se", "OR", "p"),
@@ -38,7 +56,6 @@ coefs <- function(...,
       tk
     }
   })
-
 
   # set names
   if(is.null(model.names)){
@@ -104,7 +121,7 @@ coefs <- function(...,
   if(filename == ""){
     out
   }else{
-
+    write_docx.list(out, path = filename)
   }
 
 }
