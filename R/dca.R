@@ -8,6 +8,11 @@
 #' @param thresholds Numeric vector of high risk thresholds to use when plotting
 #' and calculating net benefit values.
 #'
+#' @references
+#' Vickers AJ, Elkin EB. Decision curve analysis: a novel method for evaluating
+#' prediction models. Med Decis Making. 2006 Nov-Dec;26(6):565-74.
+#' doi: 10.1177/0272989X06295361.
+#'
 #' @inherit cal return
 #' @export
 #'
