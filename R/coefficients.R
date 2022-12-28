@@ -4,6 +4,7 @@
 #' @param multivariable logical variable indicating whether to perform univariable
 #' logistic analysis or multivariable logistic analysis (default).
 #' @param effect.values Effect value.
+#' @param model.names vector of model's names.
 #' @param conf.level Effect value level, defalut 0.95.
 #' @param conf.brackets Confidence interval bracket, default '('.
 #' @param conf.separator Confidence interval separator.
@@ -17,6 +18,7 @@
 coefs <- function(...,
                   multivariable = TRUE,
                   effect.values = c("net", "b", "se", "OR", "p"),
+                  model.names = NULL,
                   conf.level = 0.95,
                   conf.brackets = "()",
                   conf.separator = NULL,
@@ -37,7 +39,22 @@ coefs <- function(...,
     }
   })
 
-  out <- lapply(tasks, \(tk){
+
+  # set names
+  if(is.null(model.names)){
+    if(is.null(names(tasks))){
+      if(length(tasks) == 1L){
+        names(tasks) <- "nomogram"
+      }else{
+        names(tasks) <- sprintf("nomogram %d", 1:length(tasks))
+      }
+    }
+  }else{
+    stopifnot(length(model.names) == length(tasks))
+    names(tasks) <- model.names
+  }
+
+  out <- Map(\(tk, name){
     data <- tk$train.data
     outcome <- tk$outcome
     predictors <- tk$predictors
@@ -55,7 +72,8 @@ coefs <- function(...,
                   digits.effect = digits.effect,
                   ref.value = ref.value,
                   select = effect.values)
-      attr(res, "title") <- "Multivariable logistic regression analysis results"
+      title <- sprintf("Multivariable logistic regression analysis results for %s", name)
+      attr(res, "title") <- title
       res
     }else{
       res <- lapply(predictors, \(x){
@@ -75,10 +93,11 @@ coefs <- function(...,
 
       })
       res <- do.call(rbind, res)
-      attr(res, "title") <- "Univariable logistic regression analysis results"
+      title <- sprintf("Univariable logistic regression analysis results for %s", name)
+      attr(res, "title") <- title
       res
     }
-  })
+  }, tasks, names(tasks))
 
   class(out) <- c("coefs", "list")
 
