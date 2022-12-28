@@ -131,9 +131,9 @@ cal <- function(...,
     group <- "model"
 
     if(length(plotdata) == 1L){
-      title <- "Figure: Calibration plots of the nomogram for training set"
+      title <- "Figure: Calibration plots of the nomogram in the training set"
     }else{
-      title <- "Figure: Calibration plots of the nomogram for training set (A) and and validation set (B)"
+      title <- "Figure: Calibration plots of the nomogram in the training set (A) and validation set (B)"
     }
   }else if(facet == "model"){
     plotdata <- split.data.frame(plotdata, plotdata$model)

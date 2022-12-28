@@ -27,7 +27,7 @@ dca <- function(...,
                 ybreaks = seq(-0.2, 1, 0.2),
                 fontfamily = "serif",
                 fontsize = 12,
-                explain = FALSE,
+                explain = TRUE,
                 seed = 1234) {
 
   facet <- match.arg(facet)
@@ -134,11 +134,17 @@ dca <- function(...,
     }, plots, LETTERS[1:length(plots)])
   }
 
+  if(length(plots) == 1L){
+    title <- "Figure: DCA curves of the nomogram in the training set"
+  }else{
+    title <- "Figure: DCA curves of the nomogram in the training set (A) and validation set (B)"
+  }
+
   plots <- patchwork::wrap_plots(plots)
 
   attr(plots, "explain") <- explain
-  plots <- add_title(plots, "title")
-  plots <- add_note(plots, "note")
+  plots <- add_title(plots, title)
+  plots <- add_note(plots, "")
   class(plots) <- c("nmplot", class(plots))
   plots
 }

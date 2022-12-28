@@ -92,7 +92,7 @@ perf <- function(...,  newdata = NULL, cutoff = "best", digits = 3, filename = "
       test.roc <- roc_exec(data = test.data,
                            outcome = outcome,
                            exposure = ".pred",
-                           threshold = cutoff,
+                           threshold = threshold,
                            digits = digits)
 
 

@@ -95,9 +95,9 @@ roc <- function(...,
     group <- "model"
 
     if(length(plotdata) == 1L){
-      title <- "Figure: ROC curves of the nomogram for training set"
+      title <- "Figure: ROC curves of the nomogram in the training set"
     }else{
-      title <- "Figure: ROC curves of the nomogram for training set (A) and and validation set (B)"
+      title <- "Figure: ROC curves of the nomogram in the training set (A) and validation set (B)"
     }
   }else if(facet == "model"){
     plotdata <- split.data.frame(plotdata, plotdata$model)
