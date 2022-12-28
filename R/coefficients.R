@@ -91,6 +91,20 @@ coefs <- function(...,
 }
 
 
+#' Print 'coefs'
+#'
+#' @param x an object of 'coefs'
+#' @param ... more.
+#'
+#' @keywords internal
+#' @export
+print.coefs <- function(x, ...){
+  for(i in 1:length(x)){
+    print_booktabs(x[[i]], adj = c("l", "c"))
+  }
+}
+
+
 typeset.glm <- function(x,
                         data = NULL,
                         outcome = NULL,
