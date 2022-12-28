@@ -6,7 +6,7 @@
 #' @param effect.values Effect value.
 #' @param model.names vector of model's names.
 #' @param conf.level Effect value level, defalut 0.95.
-#' @param conf.brackets Confidence interval bracket, default '('.
+#' @param conf.brackets Confidence interval bracket, default '()'.
 #' @param conf.separator Confidence interval separator.
 #' @param digits.pvalue digits for p value, default 3.
 #' @param digits.effect digits for effect value, default 2.

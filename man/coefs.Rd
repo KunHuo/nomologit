@@ -30,7 +30,7 @@ logistic analysis or multivariable logistic analysis (default).}
 
 \item{conf.level}{Effect value level, defalut 0.95.}
 
-\item{conf.brackets}{Confidence interval bracket, default '('.}
+\item{conf.brackets}{Confidence interval bracket, default '()'.}
 
 \item{conf.separator}{Confidence interval separator.}
 

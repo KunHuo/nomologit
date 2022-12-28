@@ -52,6 +52,12 @@
 #'                  N1 = "N1 stage",
 #'                  NX = "NX stage")
 #'
+#' # Coefficients of multivariable logistic regression, default
+#' coefs(tk1)
+#'
+#' # Coefficients of univariable logistic regression
+#' coefs(tk1, multivariable = FALSE)
+#'
 #' # Draw calibrate curve
 #' cal(tk1)
 #'
