@@ -17,6 +17,32 @@ a nomogram.
 \description{
 Set labels for variable of nomogram
 }
+\examples{
+# View data
+head(HCC)
+
+# Develop a prediction model task.
+# The prediction outcome is status,
+# and the prediction variables are AJCC_T, AJCC_M, and AJCC_N.
+tk1 <- nmtask(train.data = HCC,
+              outcome    = "status",
+              predictors = c("AJCC_T", "AJCC_M", "AJCC_N"))
+
+# Draw a nomogram
+nom(tk1)
+
+# Set labels
+nom(tk1,
+    fun.at = c(0.5, 0.6, 0.7, 0.8, 0.85, 0.9, 0.95),
+    funlabel = "Risk of death") |>
+  label_variable(AJCC_T = "T stage of AJCC") |>
+  label_variable(AJCC_M = "M stage of AJCC") |>
+  label_variable(AJCC_N = "N stage of AJCC") |>
+  label_category(variable = "N stage of AJCC",
+                 N0 = "N0 stage",
+                 N1 = "N1 stage",
+                 NX = "NX stage")
+}
 \seealso{
 \link{label_category}
 }

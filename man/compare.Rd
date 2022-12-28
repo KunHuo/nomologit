@@ -37,5 +37,27 @@ risks between the individuals with and without the outcome increased by x\% in
 the updated model.
 }
 \examples{
-# Examples see in [nmtask] function.
+# View data
+head(HCC)
+
+index <- sample(1:nrow(HCC), 12000)
+train <- HCC[index, ]
+test  <- HCC[-index, ]
+
+tk1 <- nmtask(train.data = train,
+              test.data  = test,
+              outcome    = "status",
+              predictors = c("AJCC_T", "AJCC_M", "AJCC_N"))
+
+tk2 <- nmtask(train.data = train,
+              test.data  = test,
+              outcome    = "status",
+              predictors = c("AJCC_T", "AJCC_M", "AJCC_N", "Grade",
+                             "metastasis", "tumor_size", "Surg_Prim"))
+
+# Computes continuous NRI
+compare(tk1, tk2)
+
+# Computes categorical NRI
+compare(tk1, tk2, cutoff = 0.25)
 }
