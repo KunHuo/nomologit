@@ -19,7 +19,7 @@ dca(
   ybreaks = seq(-0.2, 1, 0.2),
   fontfamily = "serif",
   fontsize = 12,
-  explain = FALSE,
+  explain = TRUE,
   seed = 1234
 )
 }
@@ -68,4 +68,9 @@ net benefit by the probability threshold used to categorize observations as 'hig
 }
 \examples{
 # Examples see in [nmtask] function.
+}
+\references{
+Vickers AJ, Elkin EB. Decision curve analysis: a novel method for evaluating
+prediction models. Med Decis Making. 2006 Nov-Dec;26(6):565-74.
+doi: 10.1177/0272989X06295361.
 }
