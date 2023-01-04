@@ -79,23 +79,23 @@ forest <- function(data,
                                       ci_pch = 16)
 
   names(ldata)[1] <- "VAraible\n(n=23)"
-  # for(i in 1:ncol(ldata)){
-  #   if(i != 1L){
-  #     width <- max(nchar(ldata[[i]]), nchar(names(ldata)[i]), na.rm = TRUE) + col.width
-  #     if(i == est.col){
-  #       ldata[[i]] <- str_pad(ldata[[i]], width = width, adj = "left")
-  #     }
-  #
-  #     if(names(ldata)[i] %in% c("B", "b", "P value", "P Value", "P-value", "P-Value", "P")){
-  #       ldata[[i]] <- str_pad(ldata[[i]], width = max(nchar(ldata[[i]])), adj = "left")
-  #       print(ldata[[i]])
-  #
-  #     }
-  #
-  #     # names(ldata)[i] <-  str_pad(names(ldata)[i], width = width, adj = "center")
-  #     # ldata[[i]] <- str_pad(ldata[[i]], width = width, adj = "center")
-  #   }
-  # }
+  for(i in 1:ncol(ldata)){
+    if(i != 1L){
+      width <- max(nchar(ldata[[i]]), nchar(names(ldata)[i]), na.rm = TRUE) + col.width
+      if(i == est.col){
+        ldata[[i]] <- str_pad(ldata[[i]], width = width, adj = "left")
+      }
+
+      # if(names(ldata)[i] %in% c("B", "b", "P value", "P Value", "P-value", "P-Value", "P")){
+      #   ldata[[i]] <- srpubr::str_align(ldata[[i]], sep = ".")
+      #
+      #
+      # }
+
+      # names(ldata)[i] <-  str_pad(names(ldata)[i], width = width, adj = "center")
+      ldata[[i]] <- str_pad(ldata[[i]], width = width, adj = "right")
+    }
+  }
 
 
   if(is.null(axis.labels)){
