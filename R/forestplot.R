@@ -24,8 +24,7 @@ forest <- function(data,
                    graph.width = 30,
                    axis.limit = NULL,
                    axis.ticks = NULL,
-                   axis.labels = NULL,
-                   theme = NULL){
+                   axis.labels = NULL){
 
   if("glm" %in% class(data)){
     data <- as_nmtask(data)
@@ -78,7 +77,6 @@ forest <- function(data,
                                       ci_col = "#0093bd",
                                       ci_pch = 16)
 
-  names(ldata)[1] <- "VAraible\n(n=23)"
   for(i in 1:ncol(ldata)){
     if(i != 1L){
       width <- max(nchar(ldata[[i]]), nchar(names(ldata)[i]), na.rm = TRUE) + col.width
@@ -92,8 +90,8 @@ forest <- function(data,
       #
       # }
 
-      # names(ldata)[i] <-  str_pad(names(ldata)[i], width = width, adj = "center")
-      ldata[[i]] <- str_pad(ldata[[i]], width = width, adj = "right")
+      names(ldata)[i] <-  str_pad(names(ldata)[i], width = width, adj = "center")
+      ldata[[i]] <- str_pad(ldata[[i]], width = width, adj = "center")
     }
   }
 
