@@ -129,12 +129,13 @@ forest <- function(data,
                                       footnote_cex = 1,
                                       core = list(bg_params = list(fill = backgroud)), ...)
 
-
   if(is.null(graph.pos)){
     graph.pos <- est.col + 1
   }
 
-  ldata <- tibble::add_column(ldata, " " = paste(rep(" ", graph.width), collapse = ""), .after = graph.pos - 1)
+  ldata <- tibble::add_column(ldata,
+                              " " = paste(rep(" ", graph.width), collapse = ""),
+                              .after = graph.pos - 1)
 
   ldata[, ] <- lapply(ldata[, ], \(x){
     ifelse(is.na(x), "", x)
