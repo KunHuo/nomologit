@@ -1,7 +1,7 @@
 extract_effect <- function(text){
   out <- lapply(text, function(x){
     # res <- gregexpr(pattern = "(\\d+(\\.\\d+)?)", text = x)
-    res <- gregexpr(pattern = "-?([1-9]\\d*|[1-9]\\d*\\.\\d{1,3}|0\\.\\d{1,3})", text = x)
+    res <- gregexpr(pattern = "-?([1-9]\\d*|[1-9]\\d*\\.\\d{1,5}|0\\.\\d{1,5})", text = x)
     first <- res[[1]]
     last <- first + attr(res[[1]], "match.length") - 1
     res <- substring(x, first = first, last = last)
@@ -27,6 +27,9 @@ extract_effect <- function(text){
 #' @param graph.pos Column number of the data the CI will be displayed.
 #' @param fontfamily The font family.
 #' @param fontsize The size of text.
+#' @param backgroud backgroud
+#' @param backgroup.odd Odd row background color, It can be used when backgroud is NULL.
+#' @param backgroup.even Even row background color, It can be used when backgroud is NULL.
 #' @param est.color Color fill the point estimation.
 #' @param ci.color Color of the CI.
 #' @param est.shape Shape of the point estimation.
@@ -52,6 +55,9 @@ forest <- function(data,
                    graph.pos = NULL,
                    fontfamily = "serif",
                    fontsize = 12,
+                   backgroud = NULL,
+                   backgroup.odd = "#eff3f2",
+                   backgroup.even = "white",
                    est.color = "#0093bd",
                    ci.color = est.color,
                    est.shape = 16,
@@ -62,11 +68,6 @@ forest <- function(data,
                    footnote  = NULL,
                    ...){
 
-  theme <- forestploter::forest_theme(base_family = fontfamily,
-                                      base_size = fontsize,
-                                      ci_fill = est.color,
-                                      ci_col  = ci.color,
-                                      ci_pch = est.shape, ...)
 
   if("glm" %in% class(data)){
     data <- as_nmtask(data)
@@ -92,6 +93,20 @@ forest <- function(data,
   }
 
   pdata <- extract_effect(ldata[[est.col]])
+
+  if(is.null(backgroud)){
+    backgroud <- rep(backgroup.odd, nrow(ldata))
+    backgroud[(1:nrow(ldata) %% 2) == 0] <- backgroup.even
+  }
+
+  theme <- forestploter::forest_theme(base_family = fontfamily,
+                                      base_size = fontsize,
+                                      ci_fill = est.color,
+                                      ci_col  = ci.color,
+                                      ci_pch = est.shape,
+                                      footnote_cex = 1,
+                                      core = list(bg_params = list(fill = backgroud)), ...)
+
 
   if(is.null(graph.pos)){
     graph.pos <- est.col + 1

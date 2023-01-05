@@ -15,6 +15,9 @@ forest(
   graph.pos = NULL,
   fontfamily = "serif",
   fontsize = 12,
+  backgroud = NULL,
+  backgroup.odd = "#eff3f2",
+  backgroup.even = "white",
   est.color = "#0093bd",
   ci.color = est.color,
   est.shape = 16,
@@ -46,6 +49,12 @@ forest(
 \item{fontfamily}{The font family.}
 
 \item{fontsize}{The size of text.}
+
+\item{backgroud}{backgroud}
+
+\item{backgroup.odd}{Odd row background color, It can be used when backgroud is NULL.}
+
+\item{backgroup.even}{Even row background color, It can be used when backgroud is NULL.}
 
 \item{est.color}{Color fill the point estimation.}
 
