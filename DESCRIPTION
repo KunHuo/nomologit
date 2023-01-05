@@ -12,6 +12,7 @@ RoxygenNote: 7.2.3
 Imports: 
     fastshap,
     flextable,
+    forestploter,
     ggplot2,
     officer,
     patchwork,

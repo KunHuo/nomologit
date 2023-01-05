@@ -10,7 +10,7 @@
 #' @param conf.separator Confidence interval separator.
 #' @param digits.pvalue digits for p value, default 3.
 #' @param digits.effect digits for effect value, default 2.
-#' @param ref.value Reference Category name, default 'Reference'.
+#' @param ref.value Reference Category name, default '1'.
 #' @param filename filename, if you want to save to word.
 #'
 #' @return a list.
@@ -42,7 +42,7 @@ coefs <- function(...,
                   conf.separator = NULL,
                   digits.pvalue = 3,
                   digits.effect = 2,
-                  ref.value = "Reference",
+                  ref.value = 1,
                   filename = "") {
 
   tasks <- list(...)

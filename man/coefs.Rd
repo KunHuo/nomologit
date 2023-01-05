@@ -14,7 +14,7 @@ coefs(
   conf.separator = NULL,
   digits.pvalue = 3,
   digits.effect = 2,
-  ref.value = "Reference",
+  ref.value = 1,
   filename = ""
 )
 }
@@ -38,7 +38,7 @@ logistic analysis or multivariable logistic analysis (default).}
 
 \item{digits.effect}{digits for effect value, default 2.}
 
-\item{ref.value}{Reference Category name, default 'Reference'.}
+\item{ref.value}{Reference Category name, default '1'.}
 
 \item{filename}{filename, if you want to save to word.}
 }
