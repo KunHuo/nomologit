@@ -52,7 +52,7 @@ extract_effect <- function(text){
 #'              predictors = c("Grade", "AJCC_T:AJCC_M", "Surg_Prim", "metastasis"))
 #' forest(tk)
 #' forest(coefs(tk))
-#' forest(tk, axis.labels = c("Favors nagative", "Favors pasitive"))
+#' forest(tk, axis.labels = c("Favors negative", "Favors positive"))
 #'
 #' forest(tk) |>
 #'   add_border(row = 1, part = "header", where = "bottom")
