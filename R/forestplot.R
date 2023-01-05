@@ -126,6 +126,7 @@ forest <- function(data,
                          est = pdata$est,
                          lower = pdata$lower,
                          upper = pdata$upper,
+                         sizes = sizes,
                          ci_column = graph.pos,
                          xlim = axis.limit,
                          ref_line = ref.line,
@@ -138,6 +139,7 @@ forest <- function(data,
                          est = pdata$est,
                          lower = pdata$lower,
                          upper = pdata$upper,
+                         sizes,
                          ci_column = graph.pos,
                          xlim = axis.limit,
                          ref_line = 1,
@@ -148,4 +150,92 @@ forest <- function(data,
                          footnote = footnote)
   }
 
+}
+
+
+#' Add border to cells for forestplot
+#'
+#' @param plot A forest plot object.
+#' @param row  A numeric value or vector indicating row number to add border.
+#' This is corresponding to the data row number. Remember to account for any
+#' text inserted. A border will be drawn to all rows if this is omitted.
+#' @param col A numeric value or vector indicating the columns to add border.
+#' A border will be drawn to all columns if this is omitted.
+#' @param part The border will be added to "body" or "header" (default) .
+#' @param where Where to draw the border of the cell, possible values are
+#' "bottom" (default), "left", "top" and "right"
+#' @param linewidth line width, default 0.5.
+#' @param ... more arguments.
+#'
+#' @return A gtable object.
+#' @export
+add_border <- function(
+  plot,
+  row = NULL,
+  col = NULL,
+  part = c("header", "body"),
+  where = c("bottom", "left", "top", "right"),
+  linewidth = 0.5,
+  ...){
+
+  part  <- match.arg(part)
+  where <- match.arg(where)
+
+  forestploter::add_border(
+    plot = plot,
+    row = row,
+    col = col,
+    part = part,
+    where = where,
+    gp = grid::gpar(lwd = linewidth, ...)
+  )
+}
+
+
+#' Insert text to forest plot
+#'
+#' @param plot A forest plot object.
+#' @param text A character or expression vector.
+#' @param row Row to insert the text, this will be ignored if the part is "header".
+#' @param col A numeric value or vector indicating the columns the text will be
+#' added. The text will span over the column if a vector is given.
+#' @param part Part to insert text, body or header (default).
+#' @param just The justification of the text, "center" (default), "left" or "right".
+#' @param before Indicating the text will be inserted before or after the row.
+#' @param fontfamily font family, default serif.
+#' @param fontsize font size, default 12.
+#' @param fontface font face, default bold.
+#' @param padding padding
+#' @param ... more argumentd.
+#'
+#' @return A gtable object.
+#' @export
+insert_text <- function(
+  plot,
+  text,
+  row = NULL,
+  col = NULL,
+  part = c("header", "body"),
+  just = c("center", "left", "right"),
+  before = TRUE,
+  fontfamily = "serif",
+  fontsize = 12,
+  fontface = "bold",
+  padding = grid::unit(1, "mm"),
+  ...){
+
+  part <- match.arg(part)
+  just <- match.arg(just)
+
+  forestploter::insert_text(
+    plot = plot,
+    text = text,
+    row = row,
+    col = col,
+    part = part,
+    just = just,
+    before = before,
+    gp = grid::gpar(fontfamily = fontfamily, fontsize = fontsize, fontface = fontface, ...),
+    padding = padding
+  )
 }
