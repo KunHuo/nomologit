@@ -157,7 +157,6 @@ forest <- function(data,
     }
   }
 
-
   if(is.null(axis.labels)){
     forestploter::forest(data = ldata,
                          est = pdata$est,
