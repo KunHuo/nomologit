@@ -83,3 +83,25 @@ A gtable object.
 \description{
 Draw forest plot
 }
+\examples{
+tk <- nmtask(train.data = HCC,
+             outcome    = "status",
+             predictors = c("Grade", "AJCC_T:AJCC_M", "Surg_Prim", "metastasis"))
+forest(tk)
+forest(coefs(tk))
+forest(tk, axis.labels = c("Favors nagative", "Favors pasitive"))
+
+forest(tk) |>
+  add_border(row = 1, part = "header", where = "bottom")
+
+forest(tk,
+       backgroud = "white",
+       axis.ticks = c(0, 1, 2, 3, 4, 5)) |>
+  add_border(row = 1, part = "header", where = "bottom")
+
+model <- glm(status ~ Grade + AJCC_T + AJCC_M + AJCC_N + Surg_Prim + metastasis,
+             data = HCC,
+             family = binomial())
+forest(model)
+forest(coefs(model))
+}
