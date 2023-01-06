@@ -57,6 +57,11 @@
 #' # Coefficients of univariable logistic regression
 #' coefs(tk1, multivariable = FALSE)
 #'
+#' # Forest plot
+#' forest(coefs(tk1))
+#' # or
+#' forest(tk1)
+#'
 #' # Draw calibrate curve
 #' cal(tk1)
 #'
