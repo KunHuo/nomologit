@@ -3,7 +3,10 @@
 #' @param ... one or more object of 'nmtask' or 'glm'.
 #' @param multivariable logical variable indicating whether to perform univariable
 #' logistic analysis or multivariable logistic analysis (default).
-#' @param effect.values Effect value.
+#' @param effect.values Effect value, 'ne' for No. of event, 'nt' for No. of total,
+#' 'net' for No. of event and total, 'nne' for No. of non-event, 'wald' for Wald
+#' Chi-square value, 'B' for coefficients, 'p' for P value, 'se' for standard error,
+#' 'or' for odds ratio and its 95% CI, ignore case.
 #' @param model.names vector of model's names.
 #' @param conf.level Effect value level, defalut 0.95.
 #' @param conf.brackets Confidence interval bracket, default '()'.
