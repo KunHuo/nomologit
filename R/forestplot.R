@@ -1,20 +1,3 @@
-extract_effect <- function(text){
-  out <- lapply(text, function(x){
-    # res <- gregexpr(pattern = "(\\d+(\\.\\d+)?)", text = x)
-    res <- gregexpr(pattern = "-?([1-9]\\d*|[1-9]\\d*\\.\\d{1,5}|0\\.\\d{1,5})", text = x)
-    first <- res[[1]]
-    last <- first + attr(res[[1]], "match.length") - 1
-    res <- substring(x, first = first, last = last)
-    as.numeric(res)
-  })
-  out <- do.call(rbind, out)
-  colnames(out) <- c("est", "lower", "upper")
-  out <- as.data.frame(out)
-  out
-}
-
-
-
 #' Draw forest plot
 #'
 #' @param data Data (a data frame, an object from [coefs],[nmtask] or [glm]) to be displayed in the forest plot
@@ -153,6 +136,7 @@ forest <- function(data,
       if(i == est.col){
         ldata[[i]] <- str_pad(ldata[[i]], width = width, adj = "left")
       }
+
       names(ldata)[i] <-  str_pad(names(ldata)[i], width = width, adj = "center")
       ldata[[i]] <- str_pad(ldata[[i]], width = width, adj = "center")
     }
@@ -186,7 +170,6 @@ forest <- function(data,
                          ticks_digits = axis.ticks.digits,
                          footnote = footnote)
   }
-
 }
 
 
@@ -275,4 +258,19 @@ insert_text <- function(
     gp = grid::gpar(fontfamily = fontfamily, fontsize = fontsize, fontface = fontface, ...),
     padding = padding
   )
+}
+
+extract_effect <- function(text){
+  out <- lapply(text, function(x){
+    # res <- gregexpr(pattern = "(\\d+(\\.\\d+)?)", text = x)
+    res <- gregexpr(pattern = "-?([1-9]\\d*|[1-9]\\d*\\.\\d{1,5}|0\\.\\d{1,5})", text = x)
+    first <- res[[1]]
+    last <- first + attr(res[[1]], "match.length") - 1
+    res <- substring(x, first = first, last = last)
+    as.numeric(res)
+  })
+  out <- do.call(rbind, out)
+  colnames(out) <- c("est", "lower", "upper")
+  out <- as.data.frame(out)
+  out
 }
