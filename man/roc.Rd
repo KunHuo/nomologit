@@ -19,7 +19,8 @@ roc(
   fontfamily = "serif",
   fontsize = 12,
   explain = TRUE,
-  seed = 1234
+  seed = 1234,
+  probability = TRUE
 )
 }
 \arguments{
@@ -54,6 +55,8 @@ the plot into multiple panels, default 'data'.}
 \item{explain}{whether explain the figure, default TRUE.}
 
 \item{seed}{a single value, interpreted as an integer, or NULL, default 1234.}
+
+\item{probability}{Whether to calculate the probability of the best cutoff value.}
 }
 \value{
 a ggplot object from the \link{ggplot2} package, or a patchwork object from \link{patchwork} package.
