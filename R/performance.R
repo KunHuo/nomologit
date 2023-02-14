@@ -10,6 +10,7 @@
 #' @param cutoff Cutoff is the prediction probability of logistic regression model,
 #' between 0 and 1. By default, the best cut-off value is calculated according to
 #' the maximum Yodon index.
+#' @param probability Whether to calculate the probability of the best cutoff value.
 #' @param digits digits, default 3.
 #' @param filename filename, if you want to save to word.
 #'
@@ -38,7 +39,7 @@
 #'
 #' @examples
 #' # Examples see in [nmtask] function.
-perf <- function(...,  newdata = NULL, cutoff = "best", digits = 3, filename = ""){
+perf <- function(...,  newdata = NULL, cutoff = "best", probability = TRUE, digits = 3, filename = ""){
 
   tasks <- flatten_list(list(...))
 
@@ -62,16 +63,36 @@ perf <- function(...,  newdata = NULL, cutoff = "best", digits = 3, filename = "
     outcome <- tk$outcome
     predictors <- tk$predictors
 
-    train.fit <- logistic(data = train.data, outcome = outcome, predictors = predictors, method = "glm")
-    train.data$.pred <- train.fit$fitted.values
+    if(length(predictors) == 1L){
+      if(!is.numeric(train.data[[predictors]])){
+        probability <- TRUE
+      }
+    }else{
+      probability <- TRUE
+    }
 
-    train.roc <- roc_exec(
-      data = train.data,
-      outcome = outcome,
-      exposure = ".pred",
-      threshold = cutoff,
-      digits = digits
-    )
+
+    if(probability){
+      train.fit <- logistic(data = train.data, outcome = outcome, predictors = predictors, method = "glm")
+      train.data$.pred <- train.fit$fitted.values
+
+      train.roc <- roc_exec(
+        data = train.data,
+        outcome = outcome,
+        exposure = ".pred",
+        threshold = cutoff,
+        digits = digits
+      )
+    }else{
+      train.roc <- roc_exec(
+        data = train.data,
+        outcome = outcome,
+        exposure = predictors,
+        threshold = cutoff,
+        digits = digits
+      )
+    }
+
     names(train.roc) <- c("Items", sprintf("Training set (n=%d)", nrow(train.data)))
     train.roc[1, 1] <- "Cut-off *"
 
@@ -83,18 +104,28 @@ perf <- function(...,  newdata = NULL, cutoff = "best", digits = 3, filename = "
     train.roc <- rbind(train.roc, train.brier)
 
     if(!is.null(test.data)){
-      test.pre <- stats::predict(train.fit, newdata = test.data, type = "response")
-      test.fit <- stats::glm(test.data[[outcome]] ~ test.pre, family = stats::binomial())
-      test.data$.pred <- test.fit$fitted.values
 
-      threshold <- as.numeric(train.roc[1, 2][[1]])
+      if(probability){
+        test.pre <- stats::predict(train.fit, newdata = test.data, type = "response")
+        test.fit <- stats::glm(test.data[[outcome]] ~ test.pre, family = stats::binomial())
+        test.data$.pred <- test.fit$fitted.values
 
-      test.roc <- roc_exec(data = test.data,
-                           outcome = outcome,
-                           exposure = ".pred",
-                           threshold = threshold,
-                           digits = digits)
+        threshold <- as.numeric(train.roc[1, 2][[1]])
 
+        test.roc <- roc_exec(data = test.data,
+                             outcome = outcome,
+                             exposure = ".pred",
+                             threshold = threshold,
+                             digits = digits)
+      }else{
+        threshold <- as.numeric(train.roc[1, 2][[1]])
+
+        test.roc <- roc_exec(data = test.data,
+                             outcome = outcome,
+                             exposure = predictors,
+                             threshold = threshold,
+                             digits = digits)
+      }
 
       test.roc[1, 2] <- "-"
       test.roc[1, 1] <- "Cut-off *"
