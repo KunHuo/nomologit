@@ -97,7 +97,12 @@ perf <- function(...,  newdata = NULL, cutoff = "best", probability = TRUE, digi
     train.roc[1, 1] <- "Cut-off *"
 
     # Brier score
-    train.brier <- brier_score(train.data[[outcome]], train.fit$fitted.values)
+    if(probability){
+      train.brier <- brier_score(train.data[[outcome]], train.fit$fitted.values)
+    }else{
+      train.brier <- brier_score(train.data[[outcome]], train.data[[predictors]])
+    }
+
     train.brier <- format_digits(train.brier, digits = digits)
     train.brier <- data.frame(brier = "Brier score", value = train.brier)
     names(train.brier) <- names(train.roc)
@@ -132,7 +137,11 @@ perf <- function(...,  newdata = NULL, cutoff = "best", probability = TRUE, digi
       names(test.roc) <- c("Items", sprintf("Validation set (n=%d)", nrow(test.data)))
 
       # Brier score
-      test.brier <- brier_score(test.data[[outcome]], test.fit$fitted.values)
+      if(probability){
+        test.brier <- brier_score(test.data[[outcome]], test.fit$fitted.values)
+      }else{
+        test.brier <- brier_score(test.data[[outcome]], test.data[[predictors]])
+      }
       test.brier <- format_digits(test.brier, digits = digits)
       test.brier <- data.frame(brier = "Brier score", value = test.brier)
       names(test.brier) <- names(test.roc)
