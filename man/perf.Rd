@@ -4,7 +4,14 @@
 \alias{perf}
 \title{Evaluate model performance}
 \usage{
-perf(..., newdata = NULL, cutoff = "best", digits = 3, filename = "")
+perf(
+  ...,
+  newdata = NULL,
+  cutoff = "best",
+  probability = TRUE,
+  digits = 3,
+  filename = ""
+)
 }
 \arguments{
 \item{...}{one or more object of 'nmtask' or 'glm'.}
@@ -14,6 +21,8 @@ perf(..., newdata = NULL, cutoff = "best", digits = 3, filename = "")
 \item{cutoff}{Cutoff is the prediction probability of logistic regression model,
 between 0 and 1. By default, the best cut-off value is calculated according to
 the maximum Yodon index.}
+
+\item{probability}{Whether to calculate the probability of the best cutoff value.}
 
 \item{digits}{digits, default 3.}
 
