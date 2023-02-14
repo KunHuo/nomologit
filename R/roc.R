@@ -1,6 +1,7 @@
 #' Draw ROC curves
 #'
 #' @inheritParams cal
+#' @param probability Whether to calculate the probability of the best cutoff value.
 #'
 #' @inherit cal return
 #' @export
@@ -21,7 +22,8 @@ roc <- function(...,
                 fontfamily = "serif",
                 fontsize = 12,
                 explain = TRUE,
-                seed = 1234) {
+                seed = 1234,
+                probability = TRUE) {
 
   facet <- match.arg(facet)
 
@@ -50,17 +52,35 @@ roc <- function(...,
     outcome    <- tk$outcome
     predictors <- tk$predictors
 
-    train.fit <- logistic(data = train.data, outcome = outcome, predictors = predictors, method = "glm")
-    train.roc <- suppressMessages(pROC::roc(response = train.data[[outcome]],
-                                            predictor = train.fit$fitted.values,
-                                            direction = "<"))
+    if(length(predictors) == 1L){
+       if(!is.numeric(train.data[[predictors]])){
+         probability <- TRUE
+       }
+    }else{
+      probability <- TRUE
+    }
+
+    if(probability){
+      train.fit <- logistic(data = train.data, outcome = outcome, predictors = predictors, method = "glm")
+      train.roc <- suppressMessages(pROC::roc(response = train.data[[outcome]],
+                                              predictor = train.fit$fitted.values,
+                                              direction = "<"))
+    }else{
+      train.roc <- suppressMessages(pROC::roc(response = train.data[[outcome]],
+                                              predictor = train.data[[predictors]],
+                                              direction = "<"))
+    }
 
     train.plotdata <- roc_plotdata(train.roc)
     train.plotdata$group <- "Training set"
 
     if(!is.null(test.data)){
-      test.pred <- stats::predict(train.fit, test.data)
-      test.roc  <- suppressMessages(pROC::roc(response = test.data[[outcome]], predictor = test.pred, direction = "<"))
+      if(probability){
+        test.pred <- stats::predict(train.fit, test.data)
+        test.roc  <- suppressMessages(pROC::roc(response = test.data[[outcome]], predictor = test.pred, direction = "<"))
+      }else{
+        test.roc  <- suppressMessages(pROC::roc(response = test.data[[outcome]], predictor = test.data[[predictors]], direction = "<"))
+      }
       test.plotdata <- roc_plotdata(test.roc)
       test.plotdata$group <- "Validation set"
       rbind(train.plotdata, test.plotdata)
