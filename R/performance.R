@@ -71,9 +71,9 @@ perf <- function(...,  newdata = NULL, cutoff = "best", probability = TRUE, digi
       probability <- TRUE
     }
 
+    train.fit <- logistic(data = train.data, outcome = outcome, predictors = predictors, method = "glm")
 
     if(probability){
-      train.fit <- logistic(data = train.data, outcome = outcome, predictors = predictors, method = "glm")
       train.data$.pred <- train.fit$fitted.values
 
       train.roc <- roc_exec(
@@ -97,12 +97,7 @@ perf <- function(...,  newdata = NULL, cutoff = "best", probability = TRUE, digi
     train.roc[1, 1] <- "Cut-off *"
 
     # Brier score
-    if(probability){
-      train.brier <- brier_score(train.data[[outcome]], train.fit$fitted.values)
-    }else{
-      train.brier <- brier_score(train.data[[outcome]], train.data[[predictors]])
-    }
-
+    train.brier <- brier_score(train.data[[outcome]], train.fit$fitted.values)
     train.brier <- format_digits(train.brier, digits = digits)
     train.brier <- data.frame(brier = "Brier score", value = train.brier)
     names(train.brier) <- names(train.roc)
@@ -110,11 +105,10 @@ perf <- function(...,  newdata = NULL, cutoff = "best", probability = TRUE, digi
 
     if(!is.null(test.data)){
 
+      test.pre <- stats::predict(train.fit, newdata = test.data, type = "response")
+      test.fit <- stats::glm(test.data[[outcome]] ~ test.pre, family = stats::binomial())
       if(probability){
-        test.pre <- stats::predict(train.fit, newdata = test.data, type = "response")
-        test.fit <- stats::glm(test.data[[outcome]] ~ test.pre, family = stats::binomial())
         test.data$.pred <- test.fit$fitted.values
-
         threshold <- as.numeric(train.roc[1, 2][[1]])
 
         test.roc <- roc_exec(data = test.data,
@@ -137,11 +131,7 @@ perf <- function(...,  newdata = NULL, cutoff = "best", probability = TRUE, digi
       names(test.roc) <- c("Items", sprintf("Validation set (n=%d)", nrow(test.data)))
 
       # Brier score
-      if(probability){
-        test.brier <- brier_score(test.data[[outcome]], test.fit$fitted.values)
-      }else{
-        test.brier <- brier_score(test.data[[outcome]], test.data[[predictors]])
-      }
+      test.brier <- brier_score(test.data[[outcome]], test.fit$fitted.values)
       test.brier <- format_digits(test.brier, digits = digits)
       test.brier <- data.frame(brier = "Brier score", value = test.brier)
       names(test.brier) <- names(test.roc)
